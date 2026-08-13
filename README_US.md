@@ -43,14 +43,18 @@
 ## 🚀 Quick Start
 
 ### Web (recommended)
-1. Deploy to any static hosting (GitHub Pages / CloudStudio / Nginx / `python -m http.server`) or open `index.html` directly.
-2. Full PWA features (offline/install) require HTTPS or localhost.
+1. **Download source (zip)**: repo page → green `Code` button → `Download ZIP` → unzip.
+2. Open `index.html` directly for most features; **full PWA features (offline / install)** need HTTPS or localhost:
+   - With Python: run `python -m http.server 8000` inside the folder, open `http://localhost:8000`
+   - Or deploy to any static hosting (GitHub Pages / CloudStudio / Nginx)
 3. Install to desktop / home screen from the browser's install button.
 
 ### Android App (APK)
-- Every push to `main` triggers [GitHub Actions](#github-actions-auto-build) to build an APK and publish it to **Releases**.
-- Download the latest `app-debug.apk` and install (allow "install unknown apps").
-- Built with a WebView shell (Capacitor); core logic is identical to the web version and works offline.
+1. Open the **Releases** page and download the latest `CryptPwa_<version>_release.apk` (release = self-signed build; debug is for testing).
+2. Transfer the APK to your phone (USB / WeChat / cloud drive) and tap to install.
+3. Allow "install unknown apps" when prompted.
+4. The "哈机码" icon appears on your home screen; works offline.
+5. Every push to `main` triggers [GitHub Actions](#github-actions-auto-build) to build and publish a new version — re-download to update.
 
 ---
 
@@ -144,9 +148,10 @@ The Releases page — rebuilt automatically on every push. Allow "unknown source
 
 Workflow: `.github/workflows/build-apk.yml`
 
-- **Trigger:** push to `main` (or run `Build Android APK` manually in the Actions tab).
-- **Flow:** checkout → Node/Java → `npm run sync` → Gradle `assembleDebug` → tag → publish to Releases.
-- Grab the latest APK from the **Releases** page.
+- **Trigger:** push to `main` → builds **release** automatically; or run manually in the Actions tab and choose `release` / `debug`.
+- **Artifact naming:** `CryptPwa_<version>_<type>.apk` (e.g. `CryptPwa_1.0.0_release.apk`), published to Releases.
+- **Flow:** checkout → Node 22 / Java 21 → `npm run sync` → Gradle build → tag → publish to Releases.
+- Release is **self-signed** (fine for personal distribution); configure a real certificate when publishing to a store.
 
 ## 📂 Project Structure
 

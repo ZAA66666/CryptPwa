@@ -43,14 +43,18 @@
 ## 🚀 快速开始
 
 ### 网页版（推荐体验）
-1. 直接部署到任意静态托管（GitHub Pages / CloudStudio / Nginx / 本地 `python -m http.server`）
-2. 用浏览器打开 `index.html` 即可使用；PWA 完整功能（离线/安装）需 HTTPS 或 localhost
+1. **下载源码（zip）**：GitHub 仓库页 → 绿色 `Code` 按钮 → `Download ZIP` → 解压
+2. 直接双击打开 `index.html` 即可使用大部分功能；**完整 PWA 能力（离线、安装到桌面）**需通过本地服务器或 HTTPS 访问：
+   - Windows/Mac 有 Python 的话，在解压目录执行 `python -m http.server 8000`，然后浏览器打开 `http://localhost:8000`
+   - 或部署到任意静态托管（GitHub Pages / CloudStudio / Nginx）
 3. 支持**安装到桌面/主屏**：Chrome / Edge 地址栏右侧点「安装」
 
 ### 安卓 App（APK）
-- 每次推送 `main` 分支，[GitHub Actions](#github-actions-自动构建) 会自动打包安卓 APK 并发布到本仓库 **Releases** 页面
-- 下载最新 `app-debug.apk` 安装（需允许「安装未知来源应用」）
-- App 基于 WebView 壳（Capacitor）打包，核心代码与网页版完全一致，离线可用
+1. 打开仓库 **Releases** 页面，下载最新 `CryptPwa_<版本>_release.apk`（release 为正式自签名版；debug 仅供调试）
+2. 把 APK 传到手机（USB / 微信 / 网盘均可）→ 点击安装
+3. 首次安装会提示「允许安装未知来源应用」→ 允许即可
+4. 安装后桌面出现「哈机码」图标，离线可用
+5. 每次推送代码，[GitHub Actions](#github-actions-自动构建) 自动构建新版并发布到 Releases，重新下载安装即完成更新
 
 ---
 
@@ -144,9 +148,10 @@
 
 工作流：`.github/workflows/build-apk.yml`
 
-- **触发**：推送 `main` 分支（或 Actions 页手动运行 `Build Android APK`）
-- **流程**：检出 → Node/Java → `npm run sync` 同步网页资源 → Gradle 打包 debug APK → 打 tag → 发布到 Releases
-- 构建完成即可在 **Releases** 下载最新 APK
+- **触发**：推送 `main` 分支 → 自动构建 **release** 版；也可在 Actions 页面手动运行并选择 `release` / `debug`
+- **产物命名**：`CryptPwa_<版本>_<类型>.apk`（如 `CryptPwa_1.0.0_release.apk`），发布到 Releases
+- **流程**：检出 → Node 22 / Java 21 → `npm run sync` 同步网页资源 → Gradle 打包 → 打 tag → 发布到 Releases
+- release 为**自签名**（个人分发可用）；如需上架应用商店再配置正式证书
 
 ## 📂 项目结构
 

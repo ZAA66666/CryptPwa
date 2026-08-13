@@ -20,6 +20,8 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // 自签名（复用 debug keystore，自动生成）：个人/测试分发可用；上架应用商店请换正式证书
+            signingConfig signingConfigs.debug
         }
     }
 }
