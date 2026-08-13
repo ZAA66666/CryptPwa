@@ -42,6 +42,17 @@ function maybePromptVault(opts) {
 
 /* ---------- 1. 面板切换（底部导航 + 主页卡片 通用） ---------- */
 let asymAlgo = "rsa"; // 「加/解密」面板当前算法：rsa | sm2
+let symCat = "sym";   // 「加/解密」面板当前类别：sym(对称) | asym(非对称)
+function setSymCat(v) {
+  symCat = v;
+  const tabs = document.querySelectorAll("#sym-cat button");
+  tabs.forEach((b) => b.classList.toggle("active", b.dataset.v === v));
+  const paneSym = document.getElementById("sym-pane-sym");
+  const paneAsym = document.getElementById("sym-pane-asym");
+  if (paneSym) paneSym.hidden = v !== "sym";
+  if (paneAsym) paneAsym.hidden = v !== "asym";
+  if (v === "asym") setAsymAlgo(asymAlgo);
+}
 function setAsymAlgo(v) {
   asymAlgo = v;
   const btn = document.querySelector('#asym-algo button[data-v="' + v + '"]');
@@ -57,7 +68,8 @@ function setAsymAlgo(v) {
   else if (typeof ensureRsaKeys === "function") ensureRsaKeys();
 }
 function showPanel(name) {
-  if (name === "sm2") { name = "asym"; asymAlgo = "sm2"; } // SM2 已并入「加/解密」面板
+  if (name === "asym") { name = "sym"; symCat = "asym"; } // 非对称并入「加/解密」面板
+  if (name === "sm2") { name = "sym"; symCat = "asym"; asymAlgo = "sm2"; } // SM2 并入「加/解密」面板
   const panel = document.getElementById("panel-" + name);
   if (!panel) return;
   document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
@@ -67,10 +79,14 @@ function showPanel(name) {
   if (nav) nav.classList.add("active");
   // 主页才显示顶部大标题；进入具体功能时隐藏，把空间让给功能面板
   document.body.classList.toggle("on-home", name === "home");
-  // 进入「加/解密」面板：按当前算法确保密钥存在（RSA / SM2）
-  if (name === "asym") setAsymAlgo(asymAlgo);
+  // 进入「加/解密」面板：恢复上次类别，并按算法确保密钥存在
+  if (name === "sym") setSymCat(symCat);
   window.scrollTo(0, 0);
 }
+// 加/解密面板：类别切换（对称加密 / 非对称加密）
+document.querySelectorAll("#sym-cat button").forEach((b) => {
+  b.addEventListener("click", () => setSymCat(b.dataset.v));
+});
 // 加/解密面板：算法切换（RSA / SM2）
 document.querySelectorAll("#asym-algo button").forEach((b) => {
   b.addEventListener("click", () => setAsymAlgo(b.dataset.v));
@@ -1279,11 +1295,12 @@ function applyLaunchParams() {
       if (mv) { const m = encMethodSeg.querySelector('button[data-v="' + mv + '"]'); if (m) { encMethodSeg.querySelectorAll("button").forEach((x) => x.classList.remove("active")); m.classList.add("active"); } }
     }
     else if (tab === "sym") {
+      symCat = "sym";
       setVal(symInput, p.get("text")); setSel(symAlgo, p.get("algo")); setSymMode(p.get("mode"));
       setVal(symKey, p.get("key")); setVal(symIv, p.get("iv")); refreshSymHints();
     }
-    else if (tab === "asym") { setVal(rsaInput, p.get("text")); setSel(rsaOp, p.get("op")); setVal(rsaPub, p.get("key")); }
-    else if (tab === "sm2") { asymAlgo = "sm2"; setVal(sm2Input, p.get("text")); setSel(sm2Op, p.get("op")); setVal(sm2Pub, p.get("key")); }
+    else if (tab === "asym") { symCat = "asym"; setVal(rsaInput, p.get("text")); setSel(rsaOp, p.get("op")); setVal(rsaPub, p.get("key")); }
+    else if (tab === "sm2") { symCat = "asym"; asymAlgo = "sm2"; setVal(sm2Input, p.get("text")); setSel(sm2Op, p.get("op")); setVal(sm2Pub, p.get("key")); }
     else if (tab === "qr") { setVal(document.getElementById("qr-input"), p.get("text")); setSel(document.getElementById("qr-ec"), p.get("ec")); }
     showPanel(tab);
     if (p.get("run") === "1") {

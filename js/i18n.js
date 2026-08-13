@@ -101,6 +101,7 @@ window.I18N = {
 
     /* 对称 */
     "sym.algo": "算法", "sym.key": "密钥", "symFill": "密码本",
+    "sym.catSym": "对称加密", "sym.catAsym": "非对称加密",
     "sym.randKey": "随机密钥", "sym.randIv": "随机IV",
     "sym.mode": "分组模式", "sym.iv": "初始向量 IV", "sym.in": "输入",
     "sym.encrypt": "加密", "sym.decrypt": "解密", "sym.out": "结果",
@@ -169,6 +170,9 @@ window.I18N = {
     /* 文件保存路径设置 */
     "storage.title": "内容保存路径",
     "storage.hint": "RSA 密钥等「保存到文件」时的默认路径（如 sdcard/CryptoPwa）。受浏览器限制无法强制写入任意目录：Android Chrome 安装为 App 后可弹出位置选择；其它浏览器将按此名称下载到默认文件夹。",
+    "storage.locHint": "本地生成的加/解密、编/解码等结果数据，会保存到上方设置的路径下；备份文件同理。",
+    "storage.pick": "选择文件夹", "storage.reset": "恢复默认",
+    "storage.pickFail": "选择失败：", "storage.pickUnsupported": "当前浏览器不支持直接选目录，请手动输入路径。",
     "storage.saved": "已保存默认保存路径",
 
     /* 外部内容选择器（URL Scheme / Intent / 系统分享） */
@@ -368,6 +372,7 @@ window.I18N = {
     "json.emptyKey": "Empty key skipped", "json.imported": "Imported N rows", "json.copied": "Copied",
 
     "sym.algo": "Algorithm", "sym.key": "Key", "symFill": "Saved passwords",
+    "sym.catSym": "Symmetric", "sym.catAsym": "Asymmetric",
     "sym.randKey": "Random key", "sym.randIv": "Random IV",
     "sym.mode": "Mode", "sym.iv": "IV", "sym.in": "Input",
     "sym.encrypt": "Encrypt", "sym.decrypt": "Decrypt", "sym.out": "Result",
@@ -425,6 +430,9 @@ window.I18N = {
     /* Save path setting */
     "storage.title": "Content save path",
     "storage.hint": "Default path for “Save to file” (e.g. sdcard/CryptoPwa). Browsers cannot force a directory: on Android Chrome installed as an app a location picker appears; other browsers download with this name.",
+    "storage.locHint": "Results you generate locally (encrypt/decrypt, encode/decode, backups) are saved under the path above.",
+    "storage.pick": "Pick folder", "storage.reset": "Reset to default",
+    "storage.pickFail": "Pick failed: ", "storage.pickUnsupported": "This browser cannot pick a folder directly — please type the path manually.",
     "storage.saved": "Default save path saved",
 
     /* Incoming content chooser (URL Scheme / Intent / system share) */

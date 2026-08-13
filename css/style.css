@@ -334,6 +334,8 @@ textarea:focus, input:focus, select:focus {
 /* 二维码 / 条形码 子标签 */
 .qr-tabs { margin: 4px 0 14px; }
 .asym-algo { margin: 4px 0 14px; }
+.sym-cat-tabs { margin: 4px 0 14px; }
+.sym-cat-tabs button { flex: 1 1 0; }
 
 /* 条形码渲染 */
 #bc-output {

@@ -308,10 +308,16 @@
       const path = getSetting("savepath", "sdcard/CryptoPwa");
       html =
         `<div class="cp-note">${t("storage.hint")}</div>` +
+        `<div class="cp-note">${t("storage.locHint")}</div>` +
         `<div class="cp-form">` +
         `<input id="sp-path" value="${escapeHtml(path)}" placeholder="sdcard/CryptoPwa" />` +
+        `<div class="btn-row">` +
+        `<button class="btn" id="sp-pick">${t("storage.pick")}</button>` +
+        `<button class="btn ghost" id="sp-reset">${t("storage.reset")}</button>` +
         `</div>` +
-        `<div class="btn-row"><button class="btn primary" id="sp-save">${t("common.save")}</button></div>`;
+        `</div>` +
+        `<div class="btn-row"><button class="btn primary" id="sp-save">${t("common.save")}</button></div>` +
+        `<p class="hint" id="sp-pick-hint"></p>`;
     } else if (name === "theme") {
       titleEl.textContent = t("theme.title");
       const cur = getSetting("theme", "system");
@@ -383,6 +389,31 @@
         setSetting("savepath", v);
         alert(t("storage.saved"));
         render();
+      };
+      /* 选择文件夹：优先用 File System Access API（Chrome/Edge 可用），否则提示手动输入 */
+      const pickBtn = document.getElementById("sp-pick");
+      const pickHint = document.getElementById("sp-pick-hint");
+      if (pickBtn) pickBtn.onclick = async () => {
+        if (window.showDirectoryPicker) {
+          try {
+            const h = await window.showDirectoryPicker({ id: "crypto-pwa-save" });
+            const name = h.name || "selected";
+            const dir = "sdcard/" + name;
+            bodyEl.querySelector("#sp-path").value = dir;
+            setSetting("savepath", dir);
+            if (pickHint) pickHint.textContent = "✅ " + name;
+          } catch (e) {
+            if (e && e.name !== "AbortError" && pickHint) pickHint.textContent = t("storage.pickFail") + " " + (e.message || "");
+          }
+        } else if (pickHint) {
+          pickHint.textContent = t("storage.pickUnsupported");
+        }
+      };
+      const resetBtn = document.getElementById("sp-reset");
+      if (resetBtn) resetBtn.onclick = () => {
+        setSetting("savepath", "sdcard/CryptoPwa");
+        bodyEl.querySelector("#sp-path").value = "sdcard/CryptoPwa";
+        if (pickHint) pickHint.textContent = "";
       };
     } else if (name === "theme") {
       bodyEl.querySelectorAll("#theme-seg button").forEach((b) =>
