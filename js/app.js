@@ -424,10 +424,8 @@ function encDo(action) {
     out.value = result;
     if (!out.value.startsWith("❌")) {
       const methodName = { b64: "Base64", hex: "Hex", url: "URL", b32: "Base32", b58: "Base58", unicode: "Unicode", jwt: "JWT" }[method];
-      const opL = (typeof t === "function") ? t(action === "enc" ? "enc.encode" : "enc.decode") : (action === "enc" ? "编码" : "解码");
       addHistory({ cat: "enc", go: "enc", op: action, method: methodName, preview: inp.slice(0, 24) });
-      // 编码也支持存进密码本（按方式自动命名），下次可直接填入原文
-      maybePromptVault({ method: methodName + " " + opL, password: inp, targetId: "enc-input", cat: "enc" });
+      // 编码没有密码概念，不提示保存到密码本（仅加解密相关功能才会提示）
     }
   } catch (e) {
     out.value = "❌ 处理失败：" + e.message;

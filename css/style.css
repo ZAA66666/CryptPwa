@@ -828,6 +828,11 @@ input[type="file"] {
 .wd-quick { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: -2px; }
 .wd-quick-label { font-size: 13px; color: var(--muted); }
 .wd-local { margin-top: 6px; }
+/* 检测连接状态点：默认灰、联通绿、失败红 */
+#wd-test { display: inline-flex; align-items: center; gap: 6px; }
+.wd-dot { width: 10px; height: 10px; border-radius: 50%; background: #b9bcc3; flex: 0 0 auto; display: inline-block; }
+.wd-dot.ok { background: #2ecc71; box-shadow: 0 0 6px rgba(46, 204, 113, .7); }
+.wd-dot.bad { background: #fa5151; box-shadow: 0 0 6px rgba(250, 81, 81, .7); }
 /* 备份/恢复范围选择弹窗 */
 .scope-opt { display: flex; align-items: center; gap: 10px; padding: 12px 10px; border-radius: 10px; background: var(--settings-bg); cursor: pointer; font-size: 14px; color: var(--text); }
 .scope-opt input { width: 18px; height: 18px; accent-color: var(--accent); flex: 0 0 auto; }

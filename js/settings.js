@@ -870,7 +870,11 @@
       `</div>` +
       `<input id="wd-user" placeholder="${t("sync.user")}" value="${escapeHtml(cfg.user || "")}" />` +
       `<input id="wd-pass" type="password" placeholder="${t("sync.pass")}" value="${escapeHtml(cfg.pass || "")}" />` +
-      `<div class="btn-row"><button class="btn primary" id="wd-save">${t("sync.saveCfg")}</button></div>` +
+      `<div class="btn-row">` +
+      `<button class="btn primary" id="wd-save">${t("sync.saveCfg")}</button>` +
+      `<button class="btn ghost" id="wd-test"><span class="wd-dot" id="wd-dot"></span><span id="wd-test-label">${t("sync.test")}</span></button>` +
+      `</div>` +
+      `<p class="hint" id="wd-test-hint"></p>` +
       `</div>` +
       `<div class="btn-row">` +
       `<button class="btn ghost" id="wd-backup">${t("sync.backup")}</button>` +
@@ -894,6 +898,40 @@
       });
       alert(t("sync.saveCfg") + " ✅");
     };
+    /* 检测连接：用当前输入框的地址/账号/密码发 WebDAV PROPFIND 测联通性（无需先保存） */
+    const wdDot = bodyEl.querySelector("#wd-dot");
+    const wdTestBtn = bodyEl.querySelector("#wd-test");
+    const wdTestHint = bodyEl.querySelector("#wd-test-hint");
+    if (wdTestBtn && wdDot) {
+      wdTestBtn.onclick = async () => {
+        const cfg = {
+          url: bodyEl.querySelector("#wd-url").value.trim(),
+          user: bodyEl.querySelector("#wd-user").value,
+          pass: bodyEl.querySelector("#wd-pass").value,
+        };
+        if (!cfg.url) { alert(t("sync.needUrl")); return; }
+        wdDot.className = "wd-dot"; // 置灰（检测中）
+        if (wdTestHint) wdTestHint.textContent = t("sync.testing");
+        wdTestBtn.disabled = true;
+        const label = wdTestBtn.querySelector("#wd-test-label");
+        const orig = label ? label.textContent : "";
+        if (label) label.textContent = t("sync.testing");
+        try {
+          const res = await fetch(wdTarget(cfg), {
+            method: "PROPFIND",
+            headers: { "Authorization": wdAuth(cfg.user, cfg.pass), "Depth": "0" },
+          });
+          if (!(res.ok || res.status === 207)) throw new Error("HTTP " + res.status);
+          wdDot.className = "wd-dot ok"; // 绿：联通
+          if (wdTestHint) wdTestHint.textContent = t("sync.testOk");
+        } catch (e) {
+          wdDot.className = "wd-dot bad"; // 红：不联通
+          if (wdTestHint) wdTestHint.textContent = t("sync.testFail") + (e.message || "");
+        }
+        wdTestBtn.disabled = false;
+        if (label) label.textContent = orig;
+      };
+    }
     bodyEl.querySelector("#wd-backup").onclick = () => {
       /* 先让用户勾选备份范围（密码本 / 软件配置），再上传 WebDAV */
       pickScope(false, async (scope) => {
