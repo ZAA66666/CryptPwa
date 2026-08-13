@@ -569,7 +569,7 @@
       /* 数据回调：生成回调数据（成功/时间戳/处理后数据）+ 回调地址示例 */
       bodyEl.querySelector("#exp-gen").onclick = () => {
         const d = bodyEl.querySelector("#exp-input").value;
-        const payload = { ok: !!d, ts: new Date().toISOString(), data: d || "", app: "Crypto-pwa" };
+        const payload = { ok: !!d, ts: new Date().toISOString(), data: d || "", app: "CryptPwa" };
         const json = JSON.stringify(payload, null, 2);
         const enc = encodeURIComponent(JSON.stringify(payload));
         bodyEl.querySelector("#exp-result").value = json;
@@ -641,7 +641,7 @@
         btn.textContent = "🔄 " + t("about.checking");
         if (hint) hint.textContent = "";
         try {
-          const res = await fetch("https://api.github.com/repos/ZAA66666/Crypto-pwa/releases/latest");
+          const res = await fetch("https://api.github.com/repos/ZAA66666/CryptPwa/releases/latest");
           if (!res.ok) throw new Error("HTTP " + res.status);
           const rel = await res.json();
           const tag = (rel.tag_name || "").replace(/^v/i, "");

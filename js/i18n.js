@@ -4,8 +4,8 @@
  * data-i18n 属性：纯文本标签，用 textContent 填充。
  * 法律/说明页：含 HTML，由 settings.js 用 innerHTML 填充。
  * ===================================================================== */
-/* 本项目 GitHub 仓库（Crypto-pwa，作者 ZAA66666）。 */
-const GITHUB_REPO = "https://github.com/ZAA66666/Crypto-pwa";
+/* 本项目 GitHub 仓库（CryptPwa，作者 ZAA66666）。 */
+const GITHUB_REPO = "https://github.com/ZAA66666/CryptPwa";
 /* 当前版本号（用于“检测更新”对比 GitHub Releases） */
 const APP_VERSION = "1.0.0";
 window.I18N = {
@@ -214,7 +214,7 @@ window.I18N = {
       '<li>加/解密：AES / DES / 3DES / Blowfish / RC4 / Rabbit</li>' +
       '<li>非对称加/解密：RSA / SM2（生成密钥、加密解密、签名验签）</li>' +
       '<li>二维码 / 条形码生成、最近使用记录、密码本、深色模式、多语言</li></ul>' +
-      '<h3>项目源码</h3><p>本项目代码已同步至 GitHub，仓库名 <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">Crypto-pwa</a>。欢迎 Star / Fork / 提交 Issue。</p>' +
+      '<h3>项目源码</h3><p>本项目代码已同步至 GitHub，仓库名 <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">CryptPwa</a>。欢迎 Star / Fork / 提交 Issue。</p>' +
       '<h3>技术说明</h3><p>算法核心使用成熟的 <a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a> 库与浏览器原生 <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto</a>；二维码使用 <a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a>。所有计算均在本地完成，不依赖任何服务器。</p>' +
       '<h3>开源组件与引用位置</h3><ul>' +
       '<li><b><a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a></b>（MIT 许可）— 哈希与对称加密算法。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/crypto-js.js" target="_blank" rel="noopener">js/vendor/crypto-js.js</a>；用于「哈希」「编码（图片转 Base64 走其编解码）」「加/解密」面板。</li>' +
@@ -486,7 +486,7 @@ window.I18N = {
       '<li>Encrypt/Decrypt (symmetric): AES / DES / 3DES / Blowfish / RC4 / Rabbit</li>' +
       '<li>Asymmetric: RSA / SM2 (key gen, encrypt/decrypt, sign/verify)</li>' +
       '<li>QR / Barcode generation, recent history, saved passwords, dark mode, multi-language</li></ul>' +
-      '<h3>Source code</h3><p>This project is open source on GitHub, repo <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">Crypto-pwa</a>. Star / Fork / Issues welcome.</p>' +
+      '<h3>Source code</h3><p>This project is open source on GitHub, repo <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">CryptPwa</a>. Star / Fork / Issues welcome.</p>' +
       '<h3>Tech notes</h3><p>Core algorithms use the mature <a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a> library and native <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto</a>; QR uses <a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a>. Everything runs locally, no server involved.</p>' +
       '<h3>Open-source & where used</h3><ul>' +
       '<li><b><a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a></b> (MIT) — hashing & symmetric. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/crypto-js.js" target="_blank" rel="noopener">js/vendor/crypto-js.js</a>; used by Hash, Encode (image-to-Base64), and Encrypt/Decrypt panels.</li>' +
