@@ -1198,6 +1198,18 @@
           if (el) { el.value = p.value; el.dispatchEvent(new Event("input")); }
           /* 对称加/解密：填入密钥后联动「密钥长度」档位，并恢复保存的 IV（如有） */
           if (cat === "sym" || targetId === "sym-key") {
+            /* ① 算法与分组模式联动：条目 method 形如 "AES-CBC" / "Blowfish-CTR" / "RC4" */
+            if (p.method) {
+              const parts = String(p.method).split("-");
+              const algoSel = document.getElementById("sym-algo");
+              if (algoSel && parts[0] && [...algoSel.options].some((o) => o.value === parts[0])) {
+                algoSel.value = parts[0];
+                if (window.updateKeySizeUI) window.updateKeySizeUI();
+              }
+              const modeName = parts.length > 1 ? parts[1] : "";
+              if (modeName && window.setSymMode) window.setSymMode(modeName);
+            }
+            /* ② 密钥长度档位 */
             const kb = utf8ByteLength(p.value);
             const ksBox = document.getElementById("sym-keysize");
             if (ksBox) {
@@ -1208,6 +1220,7 @@
                 if (window.updateKeySizeLabel) window.updateKeySizeLabel();
               }
             }
+            /* ③ 恢复保存的 IV */
             if (p.iv) {
               const ivEl = document.getElementById("sym-iv");
               if (ivEl) { ivEl.value = p.iv; ivEl.dispatchEvent(new Event("input")); }
@@ -1348,8 +1361,20 @@
           } else {
             const el = document.getElementById(targetId);
             if (el) { el.value = fullText; el.dispatchEvent(new Event("input")); }
-            /* 对称密钥：联动密钥长度档位 + 恢复 IV */
+            /* 对称密钥：联动算法/模式/密钥长度 + 恢复 IV */
             if (targetId === "sym-key" || (targetId && targetId.indexOf("sym-") === 0)) {
+              /* ① 算法与分组模式联动（条目 method 如 AES-CBC / Blowfish-CTR / RC4） */
+              if (p.method) {
+                const parts = String(p.method).split("-");
+                const algoSel = document.getElementById("sym-algo");
+                if (algoSel && parts[0] && [...algoSel.options].some((o) => o.value === parts[0])) {
+                  algoSel.value = parts[0];
+                  if (window.updateKeySizeUI) window.updateKeySizeUI();
+                }
+                const modeName = parts.length > 1 ? parts[1] : "";
+                if (modeName && window.setSymMode) window.setSymMode(modeName);
+              }
+              /* ② 密钥长度档位 */
               const kb = utf8ByteLength(fullText);
               const ksBox = document.getElementById("sym-keysize");
               if (ksBox) {
@@ -1360,6 +1385,7 @@
                   if (window.updateKeySizeLabel) window.updateKeySizeLabel();
                 }
               }
+              /* ③ IV */
               if (p.iv) {
                 const ivEl = document.getElementById("sym-iv");
                 if (ivEl) { ivEl.value = p.iv; ivEl.dispatchEvent(new Event("input")); }
