@@ -804,7 +804,7 @@
         const p = arr[i];
         if (!p) { closePicker(); return; }
         if (cat === "rsa") {
-          // RSA：一对则同时填公钥+私钥；单把导入则填对应字段，并展开密钥框
+          // RSA：一对则同时填公钥+私钥；单把导入则填对应字段（不展开密钥框，展示走弹窗）
           const pubEl = document.getElementById("rsa-pub");
           const privEl = document.getElementById("rsa-priv");
           const k = entryKind(p);
@@ -815,17 +815,14 @@
             const el = (p.side === "public") ? pubEl : privEl;
             if (el) { el.value = p.value || ""; el.dispatchEvent(new Event("input")); }
           }
-          const box = document.getElementById("rsa-keys");
-          if (box) {
-            box.removeAttribute("hidden");
-            const vb = document.getElementById("rsa-view");
-            if (vb) vb.querySelector("span").textContent = (window.__lang === "en" ? "Hide keys" : "隐藏秘钥内容");
-          }
           if (window.rsaSaveKeys) window.rsaSaveKeys();
         } else if (targetId) {
           const el = document.getElementById(targetId);
           if (el) { el.value = p.value; el.dispatchEvent(new Event("input")); }
         }
+        // 若「查看/修改密钥对」弹窗开着，刷新其中的密钥内容
+        if (window.fillRsaView) window.fillRsaView();
+        if (window.fillSm2View) window.fillSm2View();
         closePicker();
       })
     );

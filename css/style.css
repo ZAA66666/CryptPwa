@@ -209,20 +209,20 @@ textarea:focus, input:focus, select:focus {
 .btn.ghost:active { filter: brightness(0.96); }
 .btn-row { display: flex; gap: 12px; }
 .btn-row .btn { margin-top: 16px; }
-/* RSA 密钥区：放面板底部；新生成/查看/保存 三个按钮横排占一行 */
-.rsa-key-section { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 14px; }
+/* RSA/SM2 密钥区：放面板顶部；状态文字一行（大一点）+ 按钮一行；密钥内容只在弹窗里 */
+.rsa-key-section { margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 14px; }
+.rsa-key-section .rsa-status { margin: 0 0 10px; font-size: 15px; font-weight: 600; color: var(--text); }
 .rsa-actions { display: flex; gap: 8px; }
 .rsa-actions .btn { flex: 1 1 0; min-width: 0; padding-left: 4px; padding-right: 4px; font-size: calc(13px * var(--fs)); }
 .rsa-actions .btn .kico { width: 15px; height: 15px; }
 .mini-btn.full { width: 100%; justify-content: center; margin-top: 12px; }
-/* 状态行：左状态文字、右“查看密码对”按钮 */
+/* 按钮行：查看/修改密钥对 + 密码本 横排 */
 .key-status-row { display: flex; align-items: center; gap: 10px; }
-.key-status-row .rsa-status { flex: 1 1 auto; margin: 0; font-size: 13px; }
-.key-status-row .btn { flex: 0 0 auto; }
-.rsa-view-pop { width: min(92vw, 360px); }   /* 比默认弹窗更小 */
+.key-status-row .btn { flex: 1 1 0; min-width: 0; }
+.rsa-view-pop { width: min(92vw, 380px); }   /* 比默认弹窗更小 */
 .key-block { margin-top: 12px; }
 .key-block-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
-.key-preview { margin: 0; padding: 10px 12px; background: var(--accent-soft); border-radius: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; line-height: 1.5; color: var(--text); white-space: pre-wrap; word-break: break-all; max-height: 150px; overflow-y: auto; }
+.key-preview { margin: 0; padding: 12px 14px; background: var(--accent-soft); border-radius: 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; line-height: 1.6; color: var(--text); white-space: pre-wrap; word-break: break-all; max-height: 170px; overflow-y: auto; }
 .rsa-view-actions { margin-top: 16px; }
 .rsa-view-actions .btn { flex: 1 1 0; min-width: 0; }
 .btn.full { width: 100%; margin-top: 12px; }

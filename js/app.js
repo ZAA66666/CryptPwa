@@ -839,12 +839,48 @@ async function sm2GenerateKeys() {
   } catch (e) { sm2Output.value = "❌ 生成失败：" + e.message; return false; }
 }
 
-const sm2RegenBtn = document.getElementById("sm2-regen");
-if (sm2RegenBtn) sm2RegenBtn.addEventListener("click", async (e) => {
+// 「查看/修改密钥对」弹窗（与 RSA 弹窗一致：截断展示 + 复制 + 重新生成 + 保存到密码本）
+const sm2vMask = document.getElementById("sm2v-mask");
+const sm2vPanel = document.getElementById("sm2v-panel");
+function fillSm2View() {
+  const pub = document.getElementById("sm2v-pub");
+  const priv = document.getElementById("sm2v-priv");
+  if (pub) pub.textContent = truncKey(sm2Pub.value);
+  if (priv) priv.textContent = truncKey(sm2Priv.value);
+}
+function openSm2View() {
+  if (!sm2Pub.value.trim() && !sm2Priv.value.trim()) sm2GenerateKeys();
+  fillSm2View();
+  if (sm2vPanel) sm2vPanel.classList.add("show");
+  if (sm2vMask) sm2vMask.classList.add("show");
+}
+function closeSm2View() {
+  if (sm2vPanel) sm2vPanel.classList.remove("show");
+  if (sm2vMask) sm2vMask.classList.remove("show");
+}
+const sm2ViewBtn = document.getElementById("sm2-view");
+if (sm2ViewBtn) sm2ViewBtn.addEventListener("click", openSm2View);
+const sm2vClose = document.getElementById("sm2v-close");
+if (sm2vClose) sm2vClose.addEventListener("click", closeSm2View);
+if (sm2vMask) sm2vMask.addEventListener("click", closeSm2View);
+const sm2vCopyPub = document.getElementById("sm2v-copy-pub");
+if (sm2vCopyPub) sm2vCopyPub.addEventListener("click", (e) => copyText(sm2Pub.value, e.target));
+const sm2vCopyPriv = document.getElementById("sm2v-copy-priv");
+if (sm2vCopyPriv) sm2vCopyPriv.addEventListener("click", (e) => copyText(sm2Priv.value, e.target));
+const sm2vRegen = document.getElementById("sm2v-regen");
+if (sm2vRegen) sm2vRegen.addEventListener("click", async (e) => {
   const btn = e.currentTarget, span = btn.querySelector("span"), orig = span.textContent;
   btn.disabled = true; span.textContent = "生成中…";
   await sm2GenerateKeys();
+  fillSm2View();
   span.textContent = orig; btn.disabled = false;
+});
+const sm2vSave = document.getElementById("sm2v-save");
+if (sm2vSave) sm2vSave.addEventListener("click", () => {
+  closeSm2View();
+  const pub = sm2Pub.value.trim();
+  if (!pub) { alert(_t("save.empty", "请先生成或粘贴密钥")); return; }
+  if (window.openVaultPrompt) window.openVaultPrompt({ method: "SM2", password: pub, targetId: "sm2-pub", cat: "sm2" });
 });
 
 document.getElementById("sm2-run").addEventListener("click", () => {
@@ -875,12 +911,6 @@ document.getElementById("sm2-copy").addEventListener("click", (e) => copyText(sm
 document.getElementById("sm2-export-file").addEventListener("click", () => {
   if (sm2Pub.value) saveTextFile("sm2_public.txt", sm2Pub.value);
   if (sm2Priv.value) saveTextFile("sm2_private.txt", sm2Priv.value);
-});
-document.getElementById("sm2-save").addEventListener("click", () => {
-  const pub = sm2Pub.value.trim();
-  if (!pub) { alert(_t("save.empty", "请先生成或粘贴密钥")); return; }
-  // 走通用密码本条目（存公钥，可回填到 sm2-pub）；私钥请用“导出文件”本地保存
-  if (window.openVaultPrompt) window.openVaultPrompt({ method: "SM2", password: pub, targetId: "sm2-pub", cat: "sm2" });
 });
 
 /* ---------- 5.5 RSA 密钥「保存到文件」 ---------- */
@@ -932,9 +962,7 @@ function rsaSaveFile() {
     if (priv) saveTextFile(safe + "_private.pem", priv);
   };
 }
-// 「导入密码本」：把当前密钥存入密码本（一对或单把）
-const rsaSaveVaultBtn = document.getElementById("rsa-save-vault");
-if (rsaSaveVaultBtn) rsaSaveVaultBtn.addEventListener("click", rsaToVault);
+// 「保存到密码本」：由查看密钥弹窗里的按钮触发（rsav-save / sm2v-save）
 // 「导出文件」：把当前公钥/私钥导出为 .pem 文件
 const rsaExportBtn = document.getElementById("rsa-export-file");
 if (rsaExportBtn) rsaExportBtn.addEventListener("click", rsaSaveFile);

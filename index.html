@@ -220,6 +220,21 @@
 
         <!-- 子面板：RSA -->
         <div class="asym-pane" id="asym-pane-rsa">
+          <!-- 密钥状态区（顶部）：状态文字一行 + 按钮行，密钥内容只在弹窗里 -->
+          <div class="rsa-key-section">
+            <p class="rsa-status" id="rsa-status"></p>
+            <div class="key-status-row">
+              <button class="btn" id="rsa-view"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3.6"/><path d="M11 11 20 20"/><path d="M16.5 16.5 19 14"/><path d="M14.5 14.5 17 12"/></svg><span data-i18n="rsa.viewKeys">查看/修改密钥对</span></button>
+              <button class="btn" data-fill="rsa-pub" data-cat="rsa"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span data-i18n="asym.vault">密码本</span></button>
+            </div>
+
+            <!-- 密钥对内容（hidden，仅供 JS 读写；展示一律走弹窗） -->
+            <div class="rsa-keys" id="rsa-keys" hidden>
+              <textarea id="rsa-pub" data-i18n-attr="placeholder:ph.rsaPub" placeholder="粘贴对方公钥"></textarea>
+              <textarea id="rsa-priv" data-i18n-attr="placeholder:ph.rsaPriv" placeholder="粘贴自己私钥"></textarea>
+            </div>
+          </div>
+
           <!-- 操作区 -->
           <label class="field-label" data-i18n="asym.op">操作</label>
           <select id="rsa-op">
@@ -241,22 +256,9 @@
 
           <label class="field-label" data-i18n="asym.out">结果（密文 / 签名）</label>
           <textarea id="rsa-output" readonly data-i18n-attr="placeholder:ph.result" placeholder="结果将显示在这里"></textarea>
-          <button class="btn ghost" id="rsa-copy" data-i18n="copy">复制结果</button>
-
-          <!-- 密钥区（底部：状态 + 查看密码对；密钥内容在弹窗里） -->
-          <div class="rsa-key-section">
-            <div class="key-status-row">
-              <p class="rsa-status" id="rsa-status"></p>
-              <button class="btn" id="rsa-view"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3.6"/><path d="M11 11 20 20"/><path d="M16.5 16.5 19 14"/><path d="M14.5 14.5 17 12"/></svg><span data-i18n="rsa.viewKeys">查看密码对</span></button>
-            </div>
-
-            <!-- 密钥对内容（默认隐藏，仅在“查看密码对”弹窗里展示） -->
-            <div class="rsa-keys" id="rsa-keys" hidden>
-              <textarea id="rsa-pub" data-i18n-attr="placeholder:ph.rsaPub" placeholder="粘贴对方公钥"></textarea>
-              <textarea id="rsa-priv" data-i18n-attr="placeholder:ph.rsaPriv" placeholder="粘贴自己私钥"></textarea>
-            </div>
-
-            <button class="btn ghost full" id="rsa-export-file"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l4 4v12H5z"/><path d="M9 4v5h7"/></svg><span data-i18n="rsa.saveFile">导出文件</span></button>
+          <div class="btn-row">
+            <button class="btn ghost" id="rsa-copy" data-i18n="copy">复制结果</button>
+            <button class="btn ghost" id="rsa-export-file"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l4 4v12H5z"/><path d="M9 4v5h7"/></svg><span data-i18n="rsa.saveFile">保存到文件</span></button>
           </div>
 
           <p class="hint" data-i18n="asym.hint">RSA 需运行在 https 或 localhost 环境；2048 位单次加密上限约 190 字节。</p>
@@ -264,6 +266,22 @@
 
         <!-- 子面板：SM2 国密 -->
         <div class="asym-pane" id="asym-pane-sm2" hidden>
+          <!-- 密钥状态区（顶部）：与 RSA 一致，密钥内容只在弹窗里 -->
+          <div class="rsa-key-section">
+            <p class="rsa-status" id="sm2-status"></p>
+            <div class="key-status-row">
+              <button class="btn" id="sm2-view"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3.6"/><path d="M11 11 20 20"/><path d="M16.5 16.5 19 14"/><path d="M14.5 14.5 17 12"/></svg><span data-i18n="rsa.viewKeys">查看/修改密钥对</span></button>
+              <button class="btn" data-fill="sm2-pub" data-cat="sm2"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span data-i18n="asym.vault">密码本</span></button>
+            </div>
+
+            <!-- 密钥对内容（hidden，仅供 JS 读写；展示一律走弹窗） -->
+            <div class="rsa-keys" id="sm2-keys" hidden>
+              <textarea id="sm2-pub" data-i18n-attr="placeholder:ph.sm2Pub" placeholder="04 开头的 130 位十六进制公钥"></textarea>
+              <textarea id="sm2-priv" data-i18n-attr="placeholder:ph.sm2Priv" placeholder="64 位十六进制私钥"></textarea>
+            </div>
+          </div>
+
+          <!-- 操作区 -->
           <label class="field-label" data-i18n="asym.op">操作</label>
           <select id="sm2-op">
             <option value="encrypt">加密（用公钥）</option>
@@ -284,20 +302,9 @@
 
           <label class="field-label" data-i18n="asym.out">结果（密文 / 签名）</label>
           <textarea id="sm2-output" readonly data-i18n-attr="placeholder:ph.result" placeholder="结果将显示在这里"></textarea>
-          <button class="btn ghost" id="sm2-copy" data-i18n="copy">复制结果</button>
-
-          <!-- 密钥区（inline 显示，公钥 130 位 / 私钥 64 位十六进制） -->
-          <div class="rsa-key-section">
-            <div class="key-status-row">
-              <p class="rsa-status" id="sm2-status"></p>
-              <button class="btn" id="sm2-regen"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M21 3 13 11"/><path d="M8 21H3v-5"/><path d="M3 21l8-8"/><path d="M16 21h5v-5"/><path d="M21 21l-8-8"/></svg><span data-i18n="asym.reGen">重新生成</span></button>
-            </div>
-            <label class="field-label" data-i18n="sm2.pub">公钥（04 开头，130 位十六进制）</label>
-            <textarea id="sm2-pub" data-i18n-attr="placeholder:ph.sm2Pub" placeholder="04 开头的 130 位十六进制公钥"></textarea>
-            <label class="field-label" data-i18n="sm2.priv">私钥（64 位十六进制）</label>
-            <textarea id="sm2-priv" data-i18n-attr="placeholder:ph.sm2Priv" placeholder="64 位十六进制私钥"></textarea>
-            <button class="btn ghost full" id="sm2-save"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3.6"/><path d="M11 11 20 20"/><path d="M16.5 16.5 19 14"/><path d="M14.5 14.5 17 12"/></svg><span data-i18n="rsa.saveVault">保存到密码本</span></button>
-            <button class="btn ghost full" id="sm2-export-file"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l4 4v12H5z"/><path d="M9 4v5h7"/></svg><span data-i18n="rsa.saveFile">导出文件</span></button>
+          <div class="btn-row">
+            <button class="btn ghost" id="sm2-copy" data-i18n="copy">复制结果</button>
+            <button class="btn ghost" id="sm2-export-file"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l4 4v12H5z"/><path d="M9 4v5h7"/></svg><span data-i18n="rsa.saveFile">保存到文件</span></button>
           </div>
 
           <p class="hint" data-i18n="sm2.hint">SM2 国密非对称算法，密文格式 C1C3C2（与 sm-crypto 一致）。密钥均为十六进制，公钥 130 位、私钥 64 位。</p>
@@ -610,7 +617,8 @@
             <p><b>是什么：</b>一对钥匙：<b>公钥</b>（可公开，用来加密 / 验签）+ <b>私钥</b>（自己藏好，用来解密 / 签名）。</p>
             <p><b>怎么用（对方给你发密信）：</b></p>
             <ol>
-              <li>点「生成 RSA 密钥对」→ 得到公钥和私钥；</li>
+              <li>进入「加/解密」页会<strong>自动生成</strong>密钥对（顶部显示「已生成密钥对」）；</li>
+              <li>点「查看/修改密钥对」在弹窗里查看、复制或重新生成公钥/私钥；</li>
               <li>把<b>公钥</b>发给对方；</li>
               <li>对方在「加密」里用你的公钥加密，把密文发你；</li>
               <li>你选「解密」、用<b>私钥</b>解开。</li>
@@ -637,7 +645,7 @@
           <summary>⑥ SM2 国密 —— 已并入「加/解密」页（顶部算法选 SM2）</summary>
           <div class="guide-body">
             <p><b>是什么：</b>和 RSA 一样是非对称算法（公钥加密 / 私钥解密，私钥签名 / 公钥验签），但符合<b>中国国家密码标准（国密）</b>，密文格式为 C1C3C2。</p>
-            <p><b>怎么用：</b>进「加/解密」页，顶部把算法切到 <b>SM2</b>，会自动生成密钥对（公钥 130 位、私钥 64 位十六进制）。选「加密 / 解密 / 签名 / 验签」→ 输入 →「执行」。公钥可「保存到密码本」，私钥建议「导出文件」本地保管。</p>
+            <p><b>怎么用：</b>进「加/解密」页，顶部把算法切到 <b>SM2</b>，会自动生成密钥对（顶部显示「已生成密钥对」）。点「查看/修改密钥对」在弹窗里查看、复制、重新生成，也可「保存到密码本」；私钥建议弹窗外的「保存到文件」本地保管。选「加密 / 解密 / 签名 / 验签」→ 输入 →「执行」。</p>
             <p><b>适合：</b>对接国内政务、金融等要求国密的场景。与 RSA 的区别主要在算法标准和密钥格式。</p>
           </div>
         </details>
@@ -751,11 +759,11 @@
       </div>
     </div>
 
-    <!-- RSA：查看密码对（更小弹窗，密钥截断展示） -->
+    <!-- RSA：查看/修改密钥对（更小弹窗，密钥截断展示） -->
     <div class="vp-mask" id="rsav-mask"></div>
     <div class="vp-panel rsa-view-pop" id="rsav-panel">
       <div class="vp-inner">
-        <div class="vp-head"><span class="vp-title" data-i18n="rsa.viewTitle">查看密钥对</span><button class="vp-close" id="rsav-close" aria-label="关闭">✕</button></div>
+        <div class="vp-head"><span class="vp-title" data-i18n="rsa.viewTitle">查看/修改密钥对</span><button class="vp-close" id="rsav-close" aria-label="关闭">✕</button></div>
         <div class="key-block">
           <div class="key-block-head"><span class="field-label" style="margin:0" data-i18n="asym.pub">公钥 (PUBLIC KEY)</span><button class="mini-btn" id="rsav-copy-pub" data-i18n="copy">复制</button></div>
           <pre class="key-preview" id="rsav-pub"></pre>
@@ -767,6 +775,26 @@
         <div class="btn-row rsa-view-actions">
           <button class="btn" id="rsav-regen"><span data-i18n="asym.reGen">重新生成</span></button>
           <button class="btn primary" id="rsav-save"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l4 4v12H5z"/><path d="M9 4v5h7"/></svg><span data-i18n="asym.saveVault">保存到密码本</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SM2：查看/修改密钥对（弹窗，跟 RSA 一样） -->
+    <div class="vp-mask" id="sm2v-mask"></div>
+    <div class="vp-panel rsa-view-pop" id="sm2v-panel">
+      <div class="vp-inner">
+        <div class="vp-head"><span class="vp-title" data-i18n="rsa.viewTitle">查看/修改密钥对</span><button class="vp-close" id="sm2v-close" aria-label="关闭">✕</button></div>
+        <div class="key-block">
+          <div class="key-block-head"><span class="field-label" style="margin:0" data-i18n="sm2.pub">公钥（04 开头，130 位十六进制）</span><button class="mini-btn" id="sm2v-copy-pub" data-i18n="copy">复制</button></div>
+          <pre class="key-preview" id="sm2v-pub"></pre>
+        </div>
+        <div class="key-block">
+          <div class="key-block-head"><span class="field-label" style="margin:0" data-i18n="sm2.priv">私钥（64 位十六进制）</span><button class="mini-btn" id="sm2v-copy-priv" data-i18n="copy">复制</button></div>
+          <pre class="key-preview" id="sm2v-priv"></pre>
+        </div>
+        <div class="btn-row rsa-view-actions">
+          <button class="btn" id="sm2v-regen"><span data-i18n="asym.reGen">重新生成</span></button>
+          <button class="btn primary" id="sm2v-save"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l4 4v12H5z"/><path d="M9 4v5h7"/></svg><span data-i18n="asym.saveVault">保存到密码本</span></button>
         </div>
       </div>
     </div>
