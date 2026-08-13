@@ -609,8 +609,9 @@ function refreshSymHints() {
 [symAlgo, symKey, symIv].forEach((el) => el.addEventListener("input", refreshSymHints));
 symAlgo.addEventListener("change", () => { updateKeySizeUI(); refreshSymHints(); });
 
-function validateSym() {
+function validateSym(op) {
   const algo = symAlgo.value, mode = getSymMode(), key = symKey.value, iv = symIv.value;
+  const inp = symInput.value || "";
   const rule = symKeyRule(algo);
   if (rule.flex) return { algo, mode, key, iv }; // 流密码不校验长度
   const kl = utf8ByteLength(key);
@@ -629,15 +630,26 @@ function validateSym() {
     return null;
   }
   symKeyHint.classList.remove("error");
-  if (mode !== "ECB" && utf8ByteLength(iv) !== rule.block) {
-    showError(symIvHint, `❌ IV 需正好 ${rule.block} 字节，当前 ${utf8ByteLength(iv)} 字节。`);
+  /* 解密时新格式密文自带 IV（v1:<base64iv>:<ct>）：自动提取并回填输入框，跳过 IV 校验 */
+  let effIv = iv, skipIvCheck = false;
+  if (op === "decrypt" && inp.indexOf("v1:") === 0) {
+    const parts = inp.split(":");
+    if (parts.length >= 3) {
+      try {
+        const ivStr = CryptoJS.enc.Base64.parse(parts[1]).toString(CryptoJS.enc.Utf8);
+        if (ivStr) { effIv = ivStr; skipIvCheck = true; if (symIv) symIv.value = ivStr; }
+      } catch (e) {}
+    }
+  }
+  if (mode !== "ECB" && !skipIvCheck && utf8ByteLength(effIv) !== rule.block) {
+    showError(symIvHint, `❌ IV 需正好 ${rule.block} 字节，当前 ${utf8ByteLength(effIv)} 字节。`);
     return null;
   }
-  return { algo, mode, key, iv };
+  return { algo, mode, key, iv: effIv };
 }
 
 function runSym(op) {
-  const cfg = validateSym();
+  const cfg = validateSym(op);
   if (!cfg) { symOutput.value = ""; return; }
   const { algo, mode, key, iv } = cfg;
   const input = symInput.value;
@@ -653,9 +665,21 @@ function runSym(op) {
       const keyWA = CryptoJS.enc.Utf8.parse(key);
       const options = { mode: CryptoJS.mode[mode], padding: CryptoJS.pad.Pkcs7 };
       if (mode !== "ECB") options.iv = CryptoJS.enc.Utf8.parse(iv);
-      const ct = CryptoJS[algo].encrypt(input, keyWA, options).toString();
-      const pt = CryptoJS[algo].decrypt(input, keyWA, options).toString(CryptoJS.enc.Utf8);
-      outVal = op === "encrypt" ? ct : (pt || "❌ 解密失败：密钥/模式/IV 不正确，或密文非法。");
+      /* 解密时去掉 v1: 前缀（IV 已由 validateSym 提取回填） */
+      const ctIn = (op === "decrypt" && input.indexOf("v1:") === 0) ? input.split(":").slice(2).join(":") : input;
+      let outVal2;
+      try {
+        if (op === "encrypt") {
+          const ct = CryptoJS[algo].encrypt(input, keyWA, options).toString();
+          outVal2 = (mode !== "ECB") ? "v1:" + CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(iv)) + ":" + ct : ct;
+        } else {
+          const pt = CryptoJS[algo].decrypt(ctIn, keyWA, options).toString(CryptoJS.enc.Utf8);
+          outVal2 = pt || "❌ 解密失败：密钥/模式/IV 不正确，或密文非法。";
+        }
+      } catch (e) {
+        outVal2 = "❌ 解密失败：密钥或 IV 不正确（或密文非法）。";
+      }
+      outVal = outVal2;
     }
     symOutput.value = outVal;
     if (!outVal.startsWith("❌")) {
