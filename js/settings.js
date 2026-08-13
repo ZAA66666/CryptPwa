@@ -1333,6 +1333,41 @@
         }
         row.querySelector(".vp-reveal").textContent = revealed ? t("vp.hide") : t("vp.reveal");
       };
+      /* 长按整行：弹窗查看完整内容（含公钥/私钥/方法/IV） */
+      let _lpTimer = null;
+      const startLP = (e) => {
+        if (_lpTimer) clearTimeout(_lpTimer);
+        _lpTimer = setTimeout(() => {
+          _lpTimer = null;
+          let detail = "";
+          if (k === "rsa-pair") {
+            detail = (t("vp.rsaPub") + ":\n" + (p.pub || "") + "\n\n" + t("vp.rsaPriv") + ":\n" + (p.priv || ""));
+          } else if (k === "rsa-import") {
+            detail = (opts.side === "public" ? t("vp.rsaPub") : t("vp.rsaPriv")) + ":\n" + (p.value || "");
+          } else {
+            detail = (t("vp.method") + ": " + (p.method || t("vp.generic")) + "\n" +
+                      t("common.value") + ": " + (p.value || "") +
+                      (p.iv ? "\nIV: " + p.iv : ""));
+          }
+          if (window.openEditor) {
+            /* 复用一个临时 textarea 调用 openEditor（签名 ta+editable），readonly 模式只读查看 */
+            const tmp = document.createElement("textarea");
+            tmp.value = detail;
+            window.openEditor(tmp, false);
+          } else {
+            alert(detail);
+          }
+          if (navigator.vibrate) navigator.vibrate(15);
+        }, 550);
+      };
+      const cancelLP = () => { if (_lpTimer) { clearTimeout(_lpTimer); _lpTimer = null; } };
+      row.addEventListener("touchstart", startLP, { passive: true });
+      row.addEventListener("touchend", cancelLP);
+      row.addEventListener("touchmove", cancelLP);
+      row.addEventListener("mousedown", startLP);
+      row.addEventListener("mouseup", cancelLP);
+      row.addEventListener("mouseleave", cancelLP);
+      row.addEventListener("contextmenu", (e) => { e.preventDefault(); startLP(e); });
       if (targetId) {
         row.querySelector(".vp-fill").onclick = () => {
           if (k === "rsa-pair") {

@@ -330,14 +330,20 @@ textarea:focus, input:focus, select:focus {
 
 /* 底部说明 */
 .app-footer {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: calc(56px + env(safe-area-inset-bottom));
+  z-index: 30;
   width: 100%;
   max-width: 100%;
-  margin: 16px auto 0;
-  padding: 0 16px;
-  font-size: 12px;
+  margin: 0 auto;
+  padding: 6px 16px 4px;
+  font-size: 11px;
   color: #a8aeb4;
   text-align: center;
-  line-height: 1.6;
+  line-height: 1.5;
+  background: var(--bg);
+  pointer-events: none;
 }
 .app-footer strong { color: var(--danger); }
 
