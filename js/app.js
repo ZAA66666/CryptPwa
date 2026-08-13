@@ -2060,22 +2060,26 @@ if ("serviceWorker" in navigator) {
 (function () {
   if (!window.Capacitor || !window.Capacitor.Plugins || !window.Capacitor.Plugins.App) return;
   window.Capacitor.Plugins.App.addListener("backButton", () => {
-    /* 1. 优先关闭打开的弹窗（密码本 / 选择器 / 扫码 / 密钥查看等） */
-    const masks = document.querySelectorAll(".vp-mask.show, .pw-mask.show, .scan-mask.show");
-    for (const m of masks) {
-      const closeBtn = m.querySelector(".vp-close, .pp-close, .scan-close");
+    /* 1. 优先关闭任何打开的弹窗（密码本 / 选择器 / 扫码 / 密钥查看 / 全屏编辑 / 模板） */
+    const shownMask = document.querySelector(".vp-mask.show, .pw-mask.show, .scan-mask.show, .exp-mask.show, .rsan-mask.show");
+    if (shownMask) {
+      const closeBtn = shownMask.querySelector(".vp-close, .pp-close, .scan-close, #exp-close, #rsa-name-close");
       if (closeBtn) { closeBtn.click(); return; }
-      m.click();
+      shownMask.click();
       return;
     }
     /* 2. 设置页打开 → 返回上一级（或关闭） */
-    if (window.settingsBack) { window.settingsBack(); return; }
-    /* 3. 功能面板打开（非主页）→ 返回主页 */
-    const home = document.getElementById("panel-home");
-    const cur = document.querySelector(".panel.show");
-    if (home && cur && cur !== home) {
+    const settingsOverlay = document.getElementById("settings-overlay");
+    if (settingsOverlay && !settingsOverlay.hasAttribute("hidden")) {
+      if (window.settingsBack) { window.settingsBack(); return; }
+    }
+    /* 3. 功能面板（非主页）→ 返回主页 */
+    const cur = document.querySelector(".panel.active");
+    if (cur && cur.id !== "panel-home") {
       const back = cur.querySelector(".ph-back");
       if (back) { back.click(); return; }
+      showPanel("home");
+      return;
     }
     /* 4. 主页 → 退出 App */
     window.Capacitor.Plugins.App.exitApp();

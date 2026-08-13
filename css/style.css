@@ -41,10 +41,17 @@ body {
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   padding-bottom: calc(70px + env(safe-area-inset-bottom));
+  /* 禁用网页橡皮筋滚动 / 整页 overscroll（App 体验） */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+  overflow: hidden;
 }
 
-/* 顶部标题栏（全宽，像 App 顶栏；底部小圆角；配色跟随强调色） */
+/* 顶部标题栏（全宽，像 App 顶栏；底部小圆角；配色跟随强调色；固定不滚动） */
 .app-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 40;
   width: 100%;
   background: var(--accent);
   color: var(--on-accent);
@@ -139,12 +146,28 @@ body:not(.on-home) { padding-bottom: env(safe-area-inset-bottom); }
 .panel {
   display: none;
   padding: 18px 18px 22px;
-  background: #fff;
+  background: var(--card);
 }
-.panel.active { display: block; animation: fade 0.2s ease; }
-@keyframes fade {
-  from { opacity: 0; transform: translateY(4px); }
+/* 面板切换动画：从右滑入（配合安卓预测性返回手势） */
+.panel.active {
+  display: block;
+  animation: panelIn 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes panelIn {
+  from { opacity: 0; transform: translateX(18px); }
   to   { opacity: 1; transform: none; }
+}
+/* 弹窗动画（密码本/扫码等） */
+.vp-panel.show, .scan-panel.show, .exp-panel.show {
+  animation: sheetUp 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes sheetUp {
+  from { opacity: 0; transform: translateY(28px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+/* 设置 overlay 进入动画 */
+#settings-overlay.show .overlay-body {
+  animation: sheetUp 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 /* 表单标签（带一个小绿点，增加品牌感） */

@@ -178,15 +178,12 @@
     document.documentElement.style.setProperty("--fs", map[f] || 1);
   }
   function applyImmersive() {
-    const on = getSetting("immersive", "0") === "1";
-    document.body.classList.toggle("immersive", on);
-    /* 安卓原生：状态栏透明覆盖（真沉浸式） */
+    /* 沉浸式状态栏：默认开启（移除开关），安卓原生 overlay */
+    document.body.classList.add("immersive");
     if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar) {
-      window.Capacitor.Plugins.StatusBar.setOverlaysWebView({ overlay: on }).catch(() => {});
-      if (on) {
-        const dark = document.documentElement.getAttribute("data-theme") === "dark";
-        window.Capacitor.Plugins.StatusBar.setStyle({ style: dark ? "LIGHT" : "DARK" }).catch(() => {});
-      }
+      window.Capacitor.Plugins.StatusBar.setOverlaysWebView({ overlay: true }).catch(() => {});
+      const dark = document.documentElement.getAttribute("data-theme") === "dark";
+      window.Capacitor.Plugins.StatusBar.setStyle({ style: dark ? "LIGHT" : "DARK" }).catch(() => {});
     }
   }
 
@@ -379,12 +376,12 @@
         `<div class="cp-form">` +
         `<input id="sp-path" value="${escapeHtml(path)}" placeholder="sdcard/CrytoPwa" />` +
         `<div class="btn-row">` +
-        (isCap ? "" : `<button class="btn" id="sp-pick">${t("storage.pick")}</button>`) +
+        `<button class="btn" id="sp-pick">${t("storage.pick")}</button>` +
         `<button class="btn ghost" id="sp-reset">${t("storage.reset")}</button>` +
         `</div>` +
         `</div>` +
         `<div class="btn-row"><button class="btn primary" id="sp-save">${t("common.save")}</button></div>` +
-        `<p class="hint" id="sp-pick-hint">${isCap ? t("storage.androidHint") : ""}</p>`;
+        `<p class="hint" id="sp-pick-hint"></p>`;
     } else if (name === "theme") {
       titleEl.textContent = t("theme.title");
       const cur = getSetting("theme", "system");
@@ -415,15 +412,7 @@
         `</div>` +
         `<div class="legal-text" style="margin-top:14px">${t("ext.text")}</div>`;
     } else if (name === "exp") {
-      /* 实验性：分组入口（列表） */
-      titleEl.textContent = t("exp.title");
-      html =
-        `<div class="settings-group"><ul class="settings-list">` +
-        `<li class="settings-item" id="exp-go-cb"><span>${t("exp.cb")}</span><span class="si-arrow">›</span></li>` +
-        `<li class="settings-item" id="exp-go-import"><span>${t("exp.import")}</span><span class="si-arrow">›</span></li>` +
-        `</ul></div>`;
-    } else if (name === "exp-cb") {
-      /* 数据回调：处理结果回传给调用方 */
+      /* 实验性：直接进数据回调页（移除导入方式入口） */
       titleEl.textContent = t("exp.cb");
       const inc = window.__incomingText || window.__incomingImage || "";
       html =
@@ -440,25 +429,9 @@
         `<label class="field-label">${t("exp.intentTitle")}</label>` +
         `<textarea id="exp-intent-code" readonly rows="3" style="font-family:monospace;font-size:12px"></textarea>` +
         `<div class="legal-text" style="margin-top:14px"><h3>${t("exp.noteTitle")}</h3><p>${t("exp.note")}</p></div>`;
-    } else if (name === "exp-import") {
-      /* 导入方式：外部数据如何传入本应用 */
-      titleEl.textContent = t("exp.importTitle");
-      html =
-        `<div class="cp-note">${t("exp.importHint")}</div>` +
-        `<div class="legal-text" style="margin-top:10px">` +
-        `<h3>URL Scheme</h3><p>${t("exp.importUrl")}</p>` +
-        `<h3>Android Intent</h3><p>${t("exp.importIntent")}</p>` +
-        `<h3>系统分享</h3><p>${t("exp.importShare")}</p>` +
-        `<h3>剪贴板</h3><p>${t("exp.importClip")}</p>` +
-        `</div>` +
-        `<div class="cp-form" style="margin-top:12px">` +
-        `<input id="exp-import-example" readonly value="crypto-pwa://?text=hello" />` +
-        `<div class="btn-row"><button class="btn ghost" id="exp-import-copy">${t("exp.copy")}</button></div>` +
-        `</div>`;
     } else if (name === "display") {
       titleEl.textContent = t("display.title");
       const f = getSetting("font", "normal");
-      const imm = getSetting("immersive", "0") === "1";
       const cur = getSetting("lang", "system");
       let langBtnsDisp =
         `<button data-v="system" class="${cur === "system" ? "active" : ""}">${t("lang.system")}</button>` +
@@ -477,9 +450,7 @@
         `<button data-v="normal" class="${f === "normal" ? "active" : ""}">${t("font.normal")}</button>` +
         `<button data-v="large" class="${f === "large" ? "active" : ""}">${t("font.large")}</button>` +
         `<button data-v="xlarge" class="${f === "xlarge" ? "active" : ""}">${t("font.xlarge")}</button>` +
-        `</div></div>` +
-        `<div class="settings-row"><span class="sr-label">${t("disp.immersive")}</span>` +
-        `<label class="switch"><input type="checkbox" id="imm-toggle" ${imm ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label></div>`;
+        `</div></div>`;
     } else if (name === "lang") {
       titleEl.textContent = t("disp.lang");
       const cur = getSetting("lang", "system");
@@ -516,6 +487,7 @@
       const pickBtn = document.getElementById("sp-pick");
       const pickHint = document.getElementById("sp-pick-hint");
       if (pickBtn) pickBtn.onclick = async () => {
+        /* 优先 File System Access API（桌面 Chrome/Edge） */
         if (window.showDirectoryPicker) {
           try {
             const h = await window.showDirectoryPicker({ id: "crypto-pwa-save" });
@@ -524,12 +496,30 @@
             bodyEl.querySelector("#sp-path").value = dir;
             setSetting("savepath", dir);
             if (pickHint) pickHint.textContent = "✅ " + name;
+            return;
           } catch (e) {
-            if (e && e.name !== "AbortError" && pickHint) pickHint.textContent = t("storage.pickFail") + " " + (e.message || "");
+            if (e && e.name === "AbortError") return;
+            /* 失败则降级到 input[file][webkitdirectory] */
           }
-        } else if (pickHint) {
-          pickHint.textContent = t("storage.pickUnsupported");
         }
+        /* 安卓 WebView / 不支持 FS Access：用隐藏 input 选目录 */
+        const inp = document.createElement("input");
+        inp.type = "file";
+        inp.setAttribute("webkitdirectory", "");
+        inp.setAttribute("directory", "");
+        inp.onchange = () => {
+          const f = inp.files && inp.files[0];
+          if (f) {
+            /* webkitRelativePath 形如 MyFolder/file.txt，取首段目录名 */
+            const rel = f.webkitRelativePath || f.name;
+            const seg = String(rel).split("/")[0] || "selected";
+            const dir = "sdcard/" + seg;
+            bodyEl.querySelector("#sp-path").value = dir;
+            setSetting("savepath", dir);
+            if (pickHint) pickHint.textContent = "✅ " + seg;
+          }
+        };
+        inp.click();
       };
       const resetBtn = document.getElementById("sp-reset");
       if (resetBtn) resetBtn.onclick = () => {
@@ -555,12 +545,6 @@
       if (lseg) lseg.querySelectorAll("button").forEach((b) =>
         (b.onclick = () => { setSetting("lang", b.dataset.v); applyLanguage(); render(); })
       );
-      const immT = document.getElementById("imm-toggle");
-      if (immT) immT.onchange = () => {
-        setSetting("immersive", immT.checked ? "1" : "0");
-        applyImmersive();
-        render();
-      };
     } else if (name === "extcall") {
       const et = document.getElementById("ext-toggle");
       if (et) et.onchange = () => { setSetting("ext_incoming", et.checked ? "1" : "0"); render(); };
@@ -570,13 +554,7 @@
         if (window.copyText) window.copyText(v, e.target);
       };
     } else if (name === "exp") {
-      /* 实验性列表入口 */
-      const goCb = bodyEl.querySelector("#exp-go-cb");
-      if (goCb) goCb.onclick = () => go("exp-cb");
-      const goImp = bodyEl.querySelector("#exp-go-import");
-      if (goImp) goImp.onclick = () => go("exp-import");
-    } else if (name === "exp-cb") {
-      /* 数据回调：生成回调数据（成功/时间戳/处理后数据）+ 回调地址示例 */
+      /* 实验性（直接数据回调页）：生成回调数据 + 回调地址示例 */
       bodyEl.querySelector("#exp-gen").onclick = () => {
         const d = bodyEl.querySelector("#exp-input").value;
         const payload = { ok: !!d, ts: new Date().toISOString(), data: d || "", app: "CryptPwa" };
@@ -589,13 +567,6 @@
       bodyEl.querySelector("#exp-copy").onclick = (e) => {
         const v = bodyEl.querySelector("#exp-result").value;
         if (v && window.copyText) window.copyText(v, e.target);
-      };
-    } else if (name === "exp-import") {
-      /* 导入方式：复制 URL Scheme 示例 */
-      const ic = bodyEl.querySelector("#exp-import-copy");
-      if (ic) ic.onclick = (e) => {
-        const v = bodyEl.querySelector("#exp-import-example").value;
-        if (window.copyText) window.copyText(v, e.target);
       };
     } else if (name === "lang") {
       bodyEl.querySelectorAll("#lang-seg button").forEach((b) =>
@@ -1441,7 +1412,7 @@
           if (a !== b) { alert(t("common.masterMismatch")); return; }
           setupVault(a);
           commitNew(name);
-          alert(t("common.savedOk"));
+          if (window.toast) window.toast(t("common.savedOk"));
           closeVP();
         };
       } else if (isLocked()) {
@@ -1472,13 +1443,15 @@
         const arr = readPasswords().filter((p) => matchCat(p, filterCat) && inSlot(p));
         if (arr.length === 0) html += `<p class="cp-note">${t("vp.none")}</p>`;
         html += `</div>`;
-        html += `<button class="btn ghost" id="vp-skip">${t("vp.skip")}</button>`;
+        html += `<div class="btn-row"><button class="btn primary" id="vp-save-new">${t("vp.saveCur")}</button><button class="btn ghost" id="vp-skip">${t("vp.skip")}</button></div>`;
         panel.innerHTML = wrap(html);
         const list = panel.querySelector("#vp-list");
         arr.forEach((p) => list.appendChild(makeRow(p, -1)));
         panel.querySelector("#vp-save-new").onclick = () => {
-          commitNew(panel.querySelector("#vp-label").value.trim());
-          renderVP();
+          const name = panel.querySelector("#vp-label") ? panel.querySelector("#vp-label").value.trim() : "";
+          commitNew(name);
+          if (window.toast) window.toast(t("common.savedOk"));
+          closeVP();
         };
         panel.querySelector("#vp-skip").onclick = closeVP;
       }
