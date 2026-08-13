@@ -926,6 +926,14 @@ input[type="color"] { width: 46px; height: 30px; border: 1px solid var(--border)
 .vp-inner::-webkit-scrollbar-thumb { background: var(--accent-ring); border-radius: 8px; }
 .vp-inner::-webkit-scrollbar-track { background: transparent; }
 .vp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+/* JSON 键值编辑：模板选择弹窗 */
+.kv-tpl-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.kv-tpl-opt {
+  display: block; width: 100%; padding: 14px 16px; border: 1px solid var(--border);
+  border-radius: 12px; background: var(--card); color: var(--text); font-size: 15px;
+  cursor: pointer; text-align: left;
+}
+.kv-tpl-opt:active { background: var(--accent-soft); }
 .vp-title { font-size: 16px; font-weight: 700; color: var(--text); }
 .vp-close { border: none; background: transparent; color: var(--muted); font-size: 18px; line-height: 1; cursor: pointer; }
 .vp-cur { display: flex; gap: 8px; font-size: 13px; padding: 4px 0; }

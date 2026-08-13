@@ -36,6 +36,7 @@ window.I18N = {
     "enc.imgBtn": "图片 → Base64", "enc.run": "执行", "enc.out": "结果",
     "enc.b64": "Base64", "enc.hex": "Hex", "enc.url": "URL", "enc.encode": "编码", "enc.decode": "解码",
     "enc.b32": "Base32", "enc.b58": "Base58", "enc.unicode": "Unicode", "enc.jwt": "JWT",
+    "enc.okEnc": "✅ 编码完成", "enc.okDec": "✅ 解码完成", "enc.fail": "❌ 处理失败：", "enc.empty": "请输入要编码/解码的内容",
     "ph.hashIn": "要计算哈希的文本，如 hello", "ph.encIn": "要编码或解码的内容（支持中文）",
     "ph.symIn": "加密时填明文；解密时填 Base64 密文", "ph.rsaIn": "加密填明文；解密填 Base64 密文；签名填待签名文本",
     "ph.hashKey": "HMAC 密钥", "ph.symKey": "如：1234567890123456", "ph.symIv": "CBC/CTR/CFB/OFB 模式必填",
@@ -57,6 +58,7 @@ window.I18N = {
     "json.codeOut": "提取代码",
     "json.kvHint": "逐行编辑键与值，选择值类型后一键生成 JSON；也可从格式化区导入现有 JSON。",
     "json.kvAdd": "+ 添加一行", "json.kvImport": "从格式化区导入", "json.kvGen": "生成 JSON",
+    "json.kvTpl": "＋ 模板", "json.tplTitle": "选择模板", "json.tplRandom": "🎲 随机示例", "json.tplTemplate": "📋 JSON 模板",
     "json.ok": "合法 JSON", "json.invalid": "JSON 语法错误", "json.notFound": "未找到该路径",
     "json.emptyKey": "存在空键，已跳过", "json.imported": "已导入 N 行", "json.copied": "已复制",
     "hist.emptyTip": "没有使用记录", "hist.clearConfirm": "确定清空所有使用记录？",
@@ -130,7 +132,7 @@ window.I18N = {
     "set.about": "关于", "set.privacy": "隐私政策", "set.terms": "用户协议",
     "set.security": "安全条款", "set.personal": "个人信息", "set.common": "密码本", "set.sync": "数据备份与同步",
     "set.theme": "主题", "set.display": "显示设置", "set.about2": "关于", "set.extcall": "外部调用与分享", "set.storage": "设置路径",
-    "set.grpGeneral": "通用设置", "set.grpData": "数据隐私", "set.grpPrivacy": "隐私与条款",
+    "set.grpGeneral": "通用设置", "set.grpData": "数据隐私", "set.grpPrivacy": "隐私与条款", "set.dataEnc": "数据加密", "enc.on": "已开启数据加密，密码本将以密文保存 🔒", "enc.off": "已关闭数据加密，密码本将以明文保存",
 
     /* 主题 */
     "theme.title": "主题", "theme.system": "跟随设备", "theme.light": "浅色", "theme.dark": "深色",
@@ -150,7 +152,7 @@ window.I18N = {
 
     /* 文件保存路径设置 */
     "storage.title": "内容保存路径",
-    "storage.hint": "RSA 密钥等「保存到文件」时的默认路径（如 sdcard/CryptoPwa）。受浏览器限制无法强制写入任意目录：Android Chrome 安装为 App 后可弹出位置选择；其它浏览器将按此名称下载到默认文件夹。",
+    "storage.hint": "RSA 密钥等「保存到文件」时的默认路径（如 sdcard/CrytoPwa）。受浏览器限制无法强制写入任意目录：Android Chrome 安装为 App 后可弹出位置选择；其它浏览器将按此名称下载到默认文件夹。",
     "storage.locHint": "本地生成的加/解密、编/解码等结果数据，会保存到上方设置的路径下；备份文件同理。",
     "storage.pick": "选择文件夹", "storage.reset": "恢复默认",
     "storage.pickFail": "选择失败：", "storage.pickUnsupported": "当前浏览器不支持直接选目录，请手动输入路径。",
@@ -198,7 +200,7 @@ window.I18N = {
 
     /* 密码本 */
     "common.title": "密码本", "common.add": "＋ 新增", "common.empty": "还没有保存的密码本。保存后，在加/解密 / 非对称加/解密 的密钥框旁点「密码本」即可快速填入。",
-    "common.label": "名称", "common.value": "密码 / 密钥", "common.save": "保存", "common.cancel": "取消", "common.del": "删除", "common.master": "主密码", "common.masterHint": "用于加密本地保存的密码（AES-256-CBC），忘记将无法恢复。", "common.setMaster": "设置主密码", "common.changeMaster": "修改主密码", "common.masterPlaceholder": "输入主密码", "common.confirmMaster": "确认主密码", "common.lock": "锁定", "common.unlock": "解锁", "common.unlockNow": "解锁", "common.lockedTip": "密码库已加密，输入主密码解锁后使用。", "common.masterMismatch": "两次输入不一致", "common.masterEmpty": "请输入主密码", "common.vaultReady": "密码库已就绪（密文存储，仅本机）", "common.export": "导出备份(JSON)", "common.import": "导入备份(JSON)", "common.exportDone": "已导出加密备份文件。", "common.importDone": "已导入备份。", "common.importFail": "失败：文件格式错误或主密码不对。", "vault.slot1": "库 1", "vault.slot2": "库 2", "vault.slot3": "库 3", "vault.slotHint": "密码本共有 3 套密码库（库 1 / 库 2 / 库 3）：在密码本页面顶部切换库号，即可查看对应库保存的密码；之后保存的密码/密钥会存入当前所选库。", "lang.import": "导入语言包", "lang.importHint": "选择 JSON 语言包文件（格式：{\"lang\": \"xx\", \"name\": \"语言名\", \"data\": { 翻译键: 译文 }}）。可用项目中的「中文语言包_zh.json」模板翻译后导入。", "lang.importDone": "语言包已导入，可在语言列表中切换。", "lang.importFail": "导入失败：文件格式不正确或缺少必要字段。", "sync.title": "数据备份与同步", "sync.webdav": "WebDAV", "sync.url": "服务器地址", "sync.user": "账号", "sync.pass": "密码", "sync.saveCfg": "保存配置", "sync.backup": "备份到 WebDAV", "sync.restore": "从 WebDAV 恢复", "sync.backupDone": "已备份到 WebDAV。", "sync.restoreDone": "已从 WebDAV 恢复。", "sync.fail": "操作失败：", "sync.cfgHint": "需服务器支持 WebDAV（如 Nextcloud、群晖、坚果云），并允许跨域(CORS)。", "sync.needMaster": "请先在「密码本」中设置并解锁主密码。", "sync.quick": "快捷填入服务器地址", "sync.quickJgy": "坚果云 dav.jianguoyun.com/dav/", "sync.quickNc": "Nextcloud remote.php/dav/files/", "sync.quickSyn": "群晖 /webdav", "sync.exportLocal": "导出本地备份", "sync.importLocal": "从本地导入", "sync.exportDone": "已导出本地备份文件。", "sync.importDone": "已从本地导入备份。", "sync.importFail": "导入失败：文件格式错误或主密码不对。", "sync.test": "检测连接", "sync.testing": "检测中…", "sync.testOk": "连接正常 ✅", "sync.testFail": "连接失败：", "sync.needUrl": "请先填写服务器地址",
+    "common.label": "名称", "common.value": "密码 / 密钥", "common.save": "保存", "common.cancel": "取消", "common.del": "删除", "common.master": "主密码", "common.masterHint": "用于加密本地保存的密码（AES-256-CBC），忘记将无法恢复。", "common.setMaster": "设置主密码", "common.changeMaster": "修改主密码", "common.masterPlaceholder": "输入主密码", "common.confirmMaster": "确认主密码", "common.lock": "锁定", "common.unlock": "解锁", "common.unlockNow": "解锁", "common.lockedTip": "密码库已加密，输入主密码解锁后使用。", "common.masterMismatch": "两次输入不一致", "common.masterEmpty": "请输入主密码", "common.vaultReady": "密码库已就绪（密文存储，仅本机）", "common.export": "导出备份(JSON)", "common.import": "导入备份(JSON)", "common.exportDone": "已导出加密备份文件。", "common.importDone": "已导入备份。", "common.importFail": "失败：文件格式错误或主密码不对。", "vault.slot1": "库 1", "vault.slot2": "库 2", "vault.slot3": "库 3", "vault.slotHint": "密码本共有 3 套密码库（库 1 / 库 2 / 库 3）：在密码本页面顶部切换库号，即可查看对应库保存的密码；之后保存的密码/密钥会存入当前所选库。", "lang.import": "导入语言包", "lang.importHint": "选择 JSON 语言包文件（格式：{\"lang\": \"xx\", \"name\": \"语言名\", \"data\": { 翻译键: 译文 }}）。可用项目中的「中文语言包_zh.json」模板翻译后导入。", "lang.importDone": "语言包已导入，可在语言列表中切换。", "lang.importFail": "导入失败：文件格式不正确或缺少必要字段。", "sync.title": "数据备份与同步", "sync.webdav": "WebDAV", "sync.url": "服务器地址", "sync.user": "账号", "sync.pass": "密码", "sync.saveCfg": "保存配置", "sync.backup": "备份到 WebDAV", "sync.restore": "从 WebDAV 恢复", "sync.backupDone": "已备份到 WebDAV。", "sync.restoreDone": "已从 WebDAV 恢复。", "sync.fail": "操作失败：", "sync.cfgHint": "需服务器支持 WebDAV（如 Nextcloud、群晖、坚果云），并允许跨域(CORS)。", "sync.needMaster": "请先在「密码本」中设置并解锁主密码。", "sync.quick": "快捷填入服务器地址", "sync.quickJgy": "坚果云 dav.jianguoyun.com/dav/", "sync.quickNc": "Nextcloud remote.php/dav/files/", "sync.quickSyn": "群晖 /webdav", "sync.exportLocal": "导出本地备份", "sync.importLocal": "从本地导入", "sync.exportDone": "已导出本地备份文件。", "sync.importDone": "已从本地导入备份。", "sync.importFail": "导入失败：文件格式错误或主密码不对。", "sync.test": "检测连接", "sync.testing": "检测中…", "sync.testOk": "连接正常 ✅", "sync.testFail": "连接失败：", "sync.needUrl": "请先填写服务器地址", "exp.title": "导出方式", "exp.enc": "🔒 加密保存", "exp.plain": "📄 明文保存", "exp.locked": "请先解锁密码本再导出", "exp.done": "已导出 CryptoData.json",
 
 
     /* 关于（已合并“关于软件说明”） */
@@ -297,6 +299,7 @@ window.I18N = {
     "vp.del": "删除",
     "vp.skip": "暂不保存",
     "vp.none": "还没有已保存的条目。",
+    "paste": "粘贴", "vp.pasteOk": "已粘贴并应用 ✅", "vp.pasteBad": "剪贴板内容不符合该密钥格式", "vp.pasteDenied": "无法读取剪贴板（请检查浏览器权限）",
     "vp.book": " 密码本",
     "vp.generic": "通用",
     "vp.rsaPriv": "RSA 私钥",
@@ -345,6 +348,7 @@ window.I18N = {
     "enc.imgBtn": "Image → Base64", "enc.run": "Run", "enc.out": "Result",
     "enc.b64": "Base64", "enc.hex": "Hex", "enc.url": "URL", "enc.encode": "Encode", "enc.decode": "Decode",
     "enc.b32": "Base32", "enc.b58": "Base58", "enc.unicode": "Unicode", "enc.jwt": "JWT",
+    "enc.okEnc": "✅ Encode done", "enc.okDec": "✅ Decode done", "enc.fail": "❌ Failed: ", "enc.empty": "Enter text to encode/decode",
     "ph.hashIn": "Text to hash, e.g. hello", "ph.encIn": "Content to encode/decode (Chinese supported)",
     "ph.symIn": "Plaintext to encrypt; Base64 ciphertext to decrypt", "ph.rsaIn": "Plaintext to encrypt; Base64 ciphertext to decrypt; message to sign",
     "ph.hashKey": "HMAC key", "ph.symKey": "e.g. 1234567890123456", "ph.symIv": "Required for CBC/CTR/CFB/OFB",
@@ -367,6 +371,7 @@ window.I18N = {
     "json.codeOut": "Extraction code",
     "json.kvHint": "Edit keys and values row by row, pick a value type, then generate JSON; or import existing JSON from the Format tab.",
     "json.kvAdd": "+ Add row", "json.kvImport": "Import from Format", "json.kvGen": "Generate JSON",
+    "json.kvTpl": "＋ Template", "json.tplTitle": "Choose a template", "json.tplRandom": "🎲 Random example", "json.tplTemplate": "📋 JSON template",
     "json.ok": "Valid JSON", "json.invalid": "JSON syntax error", "json.notFound": "Path not found",
     "json.emptyKey": "Empty key skipped", "json.imported": "Imported N rows", "json.copied": "Copied",
 
@@ -414,7 +419,7 @@ window.I18N = {
     "set.about": "About", "set.privacy": "Privacy Policy", "set.terms": "Terms of Use",
     "set.security": "Security Notes", "set.personal": "Personal Info", "set.common": "Saved Passwords", "set.sync": "Backup & Sync",
     "set.theme": "Theme", "set.display": "Display", "set.about2": "About", "set.extcall": "External & Sharing", "set.storage": "Set path",
-    "set.grpGeneral": "General", "set.grpData": "Data & Privacy", "set.grpPrivacy": "Privacy & Terms",
+    "set.grpGeneral": "General", "set.grpData": "Data & Privacy", "set.grpPrivacy": "Privacy & Terms", "set.dataEnc": "Data encryption", "enc.on": "Encryption ON — passwords stored as ciphertext", "enc.off": "Encryption OFF — passwords stored as plain text",
 
     "theme.title": "Theme", "theme.system": "Follow device", "theme.light": "Light", "theme.dark": "Dark",
     "accent.title": "Accent · Monet color", "accent.pick": "Custom color", "accent.reset": "Reset",
@@ -432,7 +437,7 @@ window.I18N = {
 
     /* Save path setting */
     "storage.title": "Content save path",
-    "storage.hint": "Default path for “Save to file” (e.g. sdcard/CryptoPwa). Browsers cannot force a directory: on Android Chrome installed as an app a location picker appears; other browsers download with this name.",
+    "storage.hint": "Default path for “Save to file” (e.g. sdcard/CrytoPwa). Browsers cannot force a directory: on Android Chrome installed as an app a location picker appears; other browsers download with this name.",
     "storage.locHint": "Results you generate locally (encrypt/decrypt, encode/decode, backups) are saved under the path above.",
     "storage.pick": "Pick folder", "storage.reset": "Reset to default",
     "storage.pickFail": "Pick failed: ", "storage.pickUnsupported": "This browser cannot pick a folder directly — please type the path manually.",
@@ -468,7 +473,7 @@ window.I18N = {
     "font.small": "Small", "font.normal": "Normal", "font.large": "Large", "font.xlarge": "Extra large",
 
     "common.title": "Saved Passwords", "common.add": "＋ Add", "common.empty": "No saved passwords yet. After saving, tap “Saved passwords” next to the key field in Encrypt/Decrypt or Asymmetric to fill instantly.",
-    "common.label": "Name", "common.value": "Password / Key", "common.save": "Save", "common.cancel": "Cancel", "common.del": "Delete", "common.master": "Master password", "common.masterHint": "Used to encrypt locally saved passwords (AES-256-CBC). If forgotten, data cannot be recovered.", "common.setMaster": "Set master password", "common.changeMaster": "Change master", "common.masterPlaceholder": "Enter master password", "common.confirmMaster": "Confirm password", "common.lock": "Lock", "common.unlock": "Unlock", "common.unlockNow": "Unlock", "common.lockedTip": "The vault is encrypted. Enter the master password to unlock.", "common.masterMismatch": "Passwords do not match", "common.masterEmpty": "Please enter a master password", "common.vaultReady": "Vault ready (encrypted, on-device)", "common.export": "Export backup (JSON)", "common.import": "Import backup (JSON)", "common.exportDone": "Encrypted backup exported.", "common.importDone": "Backup imported.", "common.importFail": "Failed: bad file or wrong master password.", "vault.slot1": "Vault 1", "vault.slot2": "Vault 2", "vault.slot3": "Vault 3", "vault.slotHint": "There are 3 password vaults (Vault 1/2/3): switch the number at the top of the password book to view that vault; newly saved passwords/keys go into the currently selected vault.", "lang.import": "Import language pack", "lang.importHint": "Choose a JSON language pack ({ \"lang\": \"xx\", \"name\": \"Language name\", \"data\": { key: translation } }). Use the zh template in this project to translate and import.", "lang.importDone": "Language pack imported. You can switch to it in the language list.", "lang.importFail": "Import failed: bad file format or missing fields.", "sync.title": "Backup & Sync", "sync.webdav": "WebDAV", "sync.url": "Server URL", "sync.user": "User", "sync.pass": "Password", "sync.saveCfg": "Save config", "sync.backup": "Backup to WebDAV", "sync.restore": "Restore from WebDAV", "sync.backupDone": "Backed up to WebDAV.", "sync.restoreDone": "Restored from WebDAV.", "sync.fail": "Operation failed: ", "sync.cfgHint": "Server must support WebDAV (e.g. Nextcloud, Synology, Nutstore) and allow CORS.", "sync.needMaster": "Set and unlock the master password in Saved Passwords first.", "sync.quick": "Quick fill server URL", "sync.quickJgy": "Nutstore dav.jianguoyun.com/dav/", "sync.quickNc": "Nextcloud remote.php/dav/files/", "sync.quickSyn": "Synology /webdav", "sync.exportLocal": "Export local backup", "sync.importLocal": "Import from local", "sync.exportDone": "Local backup exported.", "sync.importDone": "Local backup imported.", "sync.importFail": "Import failed: bad file or wrong master password.", "sync.test": "Test connection", "sync.testing": "Testing…", "sync.testOk": "Connection OK ✅", "sync.testFail": "Connection failed: ", "sync.needUrl": "Please fill in the server URL first",
+    "common.label": "Name", "common.value": "Password / Key", "common.save": "Save", "common.cancel": "Cancel", "common.del": "Delete", "common.master": "Master password", "common.masterHint": "Used to encrypt locally saved passwords (AES-256-CBC). If forgotten, data cannot be recovered.", "common.setMaster": "Set master password", "common.changeMaster": "Change master", "common.masterPlaceholder": "Enter master password", "common.confirmMaster": "Confirm password", "common.lock": "Lock", "common.unlock": "Unlock", "common.unlockNow": "Unlock", "common.lockedTip": "The vault is encrypted. Enter the master password to unlock.", "common.masterMismatch": "Passwords do not match", "common.masterEmpty": "Please enter a master password", "common.vaultReady": "Vault ready (encrypted, on-device)", "common.export": "Export backup (JSON)", "common.import": "Import backup (JSON)", "common.exportDone": "Encrypted backup exported.", "common.importDone": "Backup imported.", "common.importFail": "Failed: bad file or wrong master password.", "vault.slot1": "Vault 1", "vault.slot2": "Vault 2", "vault.slot3": "Vault 3", "vault.slotHint": "There are 3 password vaults (Vault 1/2/3): switch the number at the top of the password book to view that vault; newly saved passwords/keys go into the currently selected vault.", "lang.import": "Import language pack", "lang.importHint": "Choose a JSON language pack ({ \"lang\": \"xx\", \"name\": \"Language name\", \"data\": { key: translation } }). Use the zh template in this project to translate and import.", "lang.importDone": "Language pack imported. You can switch to it in the language list.", "lang.importFail": "Import failed: bad file format or missing fields.", "sync.title": "Backup & Sync", "sync.webdav": "WebDAV", "sync.url": "Server URL", "sync.user": "User", "sync.pass": "Password", "sync.saveCfg": "Save config", "sync.backup": "Backup to WebDAV", "sync.restore": "Restore from WebDAV", "sync.backupDone": "Backed up to WebDAV.", "sync.restoreDone": "Restored from WebDAV.", "sync.fail": "Operation failed: ", "sync.cfgHint": "Server must support WebDAV (e.g. Nextcloud, Synology, Nutstore) and allow CORS.", "sync.needMaster": "Set and unlock the master password in Saved Passwords first.", "sync.quick": "Quick fill server URL", "sync.quickJgy": "Nutstore dav.jianguoyun.com/dav/", "sync.quickNc": "Nextcloud remote.php/dav/files/", "sync.quickSyn": "Synology /webdav", "sync.exportLocal": "Export local backup", "sync.importLocal": "Import from local", "sync.exportDone": "Local backup exported.", "sync.importDone": "Local backup imported.", "sync.importFail": "Import failed: bad file or wrong master password.", "sync.test": "Test connection", "sync.testing": "Testing…", "sync.testOk": "Connection OK ✅", "sync.testFail": "Connection failed: ", "sync.needUrl": "Please fill in the server URL first", "exp.title": "Export mode", "exp.enc": "🔒 Encrypted", "exp.plain": "📄 Plain text", "exp.locked": "Unlock the password book first to export", "exp.done": "CryptoData.json exported",
 
 
     "about.title": "About",
@@ -561,6 +566,7 @@ window.I18N = {
     "vp.del": "Delete",
     "vp.skip": "Not now",
     "vp.none": "No saved entries yet.",
+    "paste": "Paste", "vp.pasteOk": "Pasted & applied ✅", "vp.pasteBad": "Clipboard content does not match this key format", "vp.pasteDenied": "Cannot read clipboard (check browser permission)",
     "vp.book": " Password Book",
     "vp.generic": "General",
     "vp.rsaPriv": "RSA Private Key",

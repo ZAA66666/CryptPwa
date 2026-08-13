@@ -19,8 +19,12 @@
      - sessionMaster 仅存于内存，关闭页面即清空；本地只留密文 */
   const C = window.CryptoJS;
   const VAULT_KEY = "set_vault";
+  const PLAIN_KEY = "set_vault_plain"; // 关闭数据加密时的明文存储键
   const PBKDF2_ITER = 10000;
   let sessionMaster = null; // 仅内存：解锁后的主密码
+  /* 数据加密开关（默认开启）：开启=主密码+AES 密文存储；关闭=明文存储无需主密码 */
+  function dataEncEnabled() { return localStorage.getItem("set_data_enc") !== "0"; }
+  function setDataEnc(on) { localStorage.setItem("set_data_enc", on ? "1" : "0"); }
   /* 密码本 3 套密码库：当前库号（0/1/2），localStorage 记忆；条目带 slot 字段归属 */
   let vaultSlot = parseInt(localStorage.getItem("set_vault_slot") || "0", 10) || 0;
   function setVaultSlot(n) {
@@ -35,8 +39,10 @@
   }
   function saveImportedLangs(o) { localStorage.setItem("set_imported_langs", JSON.stringify(o)); }
 
-  function vaultExists() { return !!localStorage.getItem(VAULT_KEY); }
-  function isLocked() { return vaultExists() && !sessionMaster; }
+  function vaultExists() {
+    return dataEncEnabled() ? !!localStorage.getItem(VAULT_KEY) : !!localStorage.getItem(PLAIN_KEY);
+  }
+  function isLocked() { return dataEncEnabled() && vaultExists() && !sessionMaster; }
 
   function deriveKey(master, salt) {
     return C.PBKDF2(master, salt, { keySize: 256 / 32, iterations: PBKDF2_ITER });
@@ -69,14 +75,19 @@
   }
   function lock() { sessionMaster = null; }
   function readPasswords() {
+    if (!dataEncEnabled()) {
+      const s = localStorage.getItem(PLAIN_KEY);
+      return s ? JSON.parse(s) : [];
+    }
     if (!sessionMaster) throw new Error("LOCKED");
     return decryptVault(localStorage.getItem(VAULT_KEY), sessionMaster);
   }
   function writePasswords(arr) {
+    if (!dataEncEnabled()) { localStorage.setItem(PLAIN_KEY, JSON.stringify(arr)); return; }
     if (!sessionMaster) throw new Error("LOCKED");
     localStorage.setItem(VAULT_KEY, encryptVault(arr, sessionMaster));
   }
-  function exportVault() { return localStorage.getItem(VAULT_KEY); } // 已是密文 JSON
+  function exportVault() { return localStorage.getItem(dataEncEnabled() ? VAULT_KEY : PLAIN_KEY); } // 已是密文/明文 JSON
   function importVault(blobJson, master) {
     decryptVault(blobJson, master); // 校验主密码，错则抛
     sessionMaster = master;
@@ -293,10 +304,41 @@
         const label = t("set." + it) || t(it + ".title") || it;
         html += `<li class="settings-item" data-go="${it}"><span>${escapeHtml(label)}</span><span class="si-arrow">›</span></li>`;
       });
-      html += "</ul></div>";
+      html += "</ul>";
+      /* 数据加密开关（数据隐私组末尾） */
+      if (g.items.indexOf("sync") >= 0) {
+        html += `<div class="settings-row" id="enc-row"><span class="sr-label">${t("set.dataEnc")}</span><label class="switch"><input type="checkbox" id="enc-toggle" ${dataEncEnabled() ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label></div>`;
+      }
+      html += "</div>";
     });
     bodyEl.innerHTML = html;
     bodyEl.querySelectorAll(".settings-item").forEach((li) => (li.onclick = () => go(li.dataset.go)));
+    /* 数据加密开关：默认开启；切换时在 密文(主密码) / 明文 之间迁移 */
+    const encToggle = document.getElementById("enc-toggle");
+    if (encToggle) {
+      encToggle.onchange = () => {
+        const on = encToggle.checked;
+        if (on) {
+          const master = window.prompt(t("common.setMaster") + "：" + t("common.masterPlaceholder"));
+          if (!master) { encToggle.checked = false; return; }
+          const plain = localStorage.getItem(PLAIN_KEY);
+          const arr = plain ? JSON.parse(plain) : [];
+          localStorage.removeItem(PLAIN_KEY);
+          setDataEnc(true);
+          setupVault(master);
+          writePasswords(arr);
+          alert(t("enc.on"));
+        } else {
+          if (isLocked()) { alert(t("exp.locked")); encToggle.checked = true; return; }
+          const arr = vaultExists() ? readPasswords() : [];
+          setDataEnc(false);
+          localStorage.setItem(PLAIN_KEY, JSON.stringify(arr));
+          sessionMaster = null;
+          alert(t("enc.off"));
+        }
+        render();
+      };
+    }
   }
 
   function renderSubview(name) {
@@ -320,12 +362,12 @@
       return;
     } else if (name === "storage") {
       titleEl.textContent = t("storage.title");
-      const path = getSetting("savepath", "sdcard/CryptoPwa");
+      const path = getSetting("savepath", "sdcard/CrytoPwa");
       html =
         `<div class="cp-note">${t("storage.hint")}</div>` +
         `<div class="cp-note">${t("storage.locHint")}</div>` +
         `<div class="cp-form">` +
-        `<input id="sp-path" value="${escapeHtml(path)}" placeholder="sdcard/CryptoPwa" />` +
+        `<input id="sp-path" value="${escapeHtml(path)}" placeholder="sdcard/CrytoPwa" />` +
         `<div class="btn-row">` +
         `<button class="btn" id="sp-pick">${t("storage.pick")}</button>` +
         `<button class="btn ghost" id="sp-reset">${t("storage.reset")}</button>` +
@@ -414,7 +456,7 @@
   function attachSubview(name) {
     if (name === "storage") {
       document.getElementById("sp-save").onclick = () => {
-        const v = (bodyEl.querySelector("#sp-path").value || "").trim() || "sdcard/CryptoPwa";
+        const v = (bodyEl.querySelector("#sp-path").value || "").trim() || "sdcard/CrytoPwa";
         setSetting("savepath", v);
         alert(t("storage.saved"));
         render();
@@ -440,8 +482,8 @@
       };
       const resetBtn = document.getElementById("sp-reset");
       if (resetBtn) resetBtn.onclick = () => {
-        setSetting("savepath", "sdcard/CryptoPwa");
-        bodyEl.querySelector("#sp-path").value = "sdcard/CryptoPwa";
+        setSetting("savepath", "sdcard/CrytoPwa");
+        bodyEl.querySelector("#sp-path").value = "sdcard/CrytoPwa";
         if (pickHint) pickHint.textContent = "";
       };
     } else if (name === "theme") {
@@ -561,8 +603,8 @@
     titleEl.textContent = t("common.title");
     let html = "";
 
-    if (!vaultExists()) {
-      /* 首次使用：设置主密码，之后才创建空库 */
+    if (!vaultExists() && dataEncEnabled()) {
+      /* 首次使用：设置主密码，之后才创建空库（仅加密模式） */
       html =
         `<div class="cp-note">${t("common.masterHint")}</div>` +
         `<div class="cp-form">` +
@@ -619,7 +661,7 @@
     bodyEl.innerHTML = html;
     appendAskToggle();
 
-    if (!vaultExists()) {
+    if (!vaultExists() && dataEncEnabled()) {
       bodyEl.querySelector("#mp-set").onclick = () => {
         const a = bodyEl.querySelector("#mp1").value, b = bodyEl.querySelector("#mp2").value;
         if (!a) { alert(t("common.masterEmpty")); return; }
@@ -686,17 +728,38 @@
       if (slotSeg) slotSeg.querySelectorAll("button").forEach((b) =>
         (b.onclick = () => { setVaultSlot(parseInt(b.dataset.v, 10) || 0); render(); })
       );
-      /* 导出（下载备份包：密码本密文 + 保存路径 + 显示设置） */
+      /* 导出（CryptoData.json：弹窗选 加密保存 / 明文保存） */
       bodyEl.querySelector("#cp-export").onclick = () => {
-        const blob = new Blob([buildBackup()], { type: "application/json" });
-        const aEl = document.createElement("a");
-        aEl.href = URL.createObjectURL(blob);
-        aEl.download = "crypto-pwa-backup.json";
-        aEl.click();
-        URL.revokeObjectURL(aEl.href);
-        alert(t("common.exportDone"));
+        if (isLocked()) { alert(t("exp.locked")); return; }
+        const mask = ensureEl("exp-mask", "vp-mask");
+        const panel = ensureEl("exp-panel", "vp-panel");
+        panel.innerHTML =
+          `<div class="vp-inner">` +
+          `<div class="vp-head"><span class="vp-title">${t("exp.title")}</span><button class="vp-close" id="exp-close">✕</button></div>` +
+          `<div class="kv-tpl-list">` +
+          `<button class="kv-tpl-opt" id="exp-enc">${t("exp.enc")}</button>` +
+          `<button class="kv-tpl-opt" id="exp-plain">${t("exp.plain")}</button>` +
+          `</div></div>`;
+        mask.classList.add("show"); panel.classList.add("show");
+        const close = () => { mask.classList.remove("show"); panel.classList.remove("show"); };
+        panel.querySelector("#exp-close").onclick = close;
+        mask.onclick = close;
+        const doExport = (enc) => {
+          const arr = readPasswords();
+          const ud = enc ? encryptVault(arr, sessionMaster) : JSON.stringify(arr);
+          const blob = new Blob([JSON.stringify({ Version: "V1.0", UpdateTime: new Date().toISOString(), UserData: ud }, null, 2)], { type: "application/json" });
+          const aEl = document.createElement("a");
+          aEl.href = URL.createObjectURL(blob);
+          aEl.download = "CryptoData.json";
+          aEl.click();
+          URL.revokeObjectURL(aEl.href);
+          alert(t("exp.done"));
+          close();
+        };
+        panel.querySelector("#exp-enc").onclick = () => doExport(true);
+        panel.querySelector("#exp-plain").onclick = () => doExport(false);
       };
-      /* 导入（兼容备份包 / 旧版纯密码本） */
+      /* 导入（CryptoData 加密/明文 + 兼容旧备份包） */
       const fileInput = bodyEl.querySelector("#cp-file");
       bodyEl.querySelector("#cp-import").onclick = () => fileInput.click();
       fileInput.onchange = () => {
@@ -704,15 +767,21 @@
         const reader = new FileReader();
         reader.onload = () => {
           const txt = reader.result;
-          if (isBackupBundle(txt)) {
-            try { applyBackup(txt); render(); alert(t("common.importDone")); }
-            catch (e) { alert(t("common.importFail")); }
-            return;
-          }
-          const master = window.prompt(t("common.masterPlaceholder"));
-          if (!master) return;
-          try { importVault(txt, master); render(); alert(t("common.importDone")); }
-          catch (e) { alert(t("common.importFail")); }
+          try {
+            if (isBackupBundle(txt)) { applyBackup(txt); render(); alert(t("common.importDone")); return; }
+            const o = JSON.parse(txt);
+            if (!o || o.Version !== "V1.0" || typeof o.UserData !== "string") throw new Error("fmt");
+            const ud = JSON.parse(o.UserData);
+            if (ud && typeof ud === "object" && ud.ct && ud.salt && ud.iv) {
+              /* 加密文件：输入主密码解密后写入 */
+              const master = window.prompt(t("common.masterPlaceholder"));
+              if (!master) return;
+              writePasswords(decryptVault(o.UserData, master));
+            } else if (Array.isArray(ud)) {
+              writePasswords(ud); // 明文文件
+            } else throw new Error("fmt");
+            render(); alert(t("common.importDone"));
+          } catch (e) { alert(t("common.importFail")); }
         };
         reader.readAsText(f);
       };
@@ -766,10 +835,10 @@
     const includeVault = opts.vault !== false;
     const includeSettings = opts.settings !== false;
     const out = { format: "crypto-pwa-backup", version: 1 };
-    if (includeVault) out.vault = vaultExists() ? localStorage.getItem(VAULT_KEY) : null;
+    if (includeVault) out.vault = vaultExists() ? exportVault() : null;
     if (includeSettings) {
       out.settings = {
-        savepath: getSetting("savepath", "sdcard/CryptoPwa"),
+        savepath: getSetting("savepath", "sdcard/CrytoPwa"),
         font: getSetting("font", "normal"),
         theme: getSetting("theme", "system"),
         accent: getSetting("accent", "default"),
@@ -785,7 +854,7 @@
   function applyBackup(str, scope) {
     const o = JSON.parse(str);
     scope = scope || {};
-    if (scope.vault !== false && o.vault) localStorage.setItem(VAULT_KEY, o.vault); // 密文整体写入，重新解锁即可
+    if (scope.vault !== false && o.vault) localStorage.setItem(dataEncEnabled() ? VAULT_KEY : PLAIN_KEY, o.vault); // 按当前加密模式写入
     if (scope.settings !== false) {
       const s = o.settings || {};
       if (s.savepath !== undefined) setSetting("savepath", s.savepath);
@@ -1207,8 +1276,8 @@
     }
     function renderVP() {
       const wrap = (h) => '<div class="vp-inner">' + h + '</div>';
-      if (!vaultExists()) {
-        // 首次使用：先设主密码，再把当前密钥作为第一条记录存入
+      if (!vaultExists() && dataEncEnabled()) {
+        // 首次使用：先设主密码，再把当前密钥作为第一条记录存入（仅加密模式）
         panel.innerHTML = wrap(
           headHtml() +
           `<div class="cp-note">${t("vp.ask")}</div>` +
@@ -1285,7 +1354,7 @@
     applyImmersive();
 
     window.openSettings = openSettings; // 供底部「设置」按钮调用
-    window.getSavePath = () => getSetting("savepath", "sdcard/CryptoPwa"); // 供 RSA 存文件用
+    window.getSavePath = () => getSetting("savepath", "sdcard/CrytoPwa"); // 供 RSA 存文件用
     backBtn.addEventListener("click", back);
     document.querySelectorAll("[data-fill]").forEach((b) =>
       b.addEventListener("click", () => openPicker(b.dataset.fill, b.dataset.cat))

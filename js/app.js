@@ -272,6 +272,7 @@ const hashOutput = document.getElementById("hash-output");
 /* ---------- 3. 编码面板（Base64 / Hex / URL） ---------- */
 const encInput = document.getElementById("enc-input");
 const encMethodSeg = document.getElementById("enc-method");
+let encLastOp = "enc"; // 上次执行的操作：enc 编码 / dec 解码（切方式时跟随重算）
 
 // 当前选中的编码方式：b64 / hex / url
 function getEncMethod() {
@@ -283,6 +284,8 @@ if (encMethodSeg) {
     b.addEventListener("click", () => {
       encMethodSeg.querySelectorAll("button").forEach((x) => x.classList.remove("active"));
       b.classList.add("active");
+      // 已有输入时，跟随上次操作（编码/解码）自动重新计算，避免「先按编码再切方式不执行」
+      if (encInput && encInput.value.trim()) encDo(encLastOp);
     });
   });
 }
@@ -394,9 +397,10 @@ function jwtEncode(inp) {
 
 // action: "enc" 编码 / "dec" 解码
 function encDo(action) {
+  encLastOp = action;
   const inp = encInput.value;
   const out = document.getElementById("enc-output");
-  if (!inp) { out.value = ""; return; }
+  if (!inp) { out.value = ""; if (window.toast) toast(t("enc.empty")); return; }
   const method = getEncMethod(); // b64 / hex / url
   try {
     let result;
@@ -426,9 +430,11 @@ function encDo(action) {
       const methodName = { b64: "Base64", hex: "Hex", url: "URL", b32: "Base32", b58: "Base58", unicode: "Unicode", jwt: "JWT" }[method];
       addHistory({ cat: "enc", go: "enc", op: action, method: methodName, preview: inp.slice(0, 24) });
       // 编码没有密码概念，不提示保存到密码本（仅加解密相关功能才会提示）
+      if (window.toast) toast(t(action === "enc" ? "enc.okEnc" : "enc.okDec"));
     }
   } catch (e) {
     out.value = "❌ 处理失败：" + e.message;
+    if (window.toast) toast((typeof t === "function" ? t("enc.fail") : "❌ 处理失败：") + e.message);
   }
 }
 document.getElementById("enc-encode").addEventListener("click", () => encDo("enc"));
@@ -762,6 +768,45 @@ const rsaViewBtn = document.getElementById("rsa-view");
 if (rsaViewBtn) rsaViewBtn.addEventListener("click", openRsaView);
 document.getElementById("rsav-close").addEventListener("click", closeRsaView);
 rsavMask.addEventListener("click", closeRsaView);
+
+// 密钥弹窗「粘贴」：读剪贴板 → 校验格式 → 填入对应框（另一把置空，避免拼凑成假的一对）
+async function pasteKey(kind) {
+  const fail = (msg) => { if (window.toast) toast(msg); };
+  let txt;
+  try { txt = await navigator.clipboard.readText(); }
+  catch (e) { fail(t("vp.pasteDenied")); return; }
+  const s = (txt || "").trim();
+  if (!s) { fail(t("vp.pasteBad")); return; }
+  const apply = (fill, clear, save, refresh, okMsg) => {
+    fill.value = s; if (clear) clear.value = "";
+    fill.dispatchEvent(new Event("input"));
+    if (clear) clear.dispatchEvent(new Event("input"));
+    if (save) save();
+    if (refresh) refresh();
+    fail(okMsg);
+  };
+  if (kind === "rsa-pub") {
+    if (!/-----BEGIN (RSA )?PUBLIC KEY-----/.test(s)) { fail(t("vp.pasteBad")); return; }
+    apply(rsaPub, rsaPriv, window.rsaSaveKeys, fillRsaView, t("vp.pasteOk"));
+  } else if (kind === "rsa-priv") {
+    if (!/-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----/.test(s)) { fail(t("vp.pasteBad")); return; }
+    apply(rsaPriv, rsaPub, window.rsaSaveKeys, fillRsaView, t("vp.pasteOk"));
+  } else if (kind === "sm2-pub") {
+    if (!/^04[0-9a-fA-F]{128}$/.test(s)) { fail(t("vp.pasteBad")); return; }
+    apply(sm2Pub, sm2Priv, window.sm2SaveKeys, fillSm2View, t("vp.pasteOk"));
+  } else if (kind === "sm2-priv") {
+    if (!/^[0-9a-fA-F]{64}$/.test(s)) { fail(t("vp.pasteBad")); return; }
+    apply(sm2Priv, sm2Pub, window.sm2SaveKeys, fillSm2View, t("vp.pasteOk"));
+  }
+}
+const pasteMap = {
+  "rsav-paste-pub": "rsa-pub", "rsav-paste-priv": "rsa-priv",
+  "sm2v-paste-pub": "sm2-pub", "sm2v-paste-priv": "sm2-priv",
+};
+Object.keys(pasteMap).forEach((id) => {
+  const b = document.getElementById(id);
+  if (b) b.addEventListener("click", () => pasteKey(pasteMap[id]));
+});
 document.getElementById("rsav-copy-pub").addEventListener("click", (e) => copyText(rsaPub.value, e.target));
 document.getElementById("rsav-copy-priv").addEventListener("click", (e) => copyText(rsaPriv.value, e.target));
 document.getElementById("rsav-regen").addEventListener("click", async (e) => {
@@ -939,7 +984,7 @@ if (sm2vExport) sm2vExport.addEventListener("click", sm2ExportKeys);
 const _t = (k, f) => (window.t ? window.t(k) : f);
 // 默认路径（设置里可改），文件名会带上该路径的最后一级目录名
 function getSaveBase() {
-  const p = (window.getSavePath ? window.getSavePath() : "sdcard/CryptoPwa").replace(/\/+$/, "");
+  const p = (window.getSavePath ? window.getSavePath() : "sdcard/CrytoPwa").replace(/\/+$/, "");
   return p.split("/").pop() || "CryptoPwa";
 }
 function fallbackDownload(filename, content) {
@@ -1547,6 +1592,46 @@ function setupExpanders() {
   function addKvRow(key, val, type) { if (kvList) kvList.appendChild(kvRow(key, val, type)); }
   if ($("json-kv-add")) {
     $("json-kv-add").addEventListener("click", () => addKvRow());
+    /* 「＋ 模板」：弹窗选择 随机示例 / JSON 模板，一键填入键值列表 */
+    $("json-kv-template").addEventListener("click", () => {
+      const mask = document.createElement("div");
+      mask.className = "vp-mask";
+      const panel = document.createElement("div");
+      panel.className = "vp-panel";
+      panel.innerHTML =
+        `<div class="vp-inner">` +
+        `<div class="vp-head"><span class="vp-title">${escapeHtml(t("json.tplTitle"))}</span><button class="vp-close" id="kv-tpl-close">✕</button></div>` +
+        `<div class="kv-tpl-list">` +
+        `<button class="kv-tpl-opt" id="kv-tpl-random">${escapeHtml(t("json.tplRandom"))}</button>` +
+        `<button class="kv-tpl-opt" id="kv-tpl-json">${escapeHtml(t("json.tplTemplate"))}</button>` +
+        `</div>` +
+        `</div>`;
+      mask.appendChild(panel);
+      document.body.appendChild(mask);
+      const close = () => mask.remove();
+      panel.querySelector("#kv-tpl-close").onclick = close;
+      mask.addEventListener("click", (e) => { if (e.target === mask) close(); });
+      panel.querySelector("#kv-tpl-random").onclick = () => {
+        kvList.innerHTML = "";
+        addKvRow("name", "Tom", "string");
+        addKvRow("age", String(20 + Math.floor(Math.random() * 30)), "number");
+        addKvRow("email", "user" + Math.floor(Math.random() * 9999) + "@example.com", "string");
+        addKvRow("active", Math.random() > 0.5 ? "true" : "false", "boolean");
+        addKvRow("remark", "random-" + Date.now().toString(36), "string");
+        close();
+      };
+      panel.querySelector("#kv-tpl-json").onclick = () => {
+        kvList.innerHTML = "";
+        addKvRow("id", "1", "number");
+        addKvRow("name", "张三", "string");
+        addKvRow("email", "zhangsan@example.com", "string");
+        addKvRow("role", "admin", "string");
+        addKvRow("enabled", "true", "boolean");
+        addKvRow("profile", '{"city":"北京","level":3}', "string");
+        close();
+      };
+      mask.classList.add("show"); panel.classList.add("show");
+    });
     $("json-kv-import").addEventListener("click", () => {
       const r = tryParse(jIn.value);
       if (!r.ok || typeof r.val !== "object" || r.val === null || Array.isArray(r.val)) { toast(t("json.invalid")); return; }

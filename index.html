@@ -450,6 +450,7 @@
           <div id="json-kv-list"></div>
           <div class="json-kv-actions">
             <button class="btn ghost" id="json-kv-add" data-i18n="json.kvAdd">+ 添加一行</button>
+            <button class="btn ghost" id="json-kv-template"><span data-i18n="json.kvTpl">＋ 模板</span></button>
             <button class="btn ghost" id="json-kv-import" data-i18n="json.kvImport">从格式化区导入</button>
           </div>
           <button class="btn primary" id="json-kv-gen" data-i18n="json.kvGen">生成 JSON</button>
@@ -766,11 +767,11 @@
       <div class="vp-inner">
         <div class="vp-head"><span class="vp-title" data-i18n="rsa.viewTitle">查看/修改密钥对</span><button class="vp-close" id="rsav-close" aria-label="关闭">✕</button></div>
         <div class="key-block">
-          <div class="key-block-head"><span class="field-label" style="margin:0" data-i18n="asym.pub">公钥 (PUBLIC KEY)</span><button class="mini-btn" id="rsav-copy-pub" data-i18n="copy">复制</button></div>
+          <div class="key-block-head"><span class="field-label" style="margin:0" data-i18n="asym.pub">公钥 (PUBLIC KEY)</span><button class="mini-btn" id="rsav-paste-pub" data-i18n="paste">粘贴</button><button class="mini-btn" id="rsav-copy-pub" data-i18n="copy">复制</button></div>
           <pre class="key-preview" id="rsav-pub"></pre>
         </div>
         <div class="key-block">
-          <div class="key-block-head"><span class="field-label" style="margin:0" data-i18n="asym.priv">私钥 (PRIVATE KEY)</span><button class="mini-btn" id="rsav-copy-priv" data-i18n="copy">复制</button></div>
+          <div class="key-block-head"><span class="field-label" style="margin:0" data-i18n="asym.priv">私钥 (PRIVATE KEY)</span><button class="mini-btn" id="rsav-paste-priv" data-i18n="paste">粘贴</button><button class="mini-btn" id="rsav-copy-priv" data-i18n="copy">复制</button></div>
           <pre class="key-preview" id="rsav-priv"></pre>
         </div>
         <div class="btn-row rsa-view-actions">
@@ -787,11 +788,11 @@
       <div class="vp-inner">
         <div class="vp-head"><span class="vp-title" data-i18n="rsa.viewTitle">查看/修改密钥对</span><button class="vp-close" id="sm2v-close" aria-label="关闭">✕</button></div>
         <div class="key-block">
-          <div class="key-block-head"><span class="field-label" style="margin:0" data-i18n="sm2.pub">公钥（04 开头，130 位十六进制）</span><button class="mini-btn" id="sm2v-copy-pub" data-i18n="copy">复制</button></div>
+          <div class="key-block-head"><span class="field-label" style="margin:0" data-i18n="sm2.pub">公钥（04 开头，130 位十六进制）</span><button class="mini-btn" id="sm2v-paste-pub" data-i18n="paste">粘贴</button><button class="mini-btn" id="sm2v-copy-pub" data-i18n="copy">复制</button></div>
           <pre class="key-preview" id="sm2v-pub"></pre>
         </div>
         <div class="key-block">
-          <div class="key-block-head"><span class="field-label" style="margin:0" data-i18n="sm2.priv">私钥（64 位十六进制）</span><button class="mini-btn" id="sm2v-copy-priv" data-i18n="copy">复制</button></div>
+          <div class="key-block-head"><span class="field-label" style="margin:0" data-i18n="sm2.priv">私钥（64 位十六进制）</span><button class="mini-btn" id="sm2v-paste-priv" data-i18n="paste">粘贴</button><button class="mini-btn" id="sm2v-copy-priv" data-i18n="copy">复制</button></div>
           <pre class="key-preview" id="sm2v-priv"></pre>
         </div>
         <div class="btn-row rsa-view-actions">
