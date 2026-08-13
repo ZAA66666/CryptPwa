@@ -4,6 +4,8 @@
  * data-i18n 属性：纯文本标签，用 textContent 填充。
  * 法律/说明页：含 HTML，由 settings.js 用 innerHTML 填充。
  * ===================================================================== */
+/* 本项目 GitHub 仓库（Crypto-pwa）。同步到 GitHub 后把下面的“用户名”替换成自己的用户名即可。 */
+const GITHUB_REPO = "https://github.com/用户名/Crypto-pwa";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
@@ -219,20 +221,21 @@ window.I18N = {
       '<h3>它能做什么</h3><ul>' +
       '<li>哈希：MD5 / SHA-1/224/256/384/512 / SHA-3 / RIPEMD-160 / HMAC</li>' +
       '<li>编码：Base64 / Hex / URL，以及图片转 Base64</li>' +
-      '<li>对称加密：AES / DES / 3DES / Blowfish / RC4 / Rabbit</li>' +
-      '<li>非对称加密：RSA（生成密钥、加密解密、签名验签）</li>' +
-      '<li>二维码生成、最近使用记录、密码本、深色模式、多语言</li></ul>' +
+      '<li>对称加/解密：AES / DES / 3DES / Blowfish / RC4 / Rabbit</li>' +
+      '<li>非对称加/解密：RSA / SM2（生成密钥、加密解密、签名验签）</li>' +
+      '<li>二维码 / 条形码生成、最近使用记录、密码本、深色模式、多语言</li></ul>' +
+      '<h3>项目源码</h3><p>本项目代码已同步至 GitHub，仓库名 <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">Crypto-pwa</a>。欢迎 Star / Fork / 提交 Issue。</p>' +
       '<h3>技术说明</h3><p>算法核心使用成熟的 <a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a> 库与浏览器原生 <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto</a>；二维码使用 <a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a>。所有计算均在本地完成，不依赖任何服务器。</p>' +
       '<h3>开源组件与引用位置</h3><ul>' +
-      '<li><b><a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a></b>（MIT 许可）— 哈希与对称加密算法。<br>引用文件：<a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">js/vendor/crypto-js.js</a>；用于「哈希」「编码（图片转 Base64 走其编解码）」「对称加/解密」面板。</li>' +
-      '<li><b><a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a></b>（MIT 许可）— 二维码生成。<br>引用文件：<a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">js/vendor/qrcode-generator.js</a>；用于「二维码 / 条形码」面板（<code>qr-btn</code> 调用其 <code>qrcode()</code>）。</li>' +
-      '<li><b><a href="https://github.com/cozmo/jsQR" target="_blank" rel="noopener">jsQR</a></b>（Apache-2.0）— 摄像头扫码解码。<br>引用文件：<a href="https://github.com/cozmo/jsQR" target="_blank" rel="noopener">js/vendor/jsqr.js</a>；用于「扫描二维码」。</li>' +
-      '<li><b><a href="https://github.com/lindell/JsBarcode" target="_blank" rel="noopener">JsBarcode</a></b>（MIT 许可）— 条形码生成。<br>引用文件：<a href="https://github.com/lindell/JsBarcode" target="_blank" rel="noopener">js/vendor/jsbarcode.all.min.js</a>；用于「条形码」。</li>' +
-      '<li><b><a href="https://github.com/JuneAndGreen/sm-crypto" target="_blank" rel="noopener">sm-crypto</a></b>（MIT 许可）— SM2 国密算法。<br>引用文件：<a href="https://github.com/JuneAndGreen/sm-crypto" target="_blank" rel="noopener">js/vendor/sm-crypto.esm.js</a>（依赖已改引本地 <a href="https://github.com/andyperlitch/jsbn" target="_blank" rel="noopener">jsbn</a>）；用于「加/解密 → SM2」。</li>' +
+      '<li><b><a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a></b>（MIT 许可）— 哈希与对称加密算法。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/crypto-js.js" target="_blank" rel="noopener">js/vendor/crypto-js.js</a>；用于「哈希」「编码（图片转 Base64 走其编解码）」「对称加/解密」面板。</li>' +
+      '<li><b><a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a></b>（MIT 许可）— 二维码生成。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/qrcode-generator.js" target="_blank" rel="noopener">js/vendor/qrcode-generator.js</a>；用于「二维码 / 条形码」面板（<code>qr-btn</code> 调用其 <code>qrcode()</code>）。</li>' +
+      '<li><b><a href="https://github.com/cozmo/jsQR" target="_blank" rel="noopener">jsQR</a></b>（Apache-2.0）— 摄像头扫码解码。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsqr.js" target="_blank" rel="noopener">js/vendor/jsqr.js</a>；用于「扫描二维码」。</li>' +
+      '<li><b><a href="https://github.com/lindell/JsBarcode" target="_blank" rel="noopener">JsBarcode</a></b>（MIT 许可）— 条形码生成。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbarcode.all.min.js" target="_blank" rel="noopener">js/vendor/jsbarcode.all.min.js</a>；用于「条形码」。</li>' +
+      '<li><b><a href="https://github.com/JuneAndGreen/sm-crypto" target="_blank" rel="noopener">sm-crypto</a></b>（MIT 许可）— SM2 国密算法。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/sm-crypto.esm.js" target="_blank" rel="noopener">js/vendor/sm-crypto.esm.js</a>（依赖已改引本地 <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbn.esm.js" target="_blank" rel="noopener">jsbn</a>）；用于「加/解密 → SM2」。</li>' +
       '<li><b><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a></b>（浏览器原生，无单独依赖）— RSA 密钥生成、加解密、签名验签。<br>引用位置：浏览器原生 <code>crypto.subtle</code>；用于「加/解密 → RSA」，仅 https / localhost 可用。</li>' +
       '<li><b>本项目代码</b>（手写）— 界面、交互、历史记录、密码本、设置、主题与多语言均自行实现，未封装第三方 UI 框架。</li></ul>' +
       '<p>所有计算均在本地完成、可离线使用，不向任何服务器上传数据。</p>' +
-      '<p><strong>加解密工具箱</strong> · 版本 1.0</p>',
+      '<p><strong>加解密工具箱</strong> · 版本 1.0 · <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">GitHub</a></p>',
 
     /* 隐私政策 */
     "privacy.title": "隐私政策",
@@ -321,6 +324,7 @@ window.I18N = {
     "set.gear": "Settings",
 
     "home.greet": "Toolbox · Tap a feature below to use it",
+    "home.brand": "Crypto Toolbox · v1.0",
     "tool.hash": "Hash", "tool.enc": "Encode/Decode", "tool.sym": "Sym Enc/Dec",
     "tool.asym": "Encrypt/Decrypt", "tool.qr": "QR / Barcode", "tool.guide": "Guide", "tool.json": "JSON", "tool.sm2": "SM2", "tool.cron": "Crontab", "tool.rand": "Random Text",
     "home.recent": "Recent", "home.clear": "Clear",
@@ -460,19 +464,20 @@ window.I18N = {
       '<li>Hash: MD5 / SHA-1/224/256/384/512 / SHA-3 / RIPEMD-160 / HMAC</li>' +
       '<li>Encode: Base64 / Hex / URL, plus image-to-Base64</li>' +
       '<li>Symmetric: AES / DES / 3DES / Blowfish / RC4 / Rabbit</li>' +
-      '<li>Asymmetric: RSA (key gen, encrypt/decrypt, sign/verify)</li>' +
-      '<li>QR generation, recent history, saved passwords, dark mode, multi-language</li></ul>' +
+      '<li>Asymmetric: RSA / SM2 (key gen, encrypt/decrypt, sign/verify)</li>' +
+      '<li>QR / Barcode generation, recent history, saved passwords, dark mode, multi-language</li></ul>' +
+      '<h3>Source code</h3><p>This project is open source on GitHub, repo <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">Crypto-pwa</a>. Star / Fork / Issues welcome.</p>' +
       '<h3>Tech notes</h3><p>Core algorithms use the mature <a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a> library and native <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto</a>; QR uses <a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a>. Everything runs locally, no server involved.</p>' +
       '<h3>Open-source & where used</h3><ul>' +
-      '<li><b><a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a></b> (MIT) — hashing & symmetric. File: <a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">js/vendor/crypto-js.js</a>; used by Hash, Encode (image-to-Base64), and Symmetric panels.</li>' +
-      '<li><b><a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a></b> (MIT) — QR generation. File: <a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">js/vendor/qrcode-generator.js</a>; used by the QR / Barcode panel (<code>qr-btn</code> calls its <code>qrcode()</code>).</li>' +
-      '<li><b><a href="https://github.com/cozmo/jsQR" target="_blank" rel="noopener">jsQR</a></b> (Apache-2.0) — camera QR scanning. File: <a href="https://github.com/cozmo/jsQR" target="_blank" rel="noopener">js/vendor/jsqr.js</a>; used by “Scan QR”.</li>' +
-      '<li><b><a href="https://github.com/lindell/JsBarcode" target="_blank" rel="noopener">JsBarcode</a></b> (MIT) — barcode generation. File: <a href="https://github.com/lindell/JsBarcode" target="_blank" rel="noopener">js/vendor/jsbarcode.all.min.js</a>; used by the Barcode panel.</li>' +
-      '<li><b><a href="https://github.com/JuneAndGreen/sm-crypto" target="_blank" rel="noopener">sm-crypto</a></b> (MIT) — SM2 national crypto. File: <a href="https://github.com/JuneAndGreen/sm-crypto" target="_blank" rel="noopener">js/vendor/sm-crypto.esm.js</a> (dependency rewired to local <a href="https://github.com/andyperlitch/jsbn" target="_blank" rel="noopener">jsbn</a>); used by Encrypt/Decrypt → SM2.</li>' +
+      '<li><b><a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a></b> (MIT) — hashing & symmetric. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/crypto-js.js" target="_blank" rel="noopener">js/vendor/crypto-js.js</a>; used by Hash, Encode (image-to-Base64), and Symmetric panels.</li>' +
+      '<li><b><a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a></b> (MIT) — QR generation. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/qrcode-generator.js" target="_blank" rel="noopener">js/vendor/qrcode-generator.js</a>; used by the QR / Barcode panel (<code>qr-btn</code> calls its <code>qrcode()</code>).</li>' +
+      '<li><b><a href="https://github.com/cozmo/jsQR" target="_blank" rel="noopener">jsQR</a></b> (Apache-2.0) — camera QR scanning. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsqr.js" target="_blank" rel="noopener">js/vendor/jsqr.js</a>; used by “Scan QR”.</li>' +
+      '<li><b><a href="https://github.com/lindell/JsBarcode" target="_blank" rel="noopener">JsBarcode</a></b> (MIT) — barcode generation. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbarcode.all.min.js" target="_blank" rel="noopener">js/vendor/jsbarcode.all.min.js</a>; used by the Barcode panel.</li>' +
+      '<li><b><a href="https://github.com/JuneAndGreen/sm-crypto" target="_blank" rel="noopener">sm-crypto</a></b> (MIT) — SM2 national crypto. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/sm-crypto.esm.js" target="_blank" rel="noopener">js/vendor/sm-crypto.esm.js</a> (dependency rewired to local <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbn.esm.js" target="_blank" rel="noopener">jsbn</a>); used by Encrypt/Decrypt → SM2.</li>' +
       '<li><b><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a></b> (native, no dependency) — RSA key gen, encrypt/decrypt, sign/verify. Location: native <code>crypto.subtle</code>; used by the Encrypt/Decrypt → RSA pane, only on https / localhost.</li>' +
       '<li><b>This project’s code</b> (hand-written) — UI, interaction, history, password book, settings, theme and i18n are all custom; no third-party UI framework.</li></ul>' +
       '<p>Everything runs locally and offline; nothing is uploaded to any server.</p>' +
-      '<p><strong>Crypto Toolbox</strong> · v1.0</p>',
+      '<p><strong>Crypto Toolbox</strong> · v1.0 · <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">GitHub</a></p>',
 
     "privacy.title": "Privacy Policy",
     "privacy.text":
