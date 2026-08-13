@@ -1,89 +1,176 @@
-# CryptPwa — Encryption Toolkit (PWA) 🔐
+# CryptPwa 加解密工具箱 🔐
 
-> A local-first PWA toolkit: **every calculation runs on your own device**. No data is uploaded, and it works offline.
+> 本地优先（Local-first）的网页版加解密工具箱：**所有计算都在你自己的设备上完成**，数据不上传、不联网也能用。
 
-![PWA](https://img.shields.io/badge/PWA-installable-brightgreen) ![Offline](https://img.shields.io/badge/offline-ready-blue) ![Lang](https://img.shields.io/badge/language-zh%2Fen-orange)
+![PWA](https://img.shields.io/badge/PWA-%E5%8F%AF%E5%AE%89%E8%A3%85-brightgreen) ![离线可用](https://img.shields.io/badge/%E7%A6%BB%E7%BA%BF-%E5%8F%AF%E7%94%A8-blue) ![语言](https://img.shields.io/badge/%E8%AF%AD%E8%A8%80-%E4%B8%AD%E6%96%87%2FEnglish-orange)
 
-> 🤖 **AI Disclosure:** This project's code was generated with AI assistance. Use at your own risk after review. See [AI_DISCLOSURE.md](AI_DISCLOSURE.md). — 中文说明见 [README.zh-CN.md](README.zh-CN.md)
+> 🤖 **AI 生成声明**：本项目代码由 AI 辅助生成，供学习交流使用，使用前请自行审查。详见 [AI_DISCLOSURE.md](AI_DISCLOSURE.md) ｜ [English](README_US.md)
 
 ---
 
-## ✨ Features
+## 目录
 
-| Module | Description |
+1. [功能特性](#功能特性)
+2. [隐私与安全](#隐私与安全)
+3. [快速开始](#快速开始)
+4. [使用教程](#使用教程)
+5. [平台支持](#平台支持)
+6. [GitHub Actions 自动构建](#github-actions-自动构建)
+7. [项目结构](#项目结构)
+
+---
+
+## ✨ 功能特性
+
+| 模块 | 说明 |
 |---|---|
-| **Hashing** | MD5 / SHA1 / SHA256 / SHA512 / HMAC, etc. |
-| **Encode / Decode** | Base64 / Hex / URL / Base32 / Base58 / Unicode / JWT, image → Base64 |
-| **Encrypt / Decrypt** | Symmetric: AES(128/192/256) / DES / 3DES / Blowfish / RC4 / Rabbit with ECB/CBC/CTR/CFB/OFB; Asymmetric: RSA, SM2 (Chinese national standard) |
-| **QR / Barcode** | Generate (with error-correction levels), scan via camera, barcode generation |
-| **JSON Tools** | Format / minify / validate / extract by path / key-value editor |
-| **Crontab** | Parse cron expressions and preview the next 5 run times |
-| **Random** | Random passwords / numbers / strings |
-| **Password Book** | 3 independent vaults, AES-256-CBC encrypted storage (optional plain mode), master password, CryptoData.json export/import (encrypted or plain) |
+| **哈希** | MD5 / SHA1 / SHA256 / SHA512 / HMAC 等，支持直接计算与校验 |
+| **编解码** | Base64 / Hex / URL / Base32 / Base58 / Unicode / JWT，图片转 Base64 |
+| **加/解密** | 对称：AES(128/192/256) / DES / 3DES / Blowfish / RC4 / Rabbit，支持 ECB/CBC/CTR/CFB/OFB；非对称：RSA、SM2（国密） |
+| **二维码/条形码** | 生成（含容错级别、尺寸）、摄像头扫码、条形码生成 |
+| **JSON 工具** | 格式化 / 压缩 / 校验 / 按路径提取代码 / 键值对可视化编辑 |
+| **Crontab** | 定时表达式解析 + 最近 5 次执行时间预览 |
+| **随机文本** | 随机密码 / 随机数 / 随机字符串生成 |
+| **密码本** | 3 套独立密码库、AES-256-CBC 加密存储（可切换明文模式）、主密码解锁、CryptoData.json 加密/明文导出导入 |
 
-## 🔒 Privacy & Security
+## 🔒 隐私与安全
 
-- Pure client-side computation (crypto-js / Web Crypto / sm-crypto). **Nothing is sent to any server.**
-- Password book is stored encrypted: AES-256-CBC with PBKDF2 (10,000 iterations); the master password lives only in memory.
-- Data encryption is **on by default** to keep third-party scanners from reading plaintext.
-- PWA offline support.
+- 纯前端计算（crypto-js / Web Crypto / sm-crypto），**不发送任何数据到服务器**
+- 密码本密文存储：AES-256-CBC + PBKDF2（10000 次）派生密钥，主密码仅保存在内存
+- 数据加密开关默认开启，防止第三方扫描工具读到明文内容
+- 支持 PWA 离线安装，断网可用
 
-## 🚀 Quick Start
+## 🚀 快速开始
 
-### Web (recommended)
-1. Deploy to any static hosting (GitHub Pages / CloudStudio / Nginx / `python -m http.server`), or open `index.html` directly.
-2. Full PWA features (offline/install) require HTTPS or localhost.
-3. Install to desktop / home screen from the browser's install button.
+### 网页版（推荐体验）
+1. 直接部署到任意静态托管（GitHub Pages / CloudStudio / Nginx / 本地 `python -m http.server`）
+2. 用浏览器打开 `index.html` 即可使用；PWA 完整功能（离线/安装）需 HTTPS 或 localhost
+3. 支持**安装到桌面/主屏**：Chrome / Edge 地址栏右侧点「安装」
 
-### Android App (APK)
-- Every push to `main` triggers [GitHub Actions](#-github-actions-auto-build) to build an APK and publish it to **Releases**.
-- Download the latest `app-debug.apk` and install (allow "install unknown apps").
-- Built with a WebView shell (Capacitor); core logic is identical to the web version and works offline.
+### 安卓 App（APK）
+- 每次推送 `main` 分支，[GitHub Actions](#github-actions-自动构建) 会自动打包安卓 APK 并发布到本仓库 **Releases** 页面
+- 下载最新 `app-debug.apk` 安装（需允许「安装未知来源应用」）
+- App 基于 WebView 壳（Capacitor）打包，核心代码与网页版完全一致，离线可用
 
-## 📖 Documentation
+---
 
-- **中文版自述** → [README.zh-CN.md](README.zh-CN.md)
-- **详细使用教程（中文）** → [使用教程.md](使用教程.md)
+## 📖 使用教程
 
-## 🖥 Platform Support
+所有工具的操作逻辑基本一致：**输入内容 → 设置参数 → 点击执行 → 查看/复制结果**。
 
-| Platform | Status |
+### 1. 哈希
+把任意文本变成固定长度的"指纹"（单向，无法还原），用于校验完整性、验证口令。
+
+- 输入文本 → 选择算法（MD5 / SHA1 / SHA256 / SHA512…）→ 点「计算」
+- **HMAC**（带密钥的哈希）：选 HMAC 系列算法并填写密钥，计算后可「保存到密码本」（只有 HMAC 会提示保存）
+
+### 2. 编解码
+格式转换（Base64 / Hex / URL / Base32 / Base58 / Unicode / JWT）。编码不是加密，可逆不保密。
+
+- 选「编码 / 解码」→ 选方式 → 输入 → 点「编码/解码」或「执行」
+- **切换方式会自动按上次操作重新计算**；执行成功/失败有提示
+- 图片转 Base64：选图片 → 「图片 → Base64」
+
+### 3. 加/解密
+主页「加/解密」进入，顶部切换 **对称加密 / 非对称加密**。
+
+**对称（AES / DES / 3DES / Blowfish / RC4 / Rabbit）**
+- AES 可选 128/192/256 位密钥长度；其余按提示填写
+- 分组模式：ECB / CBC / CTR / CFB / OFB（ECB 不需要 IV，其余需填 **IV**，通常 16 字节）
+- 密钥 / IV 旁有随机生成按钮
+- 加密后点「保存到密码本」，**密钥 + 模式 + 密钥长度 + IV 一起保存**；下次从密码本填入全部自动恢复
+- ⚠️ CBC 等模式密文已**自动携带 IV**（`v1:...` 格式），解密自动提取；老格式密文未保存 IV 则无法解密
+
+**非对称（RSA / SM2）**
+- RSA 进入自动生成密钥对（2048 位）；「查看/修改密钥对」可查看、复制、**粘贴导入**（自动校验 PEM 格式）、重新生成、保存到密码本
+- SM2 同样自动生成密钥对；加密用公钥、解密用私钥；支持签名/验签
+- 从密码本选择密钥后顶部显示「已从密码本选择：xxx」；私钥请妥善保管
+
+### 4. 二维码 / 条形码
+- 生成：输入内容 → 选容错级别 → 生成；条形码同页面
+- 扫描：点「扫描二维码」授权摄像头，或「从相册选择」识别；结果可复制、可「填入」其他工具
+
+### 5. JSON 工具
+- **格式化**：粘贴 JSON → 格式化 / 压缩 / 校验
+- **提取代码**：按路径提取并生成对应代码片段
+- **键值编辑**：逐行添加键/值/类型 →「生成 JSON」；「＋ 模板」一键填入随机示例或 JSON 模板；可从格式化区导入
+
+### 6. Crontab
+输入 Cron 表达式（5 段或 6 段，支持 `*`、列表、区间、步长）→ 解析出最近 5 次执行时间。
+
+### 7. 随机文本
+生成随机密码/数字/字符串：可配置长度、字符集、数量，一键复制。
+
+### 8. 密码本（常用密码管理）
+设置 → 密码本。设**主密码**（AES-256-CBC 加密存储，忘记无法找回），解锁后**每次打开 App 只需解锁一次**。
+
+- **3 套密码库**：库 1/2/3 独立，顶部切换，展示当前库密码；保存归属当前库；长按「返回」有提示
+- 各功能执行后选择保存，自动带出算法/密钥/IV；面板「密码本」按钮可填入（自动恢复参数）
+- **导出/导入 CryptoData.json**：弹窗选 🔒加密（导入需主密码）/ 📄明文；旧备份兼容
+
+### 9. 设置
+- **通用设置**：语言（中文/英文/导入语言包）、主题、强调色、字体、沉浸式、外部调用与分享、实验性（数据回调/导入方式）、内容保存路径
+- **数据隐私**：**数据加密开关**（默认开启；关闭则明文存储无需主密码）、密码本、WebDAV 备份同步（可「检测连接」：绿=通红=不通）
+- **隐私与条款**：关于（版本/检测更新/源码）、隐私政策、用户协议、安全说明
+
+### 10. 外部调用与分享
+- 开启「自动弹出」后，通过 `crypto-pwa://?text=...` 或系统分享传入文本/JSON/图片，自动弹出选择器处理
+- 导入方式（URL Scheme / Android Intent / 系统分享 / 剪贴板）与数据回调说明见「设置 → 实验性」
+
+### 常见问题（FAQ）
+
+**Q：网页版能加密后发给别人解密吗？**
+能。对称加密需把「算法 + 密钥 + IV + 密文」一起给对方（CBC 密文已含 IV）；非对称加密用对方公钥加密、对方用私钥解密。
+
+**Q：忘记主密码怎么办？**
+无法恢复（本地无明文存储）。请牢记主密码，或定期「导出备份」加密保存。
+
+**Q：安卓 APK 在哪下载？**
+仓库 Releases 页面，每次推送代码自动构建。安装时允许「未知来源」（debug 签名，仅个人使用）。
+
+---
+
+## 🖥 平台支持
+
+| 平台 | 状态 |
 |---|---|
-| Desktop browsers (Windows / macOS / Linux) | ✅ Available (installable PWA) |
-| Mobile browsers (Android / iOS) | ✅ Available (add to home screen) |
-| **Android App** | 🚧 **Planned / in development**: packaged via a WebView shell (Capacitor); offline-capable, with external app invocation & callback (URL Scheme / Intent / JS Bridge) |
+| 桌面浏览器（Windows / macOS / Linux） | ✅ 可用（PWA 可安装） |
+| 移动浏览器（Android / iOS） | ✅ 可用（PWA 可安装到主屏） |
+| **安卓 App** | 🚧 **开发中**：WebView 壳（Capacitor）打包，离线可用，支持外部应用调用与回调（URL Scheme / Intent / JS Bridge） |
 
-> Note: the app is expected to appear as an **Android app** as one of its main forms. A pure web page cannot write data back into another app due to browser restrictions; a native shell will enable the full "invoke → process → callback" plugin workflow.
+> 本项目未来将以「安卓 App」为主要形态之一。纯网页受浏览器限制无法直接把数据写回其它 App，打包原生壳后将支持完整的「外部调用 → 处理 → 回调」插件式工作流。
 
-## 🔄 GitHub Actions Auto Build
+## 🔄 GitHub Actions 自动构建
 
-Workflow: `.github/workflows/build-apk.yml`
+工作流：`.github/workflows/build-apk.yml`
 
-- **Trigger:** push to `main` (or run `Build Android APK` manually in the Actions tab)
-- **Flow:** checkout → Node/Java → Capacitor Android project → Gradle `assembleDebug` → tag → publish to Releases
-- Grab the latest APK from the **Releases** page.
+- **触发**：推送 `main` 分支（或 Actions 页手动运行 `Build Android APK`）
+- **流程**：检出 → Node/Java → `npm run sync` 同步网页资源 → Gradle 打包 debug APK → 打 tag → 发布到 Releases
+- 构建完成即可在 **Releases** 下载最新 APK
 
-## 📂 Project Structure
+## 📂 项目结构
 
 ```
-├── index.html            # SPA entry
-├── css/style.css         # All styles (light/dark themes)
+├── index.html            # 单页应用入口
+├── css/style.css         # 全部样式（明暗主题）
 ├── js/
-│   ├── app.js            # Tool logic
-│   ├── i18n.js           # zh/en strings + GITHUB_REPO constant
-│   ├── settings.js       # Settings / password book / backup & sync
-│   └── vendor/           # Offline libraries (crypto-js, jsQR, JsBarcode, …)
-├── manifest*.webmanifest # PWA manifests (zh/en)
-├── sw.js                 # Service Worker (offline cache)
-├── android/              # Capacitor Android project (APK build)
-└── .github/workflows/    # Auto-build APK
+│   ├── app.js            # 各工具逻辑
+│   ├── i18n.js           # 中英文案 + GITHUB_REPO 常量
+│   ├── settings.js       # 设置 / 密码本 / 备份同步
+│   └── vendor/           # 离线依赖库（crypto-js、jsQR、JsBarcode 等）
+├── manifest*.webmanifest # PWA 清单（中/英）
+├── sw.js                 # Service Worker（离线缓存）
+├── capacitor.config.json # 安卓打包配置（Capacitor）
+├── android/              # Capacitor 安卓工程
+├── scripts/sync-web.mjs  # 网页资源同步脚本
+└── .github/workflows/    # 自动构建 APK
 ```
 
-## 📝 License & Disclosure
+## 📝 许可证与声明
 
-- 🤖 **AI-generated code** — see [AI_DISCLOSURE.md](AI_DISCLOSURE.md)
-- Personal learning project. **Star ⭐ / Fork / Issues** are welcome.
+- 🤖 **AI 生成代码声明** —— 详见 [AI_DISCLOSURE.md](AI_DISCLOSURE.md) ｜ [English](README_US.md)
+- 本项目为个人兴趣作品，代码仅供学习交流。欢迎 **Star ⭐ / Fork / 提交 Issue**。
 
 ---
 
-*CryptPwa = Crypt + PWA: an encryption toolbox that fits in your pocket.*
+*CryptPwa = Crypt（加密）+ PWA（渐进式网页应用）：把加密工具装进口袋。*

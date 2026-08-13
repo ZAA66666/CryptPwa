@@ -4,13 +4,13 @@
 .github/
 node_modules/
 android/
+webapp/
 capacitor.config.json
 .capacitorignore
 package.json
 package-lock.json
 README.md
-README.zh-CN.md
-使用教程.md
+README_US.md
 AI_DISCLOSURE.md
 示例备份_crypto-pwa-backup.json
 中文语言包_zh.json
