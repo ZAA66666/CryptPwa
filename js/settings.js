@@ -180,6 +180,14 @@
   function applyImmersive() {
     const on = getSetting("immersive", "0") === "1";
     document.body.classList.toggle("immersive", on);
+    /* 安卓原生：状态栏透明覆盖（真沉浸式） */
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar) {
+      window.Capacitor.Plugins.StatusBar.setOverlaysWebView({ overlay: on }).catch(() => {});
+      if (on) {
+        const dark = document.documentElement.getAttribute("data-theme") === "dark";
+        window.Capacitor.Plugins.StatusBar.setStyle({ style: dark ? "LIGHT" : "DARK" }).catch(() => {});
+      }
+    }
   }
 
   /* ---------- 莫奈取色（动态强调色） ----------
@@ -283,6 +291,7 @@
   function closeSettings() { overlay.classList.remove("show"); overlay.setAttribute("hidden", ""); stack = []; }
   function go(name) { stack.push(name); render(); }
   function back() { stack.pop(); if (stack.length === 0) { closeSettings(); return; } render(); }
+  window.settingsBack = back; // 安卓返回键用：设置页逐级返回 / 关闭
 
   function render() {
     const top = stack[stack.length - 1];
@@ -363,18 +372,19 @@
     } else if (name === "storage") {
       titleEl.textContent = t("storage.title");
       const path = getSetting("savepath", "sdcard/CrytoPwa");
+      const isCap = !!(window.Capacitor && window.Capacitor.Plugins);
       html =
         `<div class="cp-note">${t("storage.hint")}</div>` +
         `<div class="cp-note">${t("storage.locHint")}</div>` +
         `<div class="cp-form">` +
         `<input id="sp-path" value="${escapeHtml(path)}" placeholder="sdcard/CrytoPwa" />` +
         `<div class="btn-row">` +
-        `<button class="btn" id="sp-pick">${t("storage.pick")}</button>` +
+        (isCap ? "" : `<button class="btn" id="sp-pick">${t("storage.pick")}</button>`) +
         `<button class="btn ghost" id="sp-reset">${t("storage.reset")}</button>` +
         `</div>` +
         `</div>` +
         `<div class="btn-row"><button class="btn primary" id="sp-save">${t("common.save")}</button></div>` +
-        `<p class="hint" id="sp-pick-hint"></p>`;
+        `<p class="hint" id="sp-pick-hint">${isCap ? t("storage.androidHint") : ""}</p>`;
     } else if (name === "theme") {
       titleEl.textContent = t("theme.title");
       const cur = getSetting("theme", "system");
@@ -700,7 +710,8 @@
           `<button data-v="2" class="${vaultSlot === 2 ? "active" : ""}">${t("vault.slot3")}</button>` +
         `</div>` +
         `<div class="cp-note">${t("common.vaultReady")}</div>` +
-        `<div class="cp-form">` +
+        `<button class="btn ghost" id="cp-new" style="margin:4px 0 10px">＋ ${t("common.new")}</button>` +
+        `<div class="cp-form" id="cp-form" style="display:none">` +
         `<input id="cp-name" placeholder="${t("common.label")}" />` +
         `<select id="cp-cat">` +
           `<option value="generic">${t("cat.generic")}</option>` +
@@ -784,6 +795,18 @@
         };
         list.appendChild(row);
       });
+      /* 「＋ 新建」：切换新增表单显隐 */
+      const cpNew = bodyEl.querySelector("#cp-new");
+      const cpForm = bodyEl.querySelector("#cp-form");
+      if (cpNew && cpForm) {
+        cpNew.onclick = () => {
+          const show = cpForm.style.display !== "none";
+          cpForm.style.display = show ? "none" : "block";
+          if (!show) cpNew.textContent = "✕ " + t("common.cancel");
+          else cpNew.textContent = "＋ " + t("common.new");
+          if (!show) bodyEl.querySelector("#cp-name").focus();
+        };
+      }
       bodyEl.querySelector("#cp-save").onclick = () => {
         const name = bodyEl.querySelector("#cp-name").value.trim();
         const val = bodyEl.querySelector("#cp-val").value;
@@ -816,12 +839,7 @@
         const doExport = (enc) => {
           const arr = readPasswords();
           const ud = enc ? encryptVault(arr, sessionMaster) : JSON.stringify(arr);
-          const blob = new Blob([JSON.stringify({ Version: "V1.0", UpdateTime: new Date().toISOString(), UserData: ud }, null, 2)], { type: "application/json" });
-          const aEl = document.createElement("a");
-          aEl.href = URL.createObjectURL(blob);
-          aEl.download = "CryptoData.json";
-          aEl.click();
-          URL.revokeObjectURL(aEl.href);
+          window.downloadJson("CryptoData.json", JSON.stringify({ Version: "V1.0", UpdateTime: new Date().toISOString(), UserData: ud }, null, 2));
           alert(t("exp.done"));
           close();
         };
@@ -1086,12 +1104,7 @@
     /* 导出本地备份（先勾选范围，再下载 JSON 文件） */
     bodyEl.querySelector("#wd-export-local").onclick = () => {
       pickScope(false, (scope) => {
-        const blob = new Blob([buildBackup(scope)], { type: "application/json" });
-        const aEl = document.createElement("a");
-        aEl.href = URL.createObjectURL(blob);
-        aEl.download = "crypto-pwa-backup.json";
-        aEl.click();
-        URL.revokeObjectURL(aEl.href);
+        window.downloadJson("crypto-pwa-backup.json", buildBackup(scope));
         alert(t("sync.exportDone"));
       });
     };

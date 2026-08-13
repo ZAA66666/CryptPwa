@@ -1019,9 +1019,19 @@ function fallbackDownload(filename, content) {
   a.href = url; a.download = filename; a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-// 保存文本到文件：优先用 File System Access（Android Chrome 装为 App 可弹位置选择），否则下载
+// 保存文本到文件：安卓 WebView 写系统文档目录；桌面优先 File System Access，否则下载
 function saveTextFile(filename, content) {
   if (!content) { alert(_t("save.empty", "请先生成或粘贴密钥")); return; }
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
+    window.Capacitor.Plugins.Filesystem.writeFile({
+      path: filename, data: content, directory: "DOCUMENTS", recursive: true,
+    }).then(() => {
+      if (window.toast) toast(_t("save.savedDoc", "已保存到系统文档目录：" + filename));
+    }).catch((err) => {
+      if (window.toast) toast(_t("save.fail", "保存失败：") + ((err && err.message) || err));
+    });
+    return;
+  }
   if (window.showSaveFilePicker) {
     window.showSaveFilePicker({
       suggestedName: filename,
@@ -1033,6 +1043,32 @@ function saveTextFile(filename, content) {
     fallbackDownload(filename, content);
   }
 }
+// 导出 JSON/文本：安卓 WebView 用系统分享/文件系统；桌面用 Blob 下载
+window.downloadJson = function (name, content) {
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
+    if (navigator.share) {
+      try {
+        const f = new File([content], name, { type: "application/json" });
+        if (navigator.canShare && navigator.canShare({ files: [f] })) {
+          navigator.share({ files: [f], title: name }).catch(() => {});
+          return;
+        }
+      } catch (e) {}
+    }
+    window.Capacitor.Plugins.Filesystem.writeFile({
+      path: name, data: content, directory: "DOCUMENTS", recursive: true,
+    }).then(() => {
+      if (window.toast) toast(_t("save.savedDoc", "已保存到系统文档目录：" + name));
+    }).catch(() => { fallbackDownload(name, content); });
+    return;
+  }
+  const blob = new Blob([content], { type: "application/octet-stream" });
+  const aEl = document.createElement("a");
+  aEl.href = URL.createObjectURL(blob);
+  aEl.download = name;
+  aEl.click();
+  URL.revokeObjectURL(aEl.href);
+};
 function rsaSaveFile() {
   const pub = rsaPub.value.trim(), priv = rsaPriv.value.trim();
   if (!pub && !priv) { alert(_t("save.empty", "请先生成或粘贴密钥")); return; }
@@ -2019,3 +2055,29 @@ if ("serviceWorker" in navigator) {
     if (!_reloaded) { _reloaded = true; location.reload(); }
   });
 }
+
+/* ---------- 10. 安卓返回键：关闭弹窗 → 设置页返回 → 面板回主页 → 退出 App ---------- */
+(function () {
+  if (!window.Capacitor || !window.Capacitor.Plugins || !window.Capacitor.Plugins.App) return;
+  window.Capacitor.Plugins.App.addListener("backButton", () => {
+    /* 1. 优先关闭打开的弹窗（密码本 / 选择器 / 扫码 / 密钥查看等） */
+    const masks = document.querySelectorAll(".vp-mask.show, .pw-mask.show, .scan-mask.show");
+    for (const m of masks) {
+      const closeBtn = m.querySelector(".vp-close, .pp-close, .scan-close");
+      if (closeBtn) { closeBtn.click(); return; }
+      m.click();
+      return;
+    }
+    /* 2. 设置页打开 → 返回上一级（或关闭） */
+    if (window.settingsBack) { window.settingsBack(); return; }
+    /* 3. 功能面板打开（非主页）→ 返回主页 */
+    const home = document.getElementById("panel-home");
+    const cur = document.querySelector(".panel.show");
+    if (home && cur && cur !== home) {
+      const back = cur.querySelector(".ph-back");
+      if (back) { back.click(); return; }
+    }
+    /* 4. 主页 → 退出 App */
+    window.Capacitor.Plugins.App.exitApp();
+  });
+})();

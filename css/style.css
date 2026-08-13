@@ -812,7 +812,8 @@ input[type="file"] {
   transition: opacity .2s ease, transform .2s ease; max-width: 80vw; text-align: center;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.legal-text { font-size: 14px; line-height: 1.8; color: #3a3f45; }
+.legal-text { font-size: 14px; line-height: 1.8; color: var(--text); }
+.legal-text code { color: var(--accent); word-break: break-all; }
 .legal-text h3 { font-size: 15px; margin: 18px 0 6px; color: var(--text); }
 .legal-text p { margin: 0 0 10px; }
 .legal-text ul { padding-left: 20px; margin: 0 0 10px; }
