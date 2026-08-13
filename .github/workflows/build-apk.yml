@@ -58,7 +58,4 @@ jobs:
           git push origin "$TAG"
           gh release create "$TAG" "$APK" \
             --title "CryptPwa $TAG" \
-            --notes "自动构建安卓 APK（debug 签名，允许未知来源即可安装）。
-
-- 构建时间：$(date -u +'%Y-%m-%d %H:%M UTC')
-- 说明：由 GitHub Actions 在推送 main 后自动生成；正式签名版可后续配置 Keystore。"
+            --notes "自动构建安卓 APK（debug 签名，允许未知来源即可安装）。构建时间：$(date -u +'%Y-%m-%d %H:%M UTC')。由 GitHub Actions 在推送 main 后自动生成；正式签名版可后续配置 Keystore。"
