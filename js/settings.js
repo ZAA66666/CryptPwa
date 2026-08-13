@@ -1,0 +1,1061 @@
+/* =====================================================================
+ * 设置模块：主题 / 语言 / 字体 / 沉浸式 / 常用密码 / 关于·隐私·协议等
+ * 依赖：i18n.js（window.I18N / t / applyLang）、app.js（renderHistory 全局）
+ * ===================================================================== */
+(function () {
+  "use strict";
+
+  /* ---------- 本地存储小工具 ---------- */
+  function getSetting(name, def) {
+    try { const v = localStorage.getItem("set_" + name); return v === null ? def : v; } catch (e) { return def; }
+  }
+  function setSetting(name, val) {
+    try { localStorage.setItem("set_" + name, val); } catch (e) {}
+  }
+  /* ---------- 加密保险库（常用密码密文存储） ----------
+     格式（JSON）：
+       { v:1, alg:"AES-256-CBC", salt:"hex(16B)", iv:"hex(16B)", ct:"base64" }
+     - 密钥由主密码经 PBKDF2 派生（10000 次，256bit），不存明文主密码
+     - sessionMaster 仅存于内存，关闭页面即清空；本地只留密文 */
+  const C = window.CryptoJS;
+  const VAULT_KEY = "set_vault";
+  const PBKDF2_ITER = 10000;
+  let sessionMaster = null; // 仅内存：解锁后的主密码
+
+  function vaultExists() { return !!localStorage.getItem(VAULT_KEY); }
+  function isLocked() { return vaultExists() && !sessionMaster; }
+
+  function deriveKey(master, salt) {
+    return C.PBKDF2(master, salt, { keySize: 256 / 32, iterations: PBKDF2_ITER });
+  }
+  function encryptVault(arr, master) {
+    const salt = C.lib.WordArray.random(16);
+    const iv = C.lib.WordArray.random(16);
+    const key = deriveKey(master, salt);
+    const ct = C.AES.encrypt(JSON.stringify(arr), key, {
+      iv: iv, mode: C.mode.CBC, padding: C.pad.Pkcs7,
+    }).toString();
+    return JSON.stringify({ v: 1, alg: "AES-256-CBC", salt: salt.toString(), iv: iv.toString(), ct: ct });
+  }
+  function decryptVault(blob, master) {
+    const o = JSON.parse(blob);
+    if (!o || o.v !== 1 || !o.ct) throw new Error("格式错误");
+    const key = deriveKey(master, C.enc.Hex.parse(o.salt));
+    const bytes = C.AES.decrypt(o.ct, key, { iv: C.enc.Hex.parse(o.iv), mode: C.mode.CBC, padding: C.pad.Pkcs7 });
+    const txt = bytes.toString(C.enc.Utf8);
+    if (!txt) throw new Error("主密码错误");
+    return JSON.parse(txt);
+  }
+  function setupVault(master) {
+    sessionMaster = master;
+    localStorage.setItem(VAULT_KEY, encryptVault([], master));
+  }
+  function unlock(master) {
+    decryptVault(localStorage.getItem(VAULT_KEY), master); // 错则抛异常
+    sessionMaster = master;
+  }
+  function lock() { sessionMaster = null; }
+  function readPasswords() {
+    if (!sessionMaster) throw new Error("LOCKED");
+    return decryptVault(localStorage.getItem(VAULT_KEY), sessionMaster);
+  }
+  function writePasswords(arr) {
+    if (!sessionMaster) throw new Error("LOCKED");
+    localStorage.setItem(VAULT_KEY, encryptVault(arr, sessionMaster));
+  }
+  function exportVault() { return localStorage.getItem(VAULT_KEY); } // 已是密文 JSON
+  function importVault(blobJson, master) {
+    decryptVault(blobJson, master); // 校验主密码，错则抛
+    sessionMaster = master;
+    localStorage.setItem(VAULT_KEY, blobJson);
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+  // 密钥只展示前后截断预览（不暴露完整 PEM）
+  function previewKey(k) {
+    if (!k) return "—";
+    const b64 = k.split("\n").filter((l) => l && !l.startsWith("-----")).join("");
+    if (b64.length <= 48) return b64;
+    return b64.slice(0, 32) + "…" + b64.slice(-12);
+  }
+  // 保险库条目类型：rsa-pair（一对）/ rsa-import（单把导入）/ generic（普通）
+  function entryKind(e) {
+    if (e && e.kind === "rsa-pair") return "rsa-pair";
+    if (e && e.kind === "rsa-import") return "rsa-import";
+    return "generic";
+  }
+  function entryTitle(e) {
+    const k = entryKind(e);
+    if (k === "rsa-pair") return (e.label || "") + (window.__lang === "en" ? " RSA Key" : t("rsa.pairSuffix"));
+    if (k === "rsa-import") return e.label || t("rsa.importDefault");
+    return e.label || "";
+  }
+  function entryBadge(e) {
+    const k = entryKind(e);
+    if (k === "rsa-pair") return { text: "2", cls: "badge-pair" };
+    if (k === "rsa-import") return { text: t("rsa.badgeExt"), cls: "badge-ext" };
+    return null;
+  }
+  function badgeHtml(b) { return b ? `<span class="rsa-badge ${b.cls}">${escapeHtml(b.text)}</span>` : ""; }
+  // 加密方式“特殊标记”：带色圆点 + 文字的彩色胶囊，按分类着色，便于一眼认出是哪个密码
+  function methodChip(method, cat) {
+    const c = cat || "generic";
+    const label = escapeHtml(method || t("vp.generic"));
+    return `<span class="mchip ${escapeHtml(c)}">${label}</span>`;
+  }
+  // 长明文截断预览（用于保存弹窗展示，避免大段内容撑爆弹窗）
+  function previewText(s, max) {
+    s = s || "";
+    max = max || 80;
+    return s.length > max ? (s.slice(0, max) + "…") : s;
+  }
+  // 条目是否匹配某个功能的过滤分类：本类 + 通用(generic) 都可见；RSA 只在 RSA 场景出现
+  function matchCat(e, f) {
+    if (!f) return true;
+    const c = e.cat || "generic";
+    if (c === f) return true;
+    if (c === "generic") return true;
+    return false;
+  }
+
+  /* ---------- 各设置应用 ---------- */
+  function resolveLang() {
+    const l = getSetting("lang", "system");
+    if (l === "system") {
+      const n = (navigator.language || "zh").toLowerCase();
+      return n.startsWith("zh") ? "zh" : "en";
+    }
+    return l === "en" ? "en" : "zh";
+  }
+  function applyLanguage() {
+    window.__lang = resolveLang();
+    if (window.applyLang) window.applyLang();
+    if (window.renderHistory) window.renderHistory();
+  }
+  function applyTheme() {
+    const th = getSetting("theme", "system");
+    const sysDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const dark = th === "dark" || (th === "system" && sysDark);
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    applyAccent(); // 重新计算强调色（深色/浅色下取不同明度）
+    // 同步浏览器状态栏/顶部沉浸区配色到当前强调色
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      const ac = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+      meta.setAttribute("content", ac || (dark ? "#161618" : "#1a1a1a"));
+    }
+  }
+  function applyFont() {
+    const f = getSetting("font", "normal");
+    const map = { small: 0.9, normal: 1, large: 1.15, xlarge: 1.3 };
+    document.documentElement.style.setProperty("--fs", map[f] || 1);
+  }
+  function applyImmersive() {
+    const on = getSetting("immersive", "0") === "1";
+    document.body.classList.toggle("immersive", on);
+  }
+
+  /* ---------- 莫奈取色（动态强调色） ----------
+     默认 accent 为墨黑/白（中性黑灰白）；用户可在「设置→主题」里选预设或自定义取色，
+     从种子色生成一套 Monet 风格的同色调色板（accent / on-accent / soft / ring），
+     浅色与深色分别取不同明度，保证可读。 */
+  const ACCENT_PRESETS = [
+    { v: "default", bg: "#1a1a1a", name: "墨黑(默认)" },
+    { v: "#07c160", bg: "#07c160", name: "微信绿" },
+    { v: "#576b95", bg: "#576b95", name: "微信蓝" },
+    { v: "#7c5cff", bg: "#7c5cff", name: "莫奈紫" },
+    { v: "#ff8a3d", bg: "#ff8a3d", name: "莫奈橙" },
+    { v: "#19b3a6", bg: "#19b3a6", name: "莫奈青" },
+  ];
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+  function hexToRgb(hex) {
+    let h = (hex || "#000000").replace("#", "");
+    if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+    const n = parseInt(h, 16);
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+  }
+  function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s = 0; const l = (max + min) / 2;
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h /= 6;
+    }
+    return { h: h * 360, s: s, l: l };
+  }
+  function hslToHex(h, s, l) {
+    h = ((h % 360) + 360) % 360 / 360; s = clamp(s, 0, 1); l = clamp(l, 0, 1);
+    let r, g, b;
+    if (s === 0) { r = g = b = l; }
+    else {
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      const hue = (t) => {
+        t = (t + 1) % 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      };
+      r = hue(h + 1 / 3); g = hue(h); b = hue(h - 1 / 3);
+    }
+    const to = (x) => Math.round(x * 255).toString(16).padStart(2, "0");
+    return "#" + to(r) + to(g) + to(b);
+  }
+  function relLuminance(hex) {
+    const { r, g, b } = hexToRgb(hex);
+    const f = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  }
+  // 由种子色（或 default）推导当前模式的强调色板
+  function computeAccent(seed, dark) {
+    if (!seed || seed === "default") {
+      return dark
+        ? { accent: "#f2f2f2", onAccent: "#111111", soft: "#2c2c2e", ring: "rgba(255,255,255,0.20)" }
+        : { accent: "#1a1a1a", onAccent: "#ffffff", soft: "#ececec", ring: "rgba(0,0,0,0.16)" };
+    }
+    const { h, s, l } = rgbToHsl(hexToRgb(seed).r, hexToRgb(seed).g, hexToRgb(seed).b);
+    const sat = clamp(s, 0.45, 0.95);
+    const lightAccent = hslToHex(h, sat, 0.52);
+    const darkAccent = hslToHex(h, sat, 0.72);
+    const onLight = relLuminance(lightAccent) < 0.45 ? "#ffffff" : "#1a1a1a";
+    const onDark = relLuminance(darkAccent) < 0.45 ? "#ffffff" : "#1a1a1a";
+    const softLight = hslToHex(h, clamp(s, 0.4, 0.9), 0.93);
+    const softDark = hslToHex(h, clamp(s, 0.3, 0.7), 0.22);
+    return {
+      accent: dark ? darkAccent : lightAccent,
+      onAccent: dark ? onDark : onLight,
+      soft: dark ? softDark : softLight,
+      ring: dark ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.16)",
+    };
+  }
+  function applyAccent() {
+    const seed = getSetting("accent", "default");
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    const p = computeAccent(seed, dark);
+    const root = document.documentElement.style;
+    root.setProperty("--accent", p.accent);
+    root.setProperty("--on-accent", p.onAccent);
+    root.setProperty("--accent-soft", p.soft);
+    root.setProperty("--accent-ring", p.ring);
+  }
+
+  /* ---------- 设置导航 ---------- */
+  const overlay = document.getElementById("settings-overlay");
+  const backBtn = document.getElementById("settings-back");
+  const titleEl = document.getElementById("settings-title");
+  const bodyEl = document.getElementById("settings-body");
+  let stack = [];
+
+  function openSettings() { stack = ["main"]; render(); overlay.classList.add("show"); overlay.removeAttribute("hidden"); }
+  function closeSettings() { overlay.classList.remove("show"); overlay.setAttribute("hidden", ""); stack = []; }
+  function go(name) { stack.push(name); render(); }
+  function back() { stack.pop(); if (stack.length === 0) { closeSettings(); return; } render(); }
+
+  function render() {
+    const top = stack[stack.length - 1];
+    if (top === "main") renderMain();
+    else renderSubview(top);
+  }
+
+  function renderMain() {
+    titleEl.textContent = t("set.title");
+    const groups = [
+      { title: t("set.grpGeneral"), items: ["display", "theme", "extcall", "storage"] },
+      { title: t("set.grpData"), items: ["common", "sync"] },
+      { title: t("set.grpPrivacy"), items: ["about", "privacy", "terms", "security", "personal"] },
+    ];
+    let html = "";
+    groups.forEach((g) => {
+      html += `<div class="settings-group"><div class="settings-group-title">${escapeHtml(g.title)}</div><ul class="settings-list">`;
+      g.items.forEach((it) => {
+        const label = t("set." + it) || t(it + ".title") || it;
+        html += `<li class="settings-item" data-go="${it}"><span>${escapeHtml(label)}</span><span class="si-arrow">›</span></li>`;
+      });
+      html += "</ul></div>";
+    });
+    bodyEl.innerHTML = html;
+    bodyEl.querySelectorAll(".settings-item").forEach((li) => (li.onclick = () => go(li.dataset.go)));
+  }
+
+  function renderSubview(name) {
+    let html = "";
+    if (["about", "privacy", "terms", "security", "personal"].includes(name)) {
+      titleEl.textContent = t(name + ".title");
+      html = `<div class="legal-text">${t(name + ".text")}</div>`;
+    } else if (name === "common") {
+      renderCommon();
+      return;
+    } else if (name === "sync") {
+      renderSync();
+      return;
+    } else if (name === "storage") {
+      titleEl.textContent = t("storage.title");
+      const path = getSetting("savepath", "sdcard/CryptoPwa");
+      html =
+        `<div class="cp-note">${t("storage.hint")}</div>` +
+        `<div class="cp-form">` +
+        `<input id="sp-path" value="${escapeHtml(path)}" placeholder="sdcard/CryptoPwa" />` +
+        `</div>` +
+        `<div class="btn-row"><button class="btn primary" id="sp-save">${t("common.save")}</button></div>`;
+    } else if (name === "theme") {
+      titleEl.textContent = t("theme.title");
+      const cur = getSetting("theme", "system");
+      const seed = getSetting("accent", "default");
+      const presetsHtml = ACCENT_PRESETS.map((p) =>
+        `<button class="accent-swatch${seed === p.v ? " active" : ""}" data-seed="${p.v}" style="--sw:${p.bg}" title="${p.name}"></button>`
+      ).join("");
+      html =
+        `<div class="sub-title">${t("theme.title")}</div>` +
+        `<div class="seg-inline" id="theme-seg">` +
+        `<button data-v="system" class="${cur === "system" ? "active" : ""}">${t("theme.system")}</button>` +
+        `<button data-v="light" class="${cur === "light" ? "active" : ""}">${t("theme.light")}</button>` +
+        `<button data-v="dark" class="${cur === "dark" ? "active" : ""}">${t("theme.dark")}</button>` +
+        `</div>` +
+        `<div class="sub-title" style="margin-top:22px">${t("accent.title")}</div>` +
+        `<div class="accent-presets" id="accent-presets">${presetsHtml}</div>` +
+        `<div class="settings-row" style="margin-top:14px"><span class="sr-label">${t("accent.pick")}</span>` +
+        `<input type="color" id="accent-color" value="${seed === "default" ? "#07c160" : seed}" /></div>`;
+    } else if (name === "extcall") {
+      titleEl.textContent = t("ext.title");
+      const on = getSetting("ext_incoming", "1") === "1";
+      html =
+        `<div class="settings-row" style="margin:14px 0 4px"><span class="sr-label">${t("ext.auto")}</span>` +
+        `<label class="switch"><input type="checkbox" id="ext-toggle" ${on ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label></div>` +
+        `<div class="cp-form" style="margin-top:10px">` +
+        `<input id="ext-example" readonly value="crypto-pwa://?text=hello" />` +
+        `<div class="btn-row"><button class="btn ghost" id="ext-copy">${t("ext.copyExample")}</button></div>` +
+        `</div>` +
+        `<div class="legal-text" style="margin-top:14px">${t("ext.text")}</div>`;
+    } else if (name === "display") {
+      titleEl.textContent = t("display.title");
+      const f = getSetting("font", "normal");
+      const imm = getSetting("immersive", "0") === "1";
+      const cur = getSetting("lang", "system");
+      html =
+        `<div class="settings-row"><span class="sr-label">${t("disp.lang")}</span>` +
+        `<div class="seg-inline" id="lang-seg">` +
+        `<button data-v="system" class="${cur === "system" ? "active" : ""}">${t("lang.system")}</button>` +
+        `<button data-v="zh" class="${cur === "zh" ? "active" : ""}">${t("lang.zh")}</button>` +
+        `<button data-v="en" class="${cur === "en" ? "active" : ""}">${t("lang.en")}</button>` +
+        `</div></div>` +
+        `<div class="settings-row"><span class="sr-label">${t("disp.font")}</span>` +
+        `<div class="seg-inline" id="font-seg">` +
+        `<button data-v="small" class="${f === "small" ? "active" : ""}">${t("font.small")}</button>` +
+        `<button data-v="normal" class="${f === "normal" ? "active" : ""}">${t("font.normal")}</button>` +
+        `<button data-v="large" class="${f === "large" ? "active" : ""}">${t("font.large")}</button>` +
+        `<button data-v="xlarge" class="${f === "xlarge" ? "active" : ""}">${t("font.xlarge")}</button>` +
+        `</div></div>` +
+        `<div class="settings-row"><span class="sr-label">${t("disp.immersive")}</span>` +
+        `<label class="switch"><input type="checkbox" id="imm-toggle" ${imm ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label></div>`;
+    } else if (name === "lang") {
+      titleEl.textContent = t("disp.lang");
+      const cur = getSetting("lang", "system");
+      html =
+        `<div class="seg-inline" id="lang-seg">` +
+        `<button data-v="system" class="${cur === "system" ? "active" : ""}">${t("lang.system")}</button>` +
+        `<button data-v="zh" class="${cur === "zh" ? "active" : ""}">${t("lang.zh")}</button>` +
+        `<button data-v="en" class="${cur === "en" ? "active" : ""}">${t("lang.en")}</button>` +
+        `</div>`;
+    }
+    bodyEl.innerHTML = html;
+    attachSubview(name);
+  }
+
+  function attachSubview(name) {
+    if (name === "storage") {
+      document.getElementById("sp-save").onclick = () => {
+        const v = (bodyEl.querySelector("#sp-path").value || "").trim() || "sdcard/CryptoPwa";
+        setSetting("savepath", v);
+        alert(t("storage.saved"));
+        render();
+      };
+    } else if (name === "theme") {
+      bodyEl.querySelectorAll("#theme-seg button").forEach((b) =>
+        (b.onclick = () => { setSetting("theme", b.dataset.v); applyTheme(); render(); })
+      );
+      bodyEl.querySelectorAll("#accent-presets .accent-swatch").forEach((b) =>
+        (b.onclick = () => { setSetting("accent", b.dataset.seed); applyTheme(); render(); })
+      );
+      const colorInput = bodyEl.querySelector("#accent-color");
+      if (colorInput) colorInput.oninput = () => { setSetting("accent", colorInput.value); applyTheme(); };
+    } else if (name === "display") {
+      const seg = bodyEl.querySelector("#font-seg");
+      if (seg) seg.querySelectorAll("button").forEach((b) =>
+        (b.onclick = () => { setSetting("font", b.dataset.v); applyFont(); render(); })
+      );
+      const lseg = bodyEl.querySelector("#lang-seg");
+      if (lseg) lseg.querySelectorAll("button").forEach((b) =>
+        (b.onclick = () => { setSetting("lang", b.dataset.v); applyLanguage(); render(); })
+      );
+      const immT = document.getElementById("imm-toggle");
+      if (immT) immT.onchange = () => {
+        setSetting("immersive", immT.checked ? "1" : "0");
+        applyImmersive();
+        render();
+      };
+    } else if (name === "extcall") {
+      const et = document.getElementById("ext-toggle");
+      if (et) et.onchange = () => { setSetting("ext_incoming", et.checked ? "1" : "0"); render(); };
+      const exCopy = bodyEl.querySelector("#ext-copy");
+      if (exCopy) exCopy.onclick = (e) => {
+        const v = bodyEl.querySelector("#ext-example").value;
+        if (window.copyText) window.copyText(v, e.target);
+      };
+    } else if (name === "lang") {
+      bodyEl.querySelectorAll("#lang-seg button").forEach((b) =>
+        (b.onclick = () => { setSetting("lang", b.dataset.v); applyLanguage(); render(); })
+      );
+    }
+  }
+
+  /* ---------- 常用密码（加密保险库）管理 ---------- */
+  function renderCommon() {
+    titleEl.textContent = t("common.title");
+    let html = "";
+
+    if (!vaultExists()) {
+      /* 首次使用：设置主密码，之后才创建空库 */
+      html =
+        `<div class="cp-note">${t("common.masterHint")}</div>` +
+        `<div class="cp-form">` +
+        `<input id="mp1" type="password" placeholder="${t("common.masterPlaceholder")}" />` +
+        `<input id="mp2" type="password" placeholder="${t("common.confirmMaster")}" />` +
+        `<div class="btn-row"><button class="btn primary" id="mp-set">${t("common.setMaster")}</button></div>` +
+        `</div>`;
+    } else if (isLocked()) {
+      /* 已加密但未解锁 */
+      html =
+        `<div class="cp-note">${t("common.lockedTip")}</div>` +
+        `<div class="cp-form">` +
+        `<input id="mpu" type="password" placeholder="${t("common.masterPlaceholder")}" />` +
+        `<div class="btn-row"><button class="btn primary" id="mp-unlock">${t("common.unlockNow")}</button></div>` +
+        `</div>`;
+    } else {
+      /* 已解锁：列表 + 新增 + 导入导出 + 锁/改密 */
+      const arr = readPasswords();
+      html =
+        `<div class="cp-note">${t("common.vaultReady")}</div>` +
+        `<div class="cp-form">` +
+        `<input id="cp-name" placeholder="${t("common.label")}" />` +
+        `<select id="cp-cat">` +
+          `<option value="generic">${t("cat.generic")}</option>` +
+          `<option value="sym">${t("cat.sym")}</option>` +
+          `<option value="enc">${t("cat.enc")}</option>` +
+          `<option value="hash">${t("cat.hash")}</option>` +
+          `<option value="rsa">${t("cat.rsa")}</option>` +
+          `<option value="qr">${t("cat.qr")}</option>` +
+        `</select>` +
+        `<input id="cp-method" placeholder="${t("vp.method")}（${t("vp.generic")}）" />` +
+        `<input id="cp-val" type="text" placeholder="${t("common.value")}" />` +
+        `<div class="btn-row"><button class="btn primary" id="cp-save">${t("common.save")}</button></div>` +
+        `</div>`;
+      if (arr.length === 0) html += `<p class="cp-note">${t("common.empty")}</p>`;
+      html += `<div id="cp-list"></div>`;
+      html +=
+        `<div class="btn-row" style="margin-top:14px">` +
+        `<button class="btn ghost" id="cp-export">${t("common.export")}</button>` +
+        `<button class="btn ghost" id="cp-import">${t("common.import")}</button>` +
+        `</div>` +
+        `<input type="file" id="cp-file" accept="application/json,.json" style="display:none" />` +
+        `<div class="btn-row">` +
+        `<button class="btn ghost" id="mp-change">${t("common.changeMaster")}</button>` +
+        `<button class="btn ghost" id="mp-lock">${t("common.lock")}</button>` +
+        `</div>`;
+    }
+    bodyEl.innerHTML = html;
+    appendAskToggle();
+
+    if (!vaultExists()) {
+      bodyEl.querySelector("#mp-set").onclick = () => {
+        const a = bodyEl.querySelector("#mp1").value, b = bodyEl.querySelector("#mp2").value;
+        if (!a) { alert(t("common.masterEmpty")); return; }
+        if (a !== b) { alert(t("common.masterMismatch")); return; }
+        setupVault(a); render();
+      };
+    } else if (isLocked()) {
+      bodyEl.querySelector("#mp-unlock").onclick = () => {
+        try { unlock(bodyEl.querySelector("#mpu").value); render(); }
+        catch (e) { alert(t("common.importFail")); }
+      };
+    } else {
+      const arr = readPasswords();
+      const list = bodyEl.querySelector("#cp-list");
+      // 按加密方式分组展示（对称/编码/哈希/RSA/二维码/通用）
+      const CAT_ORDER = { sym: 0, enc: 1, hash: 2, rsa: 3, qr: 4, generic: 5 };
+      const ordered = arr
+        .map((p, i) => ({ p, i }))
+        .sort((a, b) => (CAT_ORDER[a.p.cat || "generic"] ?? 9) - (CAT_ORDER[b.p.cat || "generic"] ?? 9));
+      let lastCat = null;
+      ordered.forEach(({ p, i }) => {
+        const c = p.cat || "generic";
+        if (c !== lastCat) {
+          const h = document.createElement("div");
+          h.className = "cp-group-title";
+          h.textContent = t("cat." + c) || c;
+          list.appendChild(h);
+          lastCat = c;
+        }
+        const k = entryKind(p);
+        const row = document.createElement("div");
+        row.className = "cp-item";
+        const title = `${escapeHtml(entryTitle(p))} ${badgeHtml(entryBadge(p))}`;
+        let sub = "";
+        if (k === "rsa-pair") sub = `<div class="cp-method">${methodChip(t("vp.rsaPub") + " / " + t("vp.rsaPriv"), "rsa")}</div>`;
+        else if (k === "rsa-import") sub = `<div class="cp-method">${methodChip((p.side === "public" ? t("vp.rsaPub") : t("vp.rsaPriv")), "rsa")}</div>`;
+        else sub = `<div class="cp-method">${methodChip(p.method || t("vp.generic"), p.cat || "generic")}</div><div class="cp-val">${escapeHtml(previewText(p.value, 60))}</div>`;
+        row.innerHTML =
+          `<div class="cp-label"><div class="cp-name">${title}</div>${sub}</div>` +
+          `<div class="cp-acts">` +
+            `<button class="cp-ren">${t("rsa.rename")}</button>` +
+            `<button class="cp-del">${t("common.del")}</button>` +
+          `</div>`;
+        row.querySelector(".cp-del").onclick = () => {
+          const a = readPasswords(); a.splice(i, 1); writePasswords(a); render();
+        };
+        row.querySelector(".cp-ren").onclick = () => {
+          const nv = window.prompt(t("rsa.rename") + "：", p.label || "");
+          if (nv === null) return;
+          const a = readPasswords(); a[i].label = nv.trim() || a[i].label; writePasswords(a); render();
+        };
+        list.appendChild(row);
+      });
+      bodyEl.querySelector("#cp-save").onclick = () => {
+        const name = bodyEl.querySelector("#cp-name").value.trim();
+        const val = bodyEl.querySelector("#cp-val").value;
+        const m = bodyEl.querySelector("#cp-method").value.trim() || t("vp.generic");
+        const cat = bodyEl.querySelector("#cp-cat") ? bodyEl.querySelector("#cp-cat").value : "generic";
+        if (!name || !val) { alert(t("common.label") + " / " + t("common.value")); return; }
+        const a = readPasswords(); a.push({ label: name, value: val, method: m, cat: cat }); writePasswords(a); render();
+      };
+      /* 导出（下载备份包：密码本密文 + 保存路径 + 显示设置） */
+      bodyEl.querySelector("#cp-export").onclick = () => {
+        const blob = new Blob([buildBackup()], { type: "application/json" });
+        const aEl = document.createElement("a");
+        aEl.href = URL.createObjectURL(blob);
+        aEl.download = "crypto-pwa-backup.json";
+        aEl.click();
+        URL.revokeObjectURL(aEl.href);
+        alert(t("common.exportDone"));
+      };
+      /* 导入（兼容备份包 / 旧版纯密码本） */
+      const fileInput = bodyEl.querySelector("#cp-file");
+      bodyEl.querySelector("#cp-import").onclick = () => fileInput.click();
+      fileInput.onchange = () => {
+        const f = fileInput.files[0]; if (!f) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const txt = reader.result;
+          if (isBackupBundle(txt)) {
+            try { applyBackup(txt); render(); alert(t("common.importDone")); }
+            catch (e) { alert(t("common.importFail")); }
+            return;
+          }
+          const master = window.prompt(t("common.masterPlaceholder"));
+          if (!master) return;
+          try { importVault(txt, master); render(); alert(t("common.importDone")); }
+          catch (e) { alert(t("common.importFail")); }
+        };
+        reader.readAsText(f);
+      };
+      /* 修改主密码 */
+      bodyEl.querySelector("#mp-change").onclick = () => {
+        const cur = window.prompt(t("common.masterPlaceholder"));
+        if (!cur) return;
+        let arr;
+        try { arr = decryptVault(localStorage.getItem(VAULT_KEY), cur); }
+        catch (e) { alert(t("common.importFail")); return; }
+        const nw = window.prompt(t("common.confirmMaster"));
+        if (!nw) return;
+        sessionMaster = nw;
+        localStorage.setItem(VAULT_KEY, encryptVault(arr, nw));
+        alert(t("common.changeMaster") + " ✅"); render();
+      };
+      /* 锁定（清空内存中的主密码） */
+      bodyEl.querySelector("#mp-lock").onclick = () => { lock(); render(); };
+    }
+  }
+
+  /* ---------- “加密后询问保存”开关（在所有状态下都显示） ---------- */
+  function appendAskToggle() {
+    const askOn = getSetting("ask_save", "1") === "1";
+    const row = document.createElement("div");
+    row.className = "settings-row";
+    row.innerHTML = `<span class="sr-label">${t("common.askSave")}</span><label class="switch"><input type="checkbox" id="ask-toggle" ${askOn ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label>`;
+    bodyEl.appendChild(row);
+    row.querySelector("#ask-toggle").onchange = () => {
+      setSetting("ask_save", row.querySelector("#ask-toggle").checked ? "1" : "0");
+      render();
+    };
+  }
+
+  /* ---------- 数据备份与同步（WebDAV） ---------- */
+  function webdavConfig() {
+    try { return JSON.parse(localStorage.getItem("set_webdav")) || { url: "", user: "", pass: "" }; }
+    catch (e) { return { url: "", user: "", pass: "" }; }
+  }
+  function saveWebdav(cfg) { try { localStorage.setItem("set_webdav", JSON.stringify(cfg)); } catch (e) {} }
+  function wdAuth(user, pass) { return "Basic " + btoa(unescape(encodeURIComponent(user + ":" + pass))); }
+  function wdTarget(cfg) {
+    let u = (cfg.url || "").trim().replace(/\s+/g, "");
+    if (!u) throw new Error("URL");
+    if (!u.endsWith(".json")) u = u.replace(/\/$/, "") + "/crypto-vault.json";
+    return u;
+  }
+  /* 备份包：包含密码本(密文) + 已设置的保存路径 + 显示设置(字体/主题/沉浸式/语言等) */
+  function buildBackup() {
+    const settings = {
+      savepath: getSetting("savepath", "sdcard/CryptoPwa"),
+      font: getSetting("font", "normal"),
+      theme: getSetting("theme", "system"),
+      accent: getSetting("accent", "default"),
+      immersive: getSetting("immersive", "0"),
+      lang: getSetting("lang", "system"),
+      ext_incoming: getSetting("ext_incoming", "1"),
+      ask_save: getSetting("ask_save", "1"),
+      webdav: webdavConfig(),
+    };
+    return JSON.stringify({
+      format: "crypto-pwa-backup", version: 1,
+      vault: vaultExists() ? localStorage.getItem(VAULT_KEY) : null,
+      settings: settings,
+    });
+  }
+  function applyBackup(str) {
+    const o = JSON.parse(str);
+    if (o.vault) localStorage.setItem(VAULT_KEY, o.vault); // 密文整体写入，重新解锁即可
+    const s = o.settings || {};
+    if (s.savepath !== undefined) setSetting("savepath", s.savepath);
+    if (s.font !== undefined) setSetting("font", s.font);
+    if (s.theme !== undefined) setSetting("theme", s.theme);
+    if (s.accent !== undefined) setSetting("accent", s.accent);
+    if (s.immersive !== undefined) setSetting("immersive", s.immersive);
+    if (s.lang !== undefined) setSetting("lang", s.lang);
+    if (s.ext_incoming !== undefined) setSetting("ext_incoming", s.ext_incoming);
+    if (s.ask_save !== undefined) setSetting("ask_save", s.ask_save);
+    if (s.webdav !== undefined) saveWebdav(s.webdav);
+    applyTheme(); applyLanguage(); applyFont(); applyImmersive();
+  }
+  function isBackupBundle(str) {
+    try { return JSON.parse(str).format === "crypto-pwa-backup"; } catch (e) { return false; }
+  }
+  async function webdavBackup() {
+    if (isLocked()) throw new Error(t("sync.needMaster"));
+    const blob = buildBackup();
+    const cfg = webdavConfig();
+    const res = await fetch(wdTarget(cfg), {
+      method: "PUT",
+      headers: { "Authorization": wdAuth(cfg.user, cfg.pass), "Content-Type": "application/json" },
+      body: blob,
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+  }
+  async function webdavRestore() {
+    const cfg = webdavConfig();
+    const res = await fetch(wdTarget(cfg), {
+      method: "GET",
+      headers: { "Authorization": wdAuth(cfg.user, cfg.pass) },
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const text = await res.text();
+    if (isBackupBundle(text)) { applyBackup(text); }
+    else {
+      const master = window.prompt(t("common.masterPlaceholder"));
+      if (!master) throw new Error("cancel");
+      importVault(text, master); // 旧版纯密码本：校验主密码并写入
+    }
+  }
+  function renderSync() {
+    titleEl.textContent = t("sync.title");
+    const cfg = webdavConfig();
+    let html =
+      `<div class="cp-note">${t("sync.cfgHint")}</div>` +
+      `<div class="cp-form">` +
+      `<input id="wd-url" placeholder="${t("sync.url")}" value="${escapeHtml(cfg.url || "")}" />` +
+      `<div class="wd-quick">` +
+      `<span class="wd-quick-label">${t("sync.quick")}</span>` +
+      `<button class="chip" data-fill="https://dav.jianguoyun.com/dav/">${t("sync.quickJgy")}</button>` +
+      `<button class="chip" data-fill="https://your-domain.com/remote.php/dav/files/USER/">${t("sync.quickNc")}</button>` +
+      `<button class="chip" data-fill="https://your-nas:5006/dav/">${t("sync.quickSyn")}</button>` +
+      `</div>` +
+      `<input id="wd-user" placeholder="${t("sync.user")}" value="${escapeHtml(cfg.user || "")}" />` +
+      `<input id="wd-pass" type="password" placeholder="${t("sync.pass")}" value="${escapeHtml(cfg.pass || "")}" />` +
+      `<div class="btn-row"><button class="btn primary" id="wd-save">${t("sync.saveCfg")}</button></div>` +
+      `</div>` +
+      `<div class="btn-row">` +
+      `<button class="btn ghost" id="wd-backup">${t("sync.backup")}</button>` +
+      `<button class="btn ghost" id="wd-restore">${t("sync.restore")}</button>` +
+      `</div>` +
+      `<div class="btn-row wd-local">` +
+      `<button class="btn ghost" id="wd-export-local">${t("sync.exportLocal")}</button>` +
+      `<button class="btn ghost" id="wd-import-local">${t("sync.importLocal")}</button>` +
+      `<input type="file" id="wd-file" accept=".json,application/json" hidden />` +
+      `</div>`;
+    bodyEl.innerHTML = html;
+    /* 快捷填入服务器地址 */
+    bodyEl.querySelectorAll(".wd-quick .chip").forEach((chip) => {
+      chip.onclick = () => { bodyEl.querySelector("#wd-url").value = chip.dataset.fill; };
+    });
+    bodyEl.querySelector("#wd-save").onclick = () => {
+      saveWebdav({
+        url: bodyEl.querySelector("#wd-url").value.trim(),
+        user: bodyEl.querySelector("#wd-user").value,
+        pass: bodyEl.querySelector("#wd-pass").value,
+      });
+      alert(t("sync.saveCfg") + " ✅");
+    };
+    bodyEl.querySelector("#wd-backup").onclick = async () => {
+      try { await webdavBackup(); alert(t("sync.backupDone")); }
+      catch (e) { if (e.message !== "cancel") alert(t("sync.fail") + e.message); }
+    };
+    bodyEl.querySelector("#wd-restore").onclick = async () => {
+      try { await webdavRestore(); render(); alert(t("sync.restoreDone")); }
+      catch (e) { if (e.message !== "cancel") alert(t("sync.fail") + e.message); }
+    };
+    /* 导出本地备份（下载 JSON 文件，包含密码本密文 + 设置） */
+    bodyEl.querySelector("#wd-export-local").onclick = () => {
+      const blob = new Blob([buildBackup()], { type: "application/json" });
+      const aEl = document.createElement("a");
+      aEl.href = URL.createObjectURL(blob);
+      aEl.download = "crypto-pwa-backup.json";
+      aEl.click();
+      URL.revokeObjectURL(aEl.href);
+      alert(t("sync.exportDone"));
+    };
+    /* 从本地导入（兼容备份包 / 旧版纯密码本） */
+    const fileInput = bodyEl.querySelector("#wd-file");
+    bodyEl.querySelector("#wd-import-local").onclick = () => fileInput.click();
+    fileInput.onchange = () => {
+      const f = fileInput.files[0]; if (!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const txt = reader.result;
+        if (isBackupBundle(txt)) {
+          try { applyBackup(txt); render(); alert(t("sync.importDone")); }
+          catch (e) { alert(t("sync.importFail")); }
+          return;
+        }
+        const master = window.prompt(t("common.masterPlaceholder"));
+        if (!master) return;
+        try { importVault(txt, master); render(); alert(t("sync.importDone")); }
+        catch (e) { alert(t("sync.importFail")); }
+      };
+      reader.readAsText(f);
+    };
+  }
+
+  /* ---------- 常用密码快捷填入（底部抽屉） ---------- */
+  function ensureEl(id, cls) {
+    let el = document.getElementById(id);
+    if (!el) { el = document.createElement("div"); el.id = id; el.className = cls; document.body.appendChild(el); }
+    return el;
+  }
+  function openPicker(targetId, cat) {
+    const mask = ensureEl("pw-mask", "pw-mask");
+    const picker = ensureEl("pw-picker", "pw-picker");
+    if (isLocked()) {
+      /* 未解锁：在抽屉里先输主密码 */
+      picker.innerHTML =
+        `<div class="pp-head"><span class="pp-title">${t("common.title")}</span><button class="pp-close">✕</button></div>` +
+        `<div class="cp-note">${t("common.lockedTip")}</div>` +
+        `<div class="cp-form"><input id="pk-unlock" type="password" placeholder="${t("common.masterPlaceholder")}" />` +
+        `<button class="btn primary" id="pk-unlock-btn">${t("common.unlockNow")}</button></div>`;
+      picker.classList.add("show"); mask.classList.add("show");
+      picker.querySelector(".pp-close").onclick = closePicker;
+      mask.onclick = closePicker;
+      picker.querySelector("#pk-unlock-btn").onclick = () => {
+        try { unlock(picker.querySelector("#pk-unlock").value); openPicker(targetId, cat); }
+        catch (e) { alert(t("common.importFail")); }
+      };
+      return;
+    }
+    let all;
+    try { all = readPasswords(); } catch (e) { return; }
+    const arr = all.filter((p) => matchCat(p, cat)); // 仅展示当前功能分类
+    let title = t("symFill");
+    if (cat && t("cat." + cat) !== "cat." + cat) title = t("cat." + cat) + t("vp.book");
+    let html = `<div class="pp-head"><span class="pp-title">${escapeHtml(title)}</span><button class="pp-close">✕</button></div>`;
+    if (arr.length === 0) {
+      html += `<p class="cp-note">${t("common.empty")}</p>`;
+    } else {
+      arr.forEach((p, i) => {
+        // 只展示名称 + 方式（不展示明文内容），方式用彩色芯片特殊标记
+        const k = entryKind(p);
+        let sub;
+        if (k === "rsa-pair") sub = methodChip(t("vp.rsaPub") + " / " + t("vp.rsaPriv"), "rsa");
+        else if (k === "rsa-import") sub = methodChip((p.side === "public" ? t("vp.rsaPub") : t("vp.rsaPriv")), "rsa");
+        else sub = methodChip(p.method || t("vp.generic"), p.cat || "generic");
+        html += `<button class="pw-opt" data-i="${i}"><div class="po-name">${escapeHtml(p.label)}</div><div class="po-method">${sub}</div></button>`;
+      });
+    }
+    picker.innerHTML = html;
+    picker.classList.add("show"); mask.classList.add("show");
+    picker.querySelector(".pp-close").onclick = closePicker;
+    mask.onclick = closePicker;
+    picker.querySelectorAll(".pw-opt").forEach((b) =>
+      (b.onclick = () => {
+        const i = +b.dataset.i;
+        const p = arr[i];
+        if (!p) { closePicker(); return; }
+        if (cat === "rsa") {
+          // RSA：一对则同时填公钥+私钥；单把导入则填对应字段，并展开密钥框
+          const pubEl = document.getElementById("rsa-pub");
+          const privEl = document.getElementById("rsa-priv");
+          const k = entryKind(p);
+          if (k === "rsa-pair") {
+            if (pubEl) { pubEl.value = p.pub || ""; pubEl.dispatchEvent(new Event("input")); }
+            if (privEl) { privEl.value = p.priv || ""; privEl.dispatchEvent(new Event("input")); }
+          } else {
+            const el = (p.side === "public") ? pubEl : privEl;
+            if (el) { el.value = p.value || ""; el.dispatchEvent(new Event("input")); }
+          }
+          const box = document.getElementById("rsa-keys");
+          if (box) {
+            box.removeAttribute("hidden");
+            const vb = document.getElementById("rsa-view");
+            if (vb) vb.querySelector("span").textContent = (window.__lang === "en" ? "Hide keys" : "隐藏秘钥内容");
+          }
+          if (window.rsaSaveKeys) window.rsaSaveKeys();
+        } else if (targetId) {
+          const el = document.getElementById(targetId);
+          if (el) { el.value = p.value; el.dispatchEvent(new Event("input")); }
+        }
+        closePicker();
+      })
+    );
+  }
+  function closePicker() {
+    const p = document.getElementById("pw-picker"); const m = document.getElementById("pw-mask");
+    if (p) p.classList.remove("show"); if (m) m.classList.remove("show");
+  }
+
+  /* ---------- 加密后「保存到密码本」弹窗 ---------- */
+  // opts: { method, password, targetId }  （targetId 为“填入”时要回填的输入框 id）
+  function ensureVpEl(id, cls) {
+    let el = document.getElementById(id);
+    if (!el) { el = document.createElement("div"); el.id = id; el.className = cls; document.body.appendChild(el); }
+    return el;
+  }
+  // 判断某个值是否已经存在于密码本（仅在已解锁时可判断；未解锁/无库返回 false）
+  window.vaultContainsValue = function (v) {
+    try {
+      if (!v || !vaultExists() || isLocked()) return false;
+      return readPasswords().some((p) => p.value === v);
+    } catch (e) { return false; }
+  };
+  window.openVaultPrompt = function (opts) {
+    const method = opts.method || t("vp.generic");
+    const password = opts.password || "";
+    const targetId = opts.targetId || null;
+    const extra = opts.extra || null;   // 额外要一并保存的条目（如 RSA 公钥）
+    const filterCat = opts.cat || null; // 仅展示当前功能的密码本（如对称）
+    const mask = ensureVpEl("vp-mask", "vp-mask");
+    const panel = ensureVpEl("vp-panel", "vp-panel");
+
+    function closeVP() { panel.classList.remove("show"); mask.classList.remove("show"); }
+    function headHtml() {
+      return `<div class="vp-head"><span class="vp-title">${t("vp.title")}</span><button class="vp-close" aria-label="关闭">✕</button></div>`;
+    }
+    // 默认名称（RSA 一对→“我的”，导入单把→“导入的RSA秘钥”，普通→方式名）
+    function defaultName() {
+      if (opts.kind === "rsa-pair") return (window.__lang === "en" ? "My" : "我的");
+      if (opts.kind === "rsa-import") return t("rsa.importDefault");
+      return method;
+    }
+    // 把当前密钥写入保险库（一对 / 单把导入 / 普通），并打上分类标签
+    function commitNew(name) {
+      const a = readPasswords();
+      const n = name || defaultName();
+      const cat = filterCat || "generic";
+      if (opts.kind === "rsa-pair") {
+        a.push({ kind: "rsa-pair", label: n, pub: opts.pub, priv: opts.priv, cat: "rsa" });
+      } else if (opts.kind === "rsa-import") {
+        a.push({ kind: "rsa-import", label: n, value: opts.password, side: opts.side, cat: "rsa" });
+      } else {
+        a.push({ label: n, value: password, method: method, cat: cat });
+        if (extra) a.push({ label: n + " · " + extra.method, value: extra.password, method: extra.method, cat: cat });
+      }
+      writePasswords(a);
+    }
+    // 当前要保存的密钥预览（仅展示截断前后，不暴露完整 PEM）
+    function curHtml() {
+      if (opts.kind === "rsa-pair") {
+        return `<div class="vp-cur"><span>${escapeHtml(t("vp.rsaPub"))}</span><b class="vp-mono">${escapeHtml(previewKey(opts.pub))}</b></div>` +
+               `<div class="vp-cur"><span>${escapeHtml(t("vp.rsaPriv"))}</span><b class="vp-mono">${escapeHtml(previewKey(opts.priv))}</b></div>`;
+      }
+      if (opts.kind === "rsa-import") {
+        const side = opts.side === "public" ? t("vp.rsaPub") : t("vp.rsaPriv");
+        return `<div class="vp-cur"><span>${escapeHtml(side)}</span><b class="vp-mono">${escapeHtml(previewKey(opts.password))}</b></div>`;
+      }
+      let h = `<div class="vp-cur"><span>${escapeHtml(t("vp.method"))}</span>${methodChip(method, filterCat)}</div>` +
+              `<div class="vp-cur"><span>${escapeHtml(t("vp.pw"))}</span><b class="vp-mono">${escapeHtml(previewText(password))}</b></div>`;
+      if (extra) h += `<div class="vp-cur"><span>${escapeHtml(extra.method)}</span><b class="vp-mono">${escapeHtml(previewText(extra.password))}</b></div>`;
+      return h;
+    }
+    // 已保存列表的一行（区分 一对 / 单把 / 普通；含徽章、显示/隐藏、填入、删除）
+    function makeRow(p, i) {
+      const row = document.createElement("div");
+      row.className = "vp-item";
+      const k = entryKind(p);
+      const titleHtml = `${escapeHtml(entryTitle(p))} ${badgeHtml(entryBadge(p))}`;
+      let methodLine = "", fullText = "";
+      if (k === "rsa-pair") {
+        methodLine = `<div class="vp-method">${methodChip(t("vp.rsaPub") + " / " + t("vp.rsaPriv"), "rsa")}</div>`;
+      } else if (k === "rsa-import") {
+        methodLine = `<div class="vp-method">${methodChip((p.side === "public" ? t("vp.rsaPub") : t("vp.rsaPriv")), "rsa")}</div>`;
+        fullText = p.value || "";
+      } else {
+        methodLine = `<div class="vp-method">${methodChip(p.method || t("vp.generic"), p.cat || "generic")}</div>`;
+        fullText = p.value || "";
+      }
+      const hidden = "•".repeat(Math.min(fullText.length, 12)) || "—";
+      row.innerHTML =
+        `<div class="vp-info">` +
+          `<div class="vp-name">${titleHtml}</div>` +
+          methodLine +
+          (k === "rsa-pair" ? "" : `<div class="vp-val">${escapeHtml(hidden)}</div>`) +
+        `</div>` +
+        `<div class="vp-actions">` +
+          `<button class="vp-reveal">${t("vp.reveal")}</button>` +
+          (targetId ? `<button class="vp-fill">${t("vp.fill")}</button>` : "") +
+          `<button class="vp-del">${t("vp.del")}</button>` +
+        `</div>`;
+      let revealed = false;
+      row.querySelector(".vp-reveal").onclick = () => {
+        revealed = !revealed;
+        if (k === "rsa-pair") {
+          const info = row.querySelector(".vp-info");
+          info.querySelectorAll(".vp-val.revealed").forEach((n) => n.remove());
+          if (revealed) {
+            const mk = (txt) => { const d = document.createElement("div"); d.className = "vp-val revealed"; d.style.whiteSpace = "pre-wrap"; d.textContent = txt; return d; };
+            info.appendChild(mk(p.pub));
+            info.appendChild(mk(p.priv));
+          }
+        } else {
+          const v = row.querySelector(".vp-val");
+          v.textContent = revealed ? fullText : hidden;
+          v.classList.toggle("revealed", revealed);
+        }
+        row.querySelector(".vp-reveal").textContent = revealed ? t("vp.hide") : t("vp.reveal");
+      };
+      if (targetId) {
+        row.querySelector(".vp-fill").onclick = () => {
+          if (k === "rsa-pair") {
+            const pubEl = document.getElementById("rsa-pub"), privEl = document.getElementById("rsa-priv");
+            if (pubEl) { pubEl.value = p.pub; pubEl.dispatchEvent(new Event("input")); }
+            if (privEl) { privEl.value = p.priv; privEl.dispatchEvent(new Event("input")); }
+            if (window.rsaSaveKeys) window.rsaSaveKeys();
+          } else {
+            const el = document.getElementById(targetId);
+            if (el) { el.value = fullText; el.dispatchEvent(new Event("input")); }
+          }
+          closeVP();
+        };
+      }
+      row.querySelector(".vp-del").onclick = () => {
+        const a = readPasswords(); const idx = a.indexOf(p); if (idx >= 0) a.splice(idx, 1); writePasswords(a); renderVP();
+      };
+      return row;
+    }
+    function renderVP() {
+      const wrap = (h) => '<div class="vp-inner">' + h + '</div>';
+      if (!vaultExists()) {
+        // 首次使用：先设主密码，再把当前密钥作为第一条记录存入
+        panel.innerHTML = wrap(
+          headHtml() +
+          `<div class="cp-note">${t("vp.ask")}</div>` +
+          `<div class="cp-form">` +
+            `<input id="vp-label" placeholder="${t("vp.name")}" value="${escapeHtml(defaultName())}" />` +
+            `<p class="vp-namehint">${t("vp.nameHint")}</p>` +
+            curHtml() +
+            `<input id="vp-mp1" type="password" placeholder="${t("common.masterPlaceholder")}" />` +
+            `<input id="vp-mp2" type="password" placeholder="${t("common.confirmMaster")}" />` +
+            `<div class="btn-row"><button class="btn primary" id="vp-create">${t("common.setMaster")}</button></div>` +
+          `</div>`
+        );
+        panel.querySelector("#vp-create").onclick = () => {
+          const a = panel.querySelector("#vp-mp1").value, b = panel.querySelector("#vp-mp2").value;
+          const name = panel.querySelector("#vp-label").value.trim() || defaultName();
+          if (!a) { alert(t("common.masterEmpty")); return; }
+          if (a !== b) { alert(t("common.masterMismatch")); return; }
+          setupVault(a);
+          commitNew(name);
+          alert(t("common.savedOk"));
+          closeVP();
+        };
+      } else if (isLocked()) {
+        // 已加密但未解锁：先在弹窗里解锁
+        panel.innerHTML = wrap(
+          headHtml() +
+          `<div class="cp-note">${t("common.lockedTip")}</div>` +
+          `<div class="cp-form">` +
+            `<input id="vp-unlock" type="password" placeholder="${t("common.masterPlaceholder")}" />` +
+            `<button class="btn primary" id="vp-unlock-btn">${t("common.unlockNow")}</button>` +
+          `</div>`
+        );
+        panel.querySelector("#vp-unlock-btn").onclick = () => {
+          try { unlock(panel.querySelector("#vp-unlock").value); renderVP(); }
+          catch (e) { alert(t("common.importFail")); }
+        };
+      } else {
+        // 已解锁：新建 + 已保存列表（仅展示当前功能的密码本）
+        let html = headHtml() + curHtml();
+        html +=
+          `<div class="cp-form" style="margin-top:10px">` +
+            `<input id="vp-label" placeholder="${t("vp.name")}" value="${escapeHtml(defaultName())}" />` +
+            `<p class="vp-namehint">${t("vp.nameHint")}</p>` +
+            `<button class="btn primary" id="vp-save-new">${t("vp.new")}</button>` +
+          `</div>`;
+        const savedTitle = filterCat ? (t("cat." + filterCat) + t("vp.book")) : t("vp.saved");
+        html += `<div class="vp-saved-title">${escapeHtml(savedTitle)}</div><div id="vp-list">`;
+        const arr = readPasswords().filter((p) => matchCat(p, filterCat));
+        if (arr.length === 0) html += `<p class="cp-note">${t("vp.none")}</p>`;
+        html += `</div>`;
+        html += `<button class="btn ghost" id="vp-skip">${t("vp.skip")}</button>`;
+        panel.innerHTML = wrap(html);
+        const list = panel.querySelector("#vp-list");
+        arr.forEach((p) => list.appendChild(makeRow(p, -1)));
+        panel.querySelector("#vp-save-new").onclick = () => {
+          commitNew(panel.querySelector("#vp-label").value.trim());
+          renderVP();
+        };
+        panel.querySelector("#vp-skip").onclick = closeVP;
+      }
+      panel.querySelector(".vp-close").onclick = closeVP;
+      mask.onclick = closeVP;
+    }
+    renderVP();
+    panel.classList.add("show"); mask.classList.add("show");
+  };
+
+  /* ---------- 初始化 ---------- */
+  function init() {
+    window.__lang = resolveLang();
+    applyTheme();
+    applyLanguage();
+    applyFont();
+    applyImmersive();
+
+    window.openSettings = openSettings; // 供底部「设置」按钮调用
+    window.getSavePath = () => getSetting("savepath", "sdcard/CryptoPwa"); // 供 RSA 存文件用
+    backBtn.addEventListener("click", back);
+    document.querySelectorAll("[data-fill]").forEach((b) =>
+      b.addEventListener("click", () => openPicker(b.dataset.fill, b.dataset.cat))
+    );
+    // 跟随系统主题变化时，若设为“跟随设备”则实时切换
+    if (window.matchMedia) {
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+        if (getSetting("theme", "system") === "system") applyTheme();
+      });
+    }
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();

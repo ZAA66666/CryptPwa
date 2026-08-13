@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#07c160" />
+  <title>加解密工具箱</title>
+  <link rel="manifest" href="manifest.webmanifest" id="manifest-link" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="on-home">
+  <header class="app-header" id="app-header">
+    <h1 data-i18n="appTitle">加解密工具箱</h1>
+    <p class="subtitle" data-i18n="appSub">哈希 · 编/解码 · 对称加/解密 · 加/解密 · 二维码/条形码</p>
+  </header>
+
+  <div class="app-card">
+    <main>
+      <!-- ========== 面板 0：主页（工具网格 + 历史记录，参考 ctool） ========== -->
+      <section class="panel active" id="panel-home">
+        <p class="home-greet" data-i18n="home.greet">工具箱 · 点下面的功能直接用</p>
+        <div class="tool-grid">
+          <button class="tool-card" data-go="hash">
+            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 7 20"/><path d="M17 4 15 20"/><path d="M4 9h16"/><path d="M3.5 15h17"/></svg></span>
+            <span class="tc-name" data-i18n="tool.hash">哈希</span>
+          </button>
+          <button class="tool-card" data-go="enc">
+            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8 5 12l4 4"/><path d="M15 8l4 4-4 4"/><path d="M13 6l-2 12"/></svg></span>
+            <span class="tc-name" data-i18n="tool.enc">编码</span>
+          </button>
+          <button class="tool-card" data-go="sym">
+            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+            <span class="tc-name" data-i18n="tool.sym">对称加密</span>
+          </button>
+          <button class="tool-card" data-go="asym">
+            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3.6"/><path d="M11 11 20 20"/><path d="M16.5 16.5 19 14"/><path d="M14.5 14.5 17 12"/></svg></span>
+            <span class="tc-name" data-i18n="tool.asym">RSA</span>
+          </button>
+          <button class="tool-card" data-go="qr">
+            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="5" y="5" width="3" height="3" rx="0.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="5" y="16" width="3" height="3" rx="0.6"/><rect x="13" y="14" width="3" height="3" rx="1"/><path d="M14 3v9M16.5 3v9M19 3v9"/></svg></span>
+            <span class="tc-name" data-i18n="tool.qr">二维码/条形码</span>
+          </button>
+          <button class="tool-card" data-go="json">
+            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h2"/><path d="M16 3h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2"/><path d="M9 9l3 3-3 3"/><path d="M15 9l-3 3 3 3"/></svg></span>
+            <span class="tc-name" data-i18n="tool.json">JSON</span>
+          </button>
+          <button class="tool-card" data-go="cron">
+            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg></span>
+            <span class="tc-name" data-i18n="tool.cron">Crontab</span>
+          </button>
+          <button class="tool-card" data-go="rand">
+            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.4"/><circle cx="7.5" cy="7.5" r="1.1"/><rect x="13" y="13" width="7" height="7" rx="1.4"/><circle cx="16.5" cy="16.5" r="1.1"/><path d="M14.5 4.5 19.5 9.5M19.5 4.5 14.5 9.5"/></svg></span>
+            <span class="tc-name" data-i18n="tool.rand">随机文本</span>
+          </button>
+          <button class="tool-card" data-go="guide">
+            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-2-2-5-2-7-1v14c2-1 5-1 7 1 2-2 5-2 7-1V5c-2-1-5-1-7 1Z"/><path d="M12 6v14"/></svg></span>
+            <span class="tc-name" data-i18n="tool.guide">教程</span>
+          </button>
+        </div>
+
+        <div class="history-head">
+          <span data-i18n="home.recent">最近使用</span>
+          <button class="link-btn" id="history-clear" data-i18n="home.clear">清空</button>
+        </div>
+        <ul class="history-list" id="history-list"></ul>
+        <p class="history-empty" id="history-empty" data-i18n="home.empty">还没有记录，去用用上面的工具吧～</p>
+      </section>
+
+      <!-- ========== 面板 1：哈希 ========== -->
+      <section class="panel" id="panel-hash">
+        <div class="panel-head">
+          <button class="ph-back" aria-label="返回">‹</button>
+          <span class="ph-title" data-i18n="ph.hash">哈希</span>
+        </div>
+        <label class="field-label" data-i18n="hash.in">输入文本</label>
+        <textarea id="hash-input" data-i18n-attr="placeholder:ph.hashIn" placeholder="要计算哈希的文本，如 hello"></textarea>
+
+        <label class="field-label" data-i18n="hash.algo">算法</label>
+        <select id="hash-algo">
+          <option value="MD5">MD5</option>
+          <option value="SHA1">SHA-1</option>
+          <option value="SHA224">SHA-224</option>
+          <option value="SHA256" selected>SHA-256</option>
+          <option value="SHA384">SHA-384</option>
+          <option value="SHA512">SHA-512</option>
+          <option value="SHA3">SHA-3 (512)</option>
+          <option value="RIPEMD160">RIPEMD-160</option>
+          <option value="HmacMD5">HMAC-MD5</option>
+          <option value="HmacSHA1">HMAC-SHA1</option>
+          <option value="HmacSHA256">HMAC-SHA256</option>
+          <option value="HmacSHA512">HMAC-SHA512</option>
+        </select>
+
+        <div id="hash-key-wrap" style="display:none">
+          <label class="field-label" data-i18n="hash.key">密钥（HMAC 需要）</label>
+          <input id="hash-key" type="text" data-i18n-attr="placeholder:ph.hashKey" placeholder="HMAC 密钥" />
+        </div>
+
+        <button class="btn primary" id="hash-btn" data-i18n="hash.btn">计算哈希</button>
+
+        <label class="field-label" data-i18n="hash.out">结果（十六进制）</label>
+        <textarea id="hash-output" readonly data-i18n-attr="placeholder:ph.result" placeholder="结果将显示在这里"></textarea>
+        <button class="btn ghost" id="hash-copy" data-i18n="copy">复制结果</button>
+      </section>
+
+      <!-- ========== 面板 2：编码 ========== -->
+      <section class="panel" id="panel-enc">
+        <div class="panel-head">
+          <button class="ph-back" aria-label="返回">‹</button>
+          <span class="ph-title" data-i18n="ph.enc">编码</span>
+        </div>
+        <label class="field-label" data-i18n="enc.in">输入</label>
+        <textarea id="enc-input" data-i18n-attr="placeholder:ph.encIn" placeholder="要编码或解码的内容（支持中文）"></textarea>
+
+        <label class="field-label" data-i18n="enc.mode">方式</label>
+        <div class="enc-controls">
+          <div class="seg-inline" id="enc-method" role="group" aria-label="编码方式">
+            <button type="button" data-v="b64" class="active" data-i18n="enc.b64">Base64</button>
+            <button type="button" data-v="hex" data-i18n="enc.hex">Hex</button>
+            <button type="button" data-v="url" data-i18n="enc.url">URL</button>
+            <button type="button" data-v="b32" data-i18n="enc.b32">Base32</button>
+            <button type="button" data-v="b58" data-i18n="enc.b58">Base58</button>
+            <button type="button" data-v="unicode" data-i18n="enc.unicode">Unicode</button>
+            <button type="button" data-v="jwt" data-i18n="enc.jwt">JWT</button>
+          </div>
+          <div class="enc-actions">
+            <button class="btn primary" id="enc-encode" data-i18n="enc.encode">编码</button>
+            <button class="btn" id="enc-decode" data-i18n="enc.decode">解码</button>
+          </div>
+        </div>
+
+        <label class="field-label" data-i18n="enc.imgLabel">图片转 Base64（可选）</label>
+        <input type="file" id="enc-file" accept="image/*" />
+        <button class="btn ghost" id="enc-img-b64" data-i18n="enc.imgBtn">图片 → Base64</button>
+
+        <button class="btn primary" id="enc-btn" data-i18n="enc.run">执行</button>
+
+        <label class="field-label" data-i18n="enc.out">结果</label>
+        <textarea id="enc-output" readonly data-i18n-attr="placeholder:ph.result" placeholder="结果将显示在这里"></textarea>
+        <button class="btn ghost" id="enc-copy" data-i18n="copy">复制结果</button>
+      </section>
+
+      <!-- ========== 面板 3：对称加密 ========== -->
+      <section class="panel" id="panel-sym">
+        <div class="panel-head">
+          <button class="ph-back" aria-label="返回">‹</button>
+          <span class="ph-title" data-i18n="ph.sym">对称加密</span>
+        </div>
+        <label class="field-label" data-i18n="sym.algo">算法</label>
+        <select id="sym-algo">
+          <option value="AES" selected>AES（密钥 16/24/32 字节）</option>
+          <option value="DES">DES（密钥 8 字节）</option>
+          <option value="3DES">3DES（密钥 24 字节）</option>
+          <option value="Blowfish">Blowfish（密钥 1~56 字节）</option>
+          <option value="RC4">RC4（流密码）</option>
+          <option value="Rabbit">Rabbit（流密码）</option>
+        </select>
+
+        <label class="field-label" data-i18n="sym.key">密钥</label>
+        <input id="sym-key" type="text" placeholder="如：1234567890123456" />
+        <div class="sym-key-actions">
+          <button class="mini-btn" data-fill="sym-key" data-cat="sym"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3.6"/><path d="M11 11 20 20"/><path d="M16.5 16.5 19 14"/><path d="M14.5 14.5 17 12"/></svg><span data-i18n="symFill">密码本</span></button>
+          <button class="mini-btn" id="sym-rand-key"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M21 3 13 11"/><path d="M8 21H3v-5"/><path d="M3 21l8-8"/><path d="M16 21h5v-5"/><path d="M21 21l-8-8"/></svg><span data-i18n="sym.randKey">随机密钥</span></button>
+          <div id="sym-keysize-wrap" class="ks-inline" style="display:none">
+            <span class="ks-label" data-i18n="sym.keySize">密钥长度</span>
+            <div class="seg-inline sym-keysize-seg" id="sym-keysize" role="group" aria-label="密钥长度">
+              <button type="button" data-bytes="16" data-bits="128" class="active">128 位</button>
+              <button type="button" data-bytes="24" data-bits="192">192 位</button>
+              <button type="button" data-bytes="32" data-bits="256">256 位</button>
+            </div>
+            <span class="ks-cur" id="sym-ks-cur">128 位</span>
+          </div>
+        </div>
+
+        <p class="hint" id="sym-key-hint"></p>
+
+        <label class="field-label" data-i18n="sym.mode">分组模式（点击选择）</label>
+        <div class="seg-inline sym-mode-seg" id="sym-mode" role="group" aria-label="分组模式">
+          <button type="button" data-v="ECB">ECB</button>
+          <button type="button" data-v="CBC" class="active">CBC</button>
+          <button type="button" data-v="CTR">CTR</button>
+          <button type="button" data-v="CFB">CFB</button>
+          <button type="button" data-v="OFB">OFB</button>
+        </div>
+
+        <div id="sym-iv-wrap" style="display:none">
+          <label class="field-label" data-i18n="sym.iv">初始向量 IV</label>
+          <div class="iv-row">
+            <input id="sym-iv" type="text" data-i18n-attr="placeholder:ph.symIv" placeholder="CBC/CTR/CFB/OFB 模式必填" />
+            <button class="mini-btn" id="sym-rand-iv"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M21 3 13 11"/><path d="M8 21H3v-5"/><path d="M3 21l8-8"/><path d="M16 21h5v-5"/><path d="M21 21l-8-8"/></svg><span data-i18n="sym.randIv">随机IV</span></button>
+          </div>
+          <p class="hint" id="sym-iv-hint"></p>
+        </div>
+
+        <label class="field-label" data-i18n="sym.in">输入</label>
+        <textarea id="sym-input" data-i18n-attr="placeholder:ph.symIn" placeholder="加密时填明文；解密时填 Base64 密文"></textarea>
+
+        <div class="btn-row">
+          <button class="btn primary" id="sym-encrypt" data-i18n="sym.encrypt">加密</button>
+          <button class="btn primary" id="sym-decrypt" data-i18n="sym.decrypt">解密</button>
+        </div>
+
+        <label class="field-label" data-i18n="sym.out">结果</label>
+        <textarea id="sym-output" readonly data-i18n-attr="placeholder:ph.result" placeholder="结果将显示在这里"></textarea>
+        <button class="btn ghost" id="sym-copy" data-i18n="copy">复制结果</button>
+      </section>
+
+      <!-- ========== 面板 4：RSA ========== -->
+      <section class="panel" id="panel-asym">
+        <div class="panel-head">
+          <button class="ph-back" aria-label="返回">‹</button>
+          <span class="ph-title" data-i18n="ph.asym">加/解密</span>
+        </div>
+
+        <!-- 算法切换：RSA / SM2 -->
+        <div class="seg-inline asym-algo" id="asym-algo" role="group" aria-label="算法">
+          <button type="button" data-v="rsa" class="active" data-i18n="rsa.algoRsa">RSA</button>
+          <button type="button" data-v="sm2" data-i18n="rsa.algoSm2">SM2 国密</button>
+        </div>
+
+        <!-- 子面板：RSA -->
+        <div class="asym-pane" id="asym-pane-rsa">
+          <!-- 操作区 -->
+          <label class="field-label" data-i18n="asym.op">操作</label>
+          <select id="rsa-op">
+            <option value="encrypt">加密（用公钥）</option>
+            <option value="decrypt">解密（用私钥）</option>
+            <option value="sign">签名（用私钥）</option>
+            <option value="verify">验签（用公钥）</option>
+          </select>
+
+          <label class="field-label" id="rsa-input-label" data-i18n="asym.in">输入</label>
+          <textarea id="rsa-input" data-i18n-attr="placeholder:ph.rsaIn" placeholder="加密填明文；解密填 Base64 密文；签名填待签名文本"></textarea>
+
+          <div id="rsa-msg-wrap" style="display:none">
+            <label class="field-label" data-i18n="asym.msg">验签原文</label>
+            <textarea id="rsa-msg" data-i18n-attr="placeholder:ph.rsaMsg" placeholder="验签时填写原始消息"></textarea>
+          </div>
+
+          <button class="btn primary" id="rsa-run" data-i18n="asym.run">执行</button>
+
+          <label class="field-label" data-i18n="asym.out">结果（密文 / 签名）</label>
+          <textarea id="rsa-output" readonly data-i18n-attr="placeholder:ph.result" placeholder="结果将显示在这里"></textarea>
+          <button class="btn ghost" id="rsa-copy" data-i18n="copy">复制结果</button>
+
+          <!-- 密钥区（底部：状态 + 查看密码对；密钥内容在弹窗里） -->
+          <div class="rsa-key-section">
+            <div class="key-status-row">
+              <p class="rsa-status" id="rsa-status"></p>
+              <button class="btn" id="rsa-view"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3.6"/><path d="M11 11 20 20"/><path d="M16.5 16.5 19 14"/><path d="M14.5 14.5 17 12"/></svg><span data-i18n="rsa.viewKeys">查看密码对</span></button>
+            </div>
+
+            <!-- 密钥对内容（默认隐藏，仅在“查看密码对”弹窗里展示） -->
+            <div class="rsa-keys" id="rsa-keys" hidden>
+              <textarea id="rsa-pub" data-i18n-attr="placeholder:ph.rsaPub" placeholder="粘贴对方公钥"></textarea>
+              <textarea id="rsa-priv" data-i18n-attr="placeholder:ph.rsaPriv" placeholder="粘贴自己私钥"></textarea>
+            </div>
+
+            <button class="btn ghost full" id="rsa-export-file"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l4 4v12H5z"/><path d="M9 4v5h7"/></svg><span data-i18n="rsa.saveFile">导出文件</span></button>
+          </div>
+
+          <p class="hint" data-i18n="asym.hint">RSA 需运行在 https 或 localhost 环境；2048 位单次加密上限约 190 字节。</p>
+        </div>
+
+        <!-- 子面板：SM2 国密 -->
+        <div class="asym-pane" id="asym-pane-sm2" hidden>
+          <label class="field-label" data-i18n="asym.op">操作</label>
+          <select id="sm2-op">
+            <option value="encrypt">加密（用公钥）</option>
+            <option value="decrypt">解密（用私钥）</option>
+            <option value="sign">签名（用私钥）</option>
+            <option value="verify">验签（用公钥）</option>
+          </select>
+
+          <label class="field-label" id="sm2-input-label" data-i18n="asym.in">输入</label>
+          <textarea id="sm2-input" data-i18n-attr="placeholder:ph.sm2In" placeholder="加密填明文；解密填十六进制密文；签名填待签名文本"></textarea>
+
+          <div id="sm2-msg-wrap" style="display:none">
+            <label class="field-label" data-i18n="asym.msg">验签原文</label>
+            <textarea id="sm2-msg" data-i18n-attr="placeholder:ph.rsaMsg" placeholder="验签时填写原始消息"></textarea>
+          </div>
+
+          <button class="btn primary" id="sm2-run" data-i18n="asym.run">执行</button>
+
+          <label class="field-label" data-i18n="asym.out">结果（密文 / 签名）</label>
+          <textarea id="sm2-output" readonly data-i18n-attr="placeholder:ph.result" placeholder="结果将显示在这里"></textarea>
+          <button class="btn ghost" id="sm2-copy" data-i18n="copy">复制结果</button>
+
+          <!-- 密钥区（inline 显示，公钥 130 位 / 私钥 64 位十六进制） -->
+          <div class="rsa-key-section">
+            <div class="key-status-row">
+              <p class="rsa-status" id="sm2-status"></p>
+              <button class="btn" id="sm2-regen"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M21 3 13 11"/><path d="M8 21H3v-5"/><path d="M3 21l8-8"/><path d="M16 21h5v-5"/><path d="M21 21l-8-8"/></svg><span data-i18n="asym.reGen">重新生成</span></button>
+            </div>
+            <label class="field-label" data-i18n="sm2.pub">公钥（04 开头，130 位十六进制）</label>
+            <textarea id="sm2-pub" data-i18n-attr="placeholder:ph.sm2Pub" placeholder="04 开头的 130 位十六进制公钥"></textarea>
+            <label class="field-label" data-i18n="sm2.priv">私钥（64 位十六进制）</label>
+            <textarea id="sm2-priv" data-i18n-attr="placeholder:ph.sm2Priv" placeholder="64 位十六进制私钥"></textarea>
+            <button class="btn ghost full" id="sm2-save"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3.6"/><path d="M11 11 20 20"/><path d="M16.5 16.5 19 14"/><path d="M14.5 14.5 17 12"/></svg><span data-i18n="rsa.saveVault">保存到密码本</span></button>
+            <button class="btn ghost full" id="sm2-export-file"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l4 4v12H5z"/><path d="M9 4v5h7"/></svg><span data-i18n="rsa.saveFile">导出文件</span></button>
+          </div>
+
+          <p class="hint" data-i18n="sm2.hint">SM2 国密非对称算法，密文格式 C1C3C2（与 sm-crypto 一致）。密钥均为十六进制，公钥 130 位、私钥 64 位。</p>
+        </div>
+      </section>
+
+      <!-- ========== 面板 5：二维码 ========== -->
+      <section class="panel" id="panel-qr">
+        <div class="panel-head">
+          <button class="ph-back" aria-label="返回">‹</button>
+          <span class="ph-title" data-i18n="ph.qr">二维码</span>
+        </div>
+
+        <!-- 子标签：二维码 / 条形码 -->
+        <div class="seg-inline qr-tabs" id="qr-tabs" role="group" aria-label="码类型">
+          <button type="button" data-v="qr" class="active" data-i18n="qr.tabQr">二维码</button>
+          <button type="button" data-v="bc" data-i18n="bc.tab">条形码</button>
+        </div>
+
+        <!-- 子标签 1：二维码 -->
+        <div class="qr-pane" id="qr-pane-qr">
+          <label class="field-label" data-i18n="qr.in">内容（文本 / 网址 / 任意字符串）</label>
+          <textarea id="qr-input" data-i18n-attr="placeholder:ph.qrIn" placeholder="如：https://example.com"></textarea>
+
+          <label class="field-label" data-i18n="qr.ec">纠错等级</label>
+          <select id="qr-ec">
+            <option value="L">L（低，7%）</option>
+            <option value="M" selected>M（中，15%）</option>
+            <option value="Q">Q（较高，25%）</option>
+            <option value="H">H（高，30%）</option>
+          </select>
+
+          <button class="btn primary" id="qr-btn" data-i18n="qr.gen">生成二维码</button>
+          <button class="btn ghost" id="qr-scan-btn" data-i18n="qr.scan">扫描二维码</button>
+
+          <label class="field-label" data-i18n="qr.out">二维码</label>
+          <div id="qr-output"></div>
+          <button class="btn ghost" id="qr-download" data-i18n="qr.dl">下载 SVG</button>
+        </div>
+
+        <!-- 子标签 2：条形码 -->
+        <div class="qr-pane" id="qr-pane-bc" style="display:none">
+          <label class="field-label" data-i18n="bc.in">内容（条形码编码的数据）</label>
+          <input type="text" id="bc-input" data-i18n-attr="placeholder:ph.bcIn" placeholder="如：123456789012 / ABC-123" />
+
+          <label class="field-label" data-i18n="bc.fmt">编码格式</label>
+          <select id="bc-fmt">
+            <option value="CODE128">CODE128（通用，推荐）</option>
+            <option value="CODE39">CODE39</option>
+            <option value="EAN13">EAN-13（商品条码）</option>
+            <option value="EAN8">EAN-8</option>
+            <option value="UPC">UPC-A</option>
+            <option value="ITF14">ITF-14</option>
+            <option value="ITF">ITF（交错 2 of 5）</option>
+            <option value="CODABAR">CODABAR（NW7）</option>
+            <option value="MSI">MSI</option>
+            <option value="Pharmacode">Pharmacode</option>
+          </select>
+
+          <div class="bc-options">
+            <label class="bc-opt">
+              <span data-i18n="bc.showVal">显示文字</span>
+              <input type="checkbox" id="bc-showval" checked />
+            </label>
+            <label class="bc-opt">
+              <span data-i18n="bc.color">线条颜色</span>
+              <input type="color" id="bc-color" value="#111111" />
+            </label>
+            <label class="bc-opt">
+              <span data-i18n="bc.bg">背景色</span>
+              <input type="color" id="bc-bg" value="#ffffff" />
+            </label>
+            <label class="bc-opt">
+              <span data-i18n="bc.height">高度</span>
+              <input type="number" id="bc-height" value="80" min="20" max="400" />
+            </label>
+          </div>
+
+          <button class="btn primary" id="bc-btn" data-i18n="bc.gen">生成条形码</button>
+          <p class="hint" id="bc-hint"></p>
+
+          <label class="field-label" data-i18n="bc.out">条形码</label>
+          <div id="bc-output"></div>
+          <button class="btn ghost" id="bc-download" data-i18n="bc.dl">下载 SVG</button>
+        </div>
+      </section>
+
+      <!-- ========== 面板 5.5：JSON 工具 ========== -->
+      <section class="panel" id="panel-json">
+        <div class="panel-head">
+          <button class="ph-back" aria-label="返回">‹</button>
+          <span class="ph-title" data-i18n="ph.json">JSON 工具</span>
+        </div>
+
+        <!-- 子标签：格式化 / 提取代码 / 键值编辑 -->
+        <div class="seg-inline json-tabs" id="json-tabs" role="group" aria-label="JSON 功能">
+          <button type="button" data-v="fmt" class="active" data-i18n="json.tabFmt">格式化</button>
+          <button type="button" data-v="extract" data-i18n="json.tabExtract">提取代码</button>
+          <button type="button" data-v="kv" data-i18n="json.tabKv">键值编辑</button>
+        </div>
+
+        <!-- 子标签 1：格式化 / 编辑 -->
+        <div class="json-tab-pane" id="json-pane-fmt">
+          <label class="field-label" data-i18n="json.input">JSON 内容（可直接编辑）</label>
+          <textarea id="json-input" data-i18n-attr="placeholder:ph.jsonIn" placeholder="粘贴或输入 JSON，如 {&quot;name&quot;:&quot;Tom&quot;}"></textarea>
+          <div class="json-fmt-actions">
+            <button class="btn primary" id="json-format" data-i18n="json.format">格式化</button>
+            <button class="btn" id="json-minify" data-i18n="json.minify">压缩</button>
+            <button class="btn ghost" id="json-validate" data-i18n="json.validate">校验</button>
+          </div>
+          <p class="hint" id="json-fmt-hint"></p>
+          <label class="field-label" data-i18n="json.output">结果</label>
+          <textarea id="json-output" readonly data-i18n-attr="placeholder:ph.result" placeholder="格式化 / 压缩结果将显示在这里"></textarea>
+          <button class="btn ghost" id="json-copy" data-i18n="copy">复制结果</button>
+        </div>
+
+        <!-- 子标签 2：按路径提取并生成代码 -->
+        <div class="json-tab-pane" id="json-pane-extract" hidden>
+          <label class="field-label" data-i18n="json.input">JSON 内容</label>
+          <textarea id="json-ex-input" data-i18n-attr="placeholder:ph.jsonIn" placeholder="粘贴 JSON"></textarea>
+          <label class="field-label" data-i18n="json.fieldPath">键路径（如 user.name 或 list.0）</label>
+          <input id="json-path" type="text" data-i18n-attr="placeholder:ph.jsonPath" placeholder="user.name" />
+          <label class="field-label" data-i18n="json.lang">生成代码语言</label>
+          <select id="json-lang">
+            <option value="js">JavaScript</option>
+            <option value="py">Python</option>
+            <option value="java">Java</option>
+            <option value="csharp">C#</option>
+            <option value="go">Go</option>
+            <option value="php">PHP</option>
+          </select>
+          <button class="btn primary" id="json-extract" data-i18n="json.genCode">生成提取代码</button>
+          <p class="hint" id="json-ex-hint"></p>
+          <label class="field-label" data-i18n="json.codeOut">提取代码</label>
+          <textarea id="json-code" readonly data-i18n-attr="placeholder:ph.jsonCode" placeholder="生成的代码将显示在这里"></textarea>
+          <button class="btn ghost" id="json-code-copy" data-i18n="copy">复制代码</button>
+        </div>
+
+        <!-- 子标签 3：键值对编辑 -->
+        <div class="json-tab-pane" id="json-pane-kv" hidden>
+          <p class="hint" data-i18n="json.kvHint">逐行编辑键与值，选择值类型后一键生成 JSON；也可从格式化区导入现有 JSON。</p>
+          <div id="json-kv-list"></div>
+          <div class="json-kv-actions">
+            <button class="btn ghost" id="json-kv-add" data-i18n="json.kvAdd">+ 添加一行</button>
+            <button class="btn ghost" id="json-kv-import" data-i18n="json.kvImport">从格式化区导入</button>
+          </div>
+          <button class="btn primary" id="json-kv-gen" data-i18n="json.kvGen">生成 JSON</button>
+          <label class="field-label" data-i18n="json.output">生成结果</label>
+          <textarea id="json-kv-output" readonly data-i18n-attr="placeholder:ph.result" placeholder="生成的 JSON 将显示在这里"></textarea>
+          <button class="btn ghost" id="json-kv-copy" data-i18n="copy">复制结果</button>
+        </div>
+      </section>
+
+      <!-- ========== 面板 5.8：Crontab 定时表达式 ========== -->
+      <section class="panel" id="panel-cron">
+        <div class="panel-head">
+          <button class="ph-back" aria-label="返回">‹</button>
+          <span class="ph-title" data-i18n="ph.cron">Crontab</span>
+        </div>
+
+        <label class="field-label" data-i18n="cron.expr">表达式（5 段：分 时 日 月 周）</label>
+        <input id="cron-expr" type="text" placeholder="* * * * *" value="* * * * *" />
+
+        <div class="cron-fields">
+          <div class="cron-field"><span data-i18n="cron.fMin">分钟</span><code>*/15</code></div>
+          <div class="cron-field"><span data-i18n="cron.fHour">小时</span><code>0</code></div>
+          <div class="cron-field"><span data-i18n="cron.fDay">日</span><code>*</code></div>
+          <div class="cron-field"><span data-i18n="cron.fMon">月</span><code>*</code></div>
+          <div class="cron-field"><span data-i18n="cron.fDow">周</span><code>*</code></div>
+        </div>
+
+        <button class="btn primary" id="cron-parse" data-i18n="cron.parse">解析 / 校验</button>
+
+        <label class="field-label" data-i18n="cron.next">接下来 5 次执行</label>
+        <div id="cron-next" class="cron-next"></div>
+
+        <label class="field-label" data-i18n="cron.example">常用示例</label>
+        <div class="cron-tpls">
+          <button class="chip" data-expr="* * * * *" data-i18n="cron.tplMin">每分钟</button>
+          <button class="chip" data-expr="0 * * * *" data-i18n="cron.tplHour">每小时整点</button>
+          <button class="chip" data-expr="30 8 * * *" data-i18n="cron.tplDaily830">每天 8:30</button>
+          <button class="chip" data-expr="0 9 * * 1" data-i18n="cron.tplMon900">每周一 9:00</button>
+          <button class="chip" data-expr="0 0 1 * *" data-i18n="cron.tplMonthly1">每月 1 号</button>
+          <button class="chip" data-expr="0 12 * * *" data-i18n="cron.tplNoon">每天中午 12:00</button>
+          <button class="chip" data-expr="0 9 * * 1-5" data-i18n="cron.tplWorkday">每工作日 9:00</button>
+        </div>
+
+        <details class="cron-how">
+          <summary data-i18n="cron.how">怎么写 Cron 表达式</summary>
+          <div class="guide-body">
+            <p><b>格式：</b><code>分 时 日 月 周</code>（5 段，空格分隔）。</p>
+            <p><b>*</b>：<span data-i18n="cron.wild">代表“每”一个单位</span></p>
+            <p><b>*/n</b>：<span data-i18n="cron.step">步长</span></p>
+            <p><b>a,b,c</b>：<span data-i18n="cron.list">列表</span></p>
+            <p><b>a-b</b>：<span data-i18n="cron.range">区间</span></p>
+            <p>例：<code>*/15 9-17 * * 1-5</code> = 工作日 9 点到 17 点之间每 15 分钟。</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- ========== 面板 5.9：随机文本生成 ========== -->
+      <section class="panel" id="panel-rand">
+        <div class="panel-head">
+          <button class="ph-back" aria-label="返回">‹</button>
+          <span class="ph-title" data-i18n="ph.rand">随机文本生成</span>
+        </div>
+
+        <div class="seg-inline rand-tabs" id="rand-tabs" role="group" aria-label="随机类型">
+          <button type="button" data-v="str" class="active" data-i18n="rand.str">随机字符串</button>
+          <button type="button" data-v="fake" data-i18n="rand.fake">随机虚假数据</button>
+        </div>
+
+        <div class="rand-pane" id="rand-pane-str">
+          <label class="field-label" data-i18n="rand.charset">字符范围</label>
+          <div class="rand-charsets">
+            <label class="chk"><input type="checkbox" class="rcs" value="digit" checked /> <span data-i18n="rand.digit">数字</span></label>
+            <label class="chk"><input type="checkbox" class="rcs" value="lower" checked /> <span data-i18n="rand.lower">小写字母</span></label>
+            <label class="chk"><input type="checkbox" class="rcs" value="upper" /> <span data-i18n="rand.upper">大写字母</span></label>
+            <label class="chk"><input type="checkbox" class="rcs" value="special" /> <span data-i18n="rand.special">特殊符号</span></label>
+          </div>
+          <label class="field-label" data-i18n="rand.custom">自定义字符（可选，与上面叠加）</label>
+          <input id="rand-custom" type="text" placeholder="如：abc123@#" />
+          <label class="field-label" data-i18n="rand.len">长度（字符数）</label>
+          <input id="rand-len" type="number" value="16" min="1" max="512" />
+          <label class="field-label" data-i18n="rand.regex">正则约束（可选，生成结果需匹配）</label>
+          <input id="rand-regex" type="text" placeholder="如：^[A-Za-z0-9]{8,}$" />
+          <label class="field-label" data-i18n="rand.count">生成数量</label>
+          <input id="rand-count" type="number" value="1" min="1" max="200" />
+          <button class="btn primary" id="rand-gen" data-i18n="rand.gen">生成</button>
+        </div>
+
+        <div class="rand-pane" id="rand-pane-fake" style="display:none">
+          <label class="field-label" data-i18n="rand.presets">快捷生成常用格式</label>
+          <div class="rand-presets">
+            <button class="chip" data-preset="name" data-i18n="rand.pName">姓名</button>
+            <button class="chip" data-preset="email" data-i18n="rand.pEmail">邮箱</button>
+            <button class="chip" data-preset="phone" data-i18n="rand.pPhone">手机号</button>
+            <button class="chip" data-preset="id" data-i18n="rand.pId">身份证号</button>
+            <button class="chip" data-preset="addr" data-i18n="rand.pAddr">地址</button>
+            <button class="chip" data-preset="company" data-i18n="rand.pCompany">公司名</button>
+            <button class="chip" data-preset="uuid" data-i18n="rand.pUuid">UUID</button>
+            <button class="chip" data-preset="url" data-i18n="rand.pUrl">网址</button>
+            <button class="chip" data-preset="bank" data-i18n="rand.pBank">银行卡号</button>
+            <button class="chip" data-preset="color" data-i18n="rand.pColor">颜色值</button>
+            <button class="chip" data-preset="date" data-i18n="rand.pDate">日期</button>
+          </div>
+          <label class="field-label" data-i18n="rand.count">生成数量</label>
+          <input id="rand-fake-count" type="number" value="5" min="1" max="200" />
+          <button class="btn primary" id="rand-fake-gen" data-i18n="rand.gen">生成</button>
+        </div>
+
+        <label class="field-label" data-i18n="rand.out">结果</label>
+        <textarea id="rand-output" readonly data-i18n-attr="placeholder:ph.result" placeholder="结果将显示在这里"></textarea>
+        <button class="btn ghost" id="rand-copy" data-i18n="rand.copy">复制结果</button>
+      </section>
+
+      <!-- ========== 面板 6：使用教程 ========== -->
+      <section class="panel" id="panel-guide">
+        <div class="panel-head">
+          <button class="ph-back" aria-label="返回">‹</button>
+          <span class="ph-title" data-i18n="ph.guide">使用教程</span>
+        </div>
+        <p class="guide-intro">
+          点开下面的卡片，照着「怎么用」一步步做就行。每个都给了实例，边看边练最快上手。
+        </p>
+
+        <details class="guide-item" open>
+          <summary>① 哈希（Hash）—— 给数据算个“指纹”</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>把任意长度的文本，变成一串固定长度的字符（指纹）。<b>不可逆</b>——算出来就回不去原文。<b>哈希不需要密码</b>，所以算完也不会弹出“存密码本”。</p>
+            <p><b>怎么用：</b></p>
+            <ol>
+              <li>在「哈希」页粘贴文本（如 <code>hello</code>）；</li>
+              <li>选算法（推荐 SHA-256；只有 HMAC 系列才需要填“密钥”）；</li>
+              <li>点「计算哈希」→ 复制结果。</li>
+            </ol>
+            <p><b>举个栗子：</b><code>SHA-256("hello")</code> =<br><code class="mono">2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824</code></p>
+            <p><b>注意：</b>MD5 / SHA-1 已不安全，只拿来做<b>非机密</b>的完整性校验（比如比对文件有没有传错），别当密码保护用。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>② 编/解码（Base64 / Hex / URL / Base32 / Base58 / Unicode / JWT）—— 不是加密！</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>只是把数据<b>换一种写法</b>，可逆、<b>不需要密钥</b>。它<b>不是加密</b>，谁都能还原。</p>
+            <p><b>怎么用：</b>在「编/解码」页选方式（如 Base64 编码）→ 输入 →「执行」。</p>
+            <p><b>举个栗子：</b><code>Base64("hello")</code> = <code class="mono">aGVsbG8=</code>。Base32 / Base58 常用于分享密钥、区块链地址；Unicode 转义便于在代码里嵌中文；JWT 是带签名的令牌（可看 header/payload）。</p>
+            <p><b>注意：</b>编码 ≠ 加密。想保密请用下面的「对称 / 非对称」加密，别把密码只做 Base64 就当保护了。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>③ 对称加/解密（AES / DES / 3DES / Blowfish / RC4 / Rabbit）</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>加密和解密用<b>同一把密钥</b>。适合你知道对方、能安全把密钥告诉他的情况。</p>
+            <p><b>怎么用：</b></p>
+            <ol>
+              <li>选算法（<b>优先 AES</b>，最通用最安全）；</li>
+              <li>填密钥（注意下面的长度提示：AES 要 16 / 24 / 32 字节，DES 8 字节，3DES 24 字节）；</li>
+              <li>选分组模式：<b>ECB</b>（最简单、无需 IV，但最不安全）；<b>CBC</b> 等需要填 IV；</li>
+              <li>输入明文 / 密文 →「加密」或「解密」。</li>
+            </ol>
+            <p><b>注意：</b>流密码（RC4 / Rabbit）密钥长度任意、没有模式/IV。DES、3DES、ECB 模式已不推荐用于真实机密。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>④ 加/解密 · RSA（非对称）—— 一把公钥、一把私钥（SM2 也在本页）</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>一对钥匙：<b>公钥</b>（可公开，用来加密 / 验签）+ <b>私钥</b>（自己藏好，用来解密 / 签名）。</p>
+            <p><b>怎么用（对方给你发密信）：</b></p>
+            <ol>
+              <li>点「生成 RSA 密钥对」→ 得到公钥和私钥；</li>
+              <li>把<b>公钥</b>发给对方；</li>
+              <li>对方在「加密」里用你的公钥加密，把密文发你；</li>
+              <li>你选「解密」、用<b>私钥</b>解开。</li>
+            </ol>
+            <p><b>签名（证明是你发的）：</b>你选「签名」用<b>私钥</b>对文本签名 → 对方选「验签」用你的<b>公钥</b>验证。</p>
+            <p><b>注意：</b>① 需运行在 <b>https 或 localhost</b> 环境；② 2048 位单次最多加密约 190 字节；③ <b>私钥绝不能泄露</b>。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>⑤ 二维码 & 条形码 —— 把文字/链接变成可扫的图</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>把文本、网址等变成一张能被手机扫出来的图（二维码）；也能生成<b>条形码</b>（商品条码、Code128 等机器可读线条）。</p>
+            <p><b>怎么用：</b>在「二维码 / 条形码」页，顶部切「二维码 / 条形码」：</p>
+            <ul>
+              <li><b>二维码</b>：填内容（如网址）→ 选纠错等级 →「生成二维码」→ 可「下载 SVG」或「扫描二维码」。</li>
+              <li><b>条形码</b>：填内容（如 <code>123456789012</code>）→ 选格式（CODE128 / EAN13 等）→「生成条形码」→ 可下载 SVG。</li>
+            </ul>
+            <p><b>注意：</b>纠错等级越高越抗污损但图案越密；条形码请按用途选对格式（商品用 EAN-13，通用用 CODE128）。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>⑥ SM2 国密 —— 已并入「加/解密」页（顶部算法选 SM2）</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>和 RSA 一样是非对称算法（公钥加密 / 私钥解密，私钥签名 / 公钥验签），但符合<b>中国国家密码标准（国密）</b>，密文格式为 C1C3C2。</p>
+            <p><b>怎么用：</b>进「加/解密」页，顶部把算法切到 <b>SM2</b>，会自动生成密钥对（公钥 130 位、私钥 64 位十六进制）。选「加密 / 解密 / 签名 / 验签」→ 输入 →「执行」。公钥可「保存到密码本」，私钥建议「导出文件」本地保管。</p>
+            <p><b>适合：</b>对接国内政务、金融等要求国密的场景。与 RSA 的区别主要在算法标准和密钥格式。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>⑦ JSON 工具 —— 格式化 / 提取 / 键值编辑</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>对 JSON 做整理和加工，不加密。</p>
+            <ul>
+              <li><b>格式化</b>：把压缩的 JSON 美化缩进；<b>压缩</b>：去掉空格变一行；<b>校验</b>：检查是否合法。</li>
+              <li><b>提取代码</b>：填 JSON + 键路径（如 <code>user.name</code>），生成对应语言的取值代码。</li>
+              <li><b>键值编辑</b>：像表格一样逐行加键和值，选类型后一键生成 JSON，也可从格式化区导入。</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>⑧ Crontab —— 写定时任务表达式</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>用一行 5 段表达式描述“什么时候执行”，常用于定时任务（如每天备份）。</p>
+            <p><b>怎么用：</b>在「Crontab」页写表达式（或点下面的常用示例）→「解析 / 校验」会告诉你接下来 5 次执行时间。</p>
+            <p><b>格式：</b><code>分 时 日 月 周</code>。例 <code>*/15 9-17 * * 1-5</code> = 工作日 9–17 点每 15 分钟。点开「怎么写」有详细说明。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>⑨ 随机文本生成 —— 字符串 / 虚假数据</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>快速造测试数据，不加密。</p>
+            <ul>
+              <li><b>随机字符串</b>：勾选字符范围（数字/大小写/特殊符号）、设长度、可加正则约束、设数量，一键生成。</li>
+              <li><b>随机虚假数据</b>：一键生成姓名、邮箱、手机号、身份证、地址、公司、UUID、网址、银行卡、颜色、日期等常见“假数据”，适合填表/造样例。</li>
+            </ul>
+            <p><b>注意：</b>这些都是<b>随机/虚构</b>数据，仅用于测试，不含真实个人信息。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>⑩ 基础概念小抄</summary>
+          <div class="guide-body">
+            <ul>
+              <li><b>明文</b>：还没处理的原始内容；<b>密文</b>：加密后的乱码。</li>
+              <li><b>密钥 / 密码</b>：加密用的“钥匙”，<b>千万别用同一个当密码</b>。</li>
+              <li><b>可逆 vs 不可逆</b>：加密、编码能还原；哈希不能还原。</li>
+              <li><b>该用哪个：</b>校验完整性→哈希；让数据能传输→编码；你和对方都要看原文且要保密→对称加密；只给对方看、怕中间人→RSA / SM2。</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <!-- ========== 面板 7：外部调用（收到文字/图片后选择处理方式） ========== -->
+      <section class="panel" id="panel-incoming">
+        <div class="panel-head">
+          <button class="ph-back" aria-label="返回">‹</button>
+          <span class="ph-title" data-i18n="inc.title">外部内容</span>
+        </div>
+
+        <div class="inc-card">
+          <div class="inc-label" data-i18n="inc.from">收到内容</div>
+          <div class="inc-preview" id="inc-preview"></div>
+          <button class="mini-btn" id="inc-pick-img" data-i18n="inc.pickImg">选择图片文件</button>
+          <input type="file" id="inc-file" accept="image/*" style="display:none" />
+        </div>
+
+        <div class="inc-group">
+          <div class="inc-gtitle" data-i18n="inc.quick">快捷编码</div>
+          <div class="inc-chips">
+            <button class="chip" data-act="enc" data-v="b64" data-i18n="inc.b64enc">Base64 编码</button>
+            <button class="chip" data-act="enc" data-v="hex" data-i18n="inc.hexenc">Hex 编码</button>
+            <button class="chip" data-act="enc" data-v="url" data-i18n="inc.urlenc">URL 编码</button>
+          </div>
+        </div>
+
+        <div class="inc-group">
+          <div class="inc-gtitle" data-i18n="inc.encrypt">快捷加密</div>
+          <div class="inc-chips">
+            <button class="chip" data-act="sym" data-v="AES" data-i18n="inc.aes">AES 加密</button>
+            <button class="chip" data-act="sym" data-v="DES" data-i18n="inc.des">DES 加密</button>
+            <button class="chip" data-act="rsa" data-i18n="inc.rsa">RSA 加密</button>
+          </div>
+        </div>
+
+        <div class="inc-group">
+          <div class="inc-gtitle" data-i18n="inc.hash">哈希</div>
+          <div class="inc-chips">
+            <button class="chip" data-act="hash" data-v="MD5" data-i18n="inc.md5">MD5</button>
+            <button class="chip" data-act="hash" data-v="SHA256" data-i18n="inc.sha256">SHA-256</button>
+          </div>
+        </div>
+
+        <div class="inc-group">
+          <div class="inc-gtitle" data-i18n="inc.other">其他</div>
+          <div class="inc-chips">
+            <button class="chip" data-act="imgb64" data-i18n="inc.imgb64">图片 → Base64</button>
+            <button class="chip" data-act="qr" data-i18n="inc.qr">生成二维码</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- RSA 保存文件：命名弹窗（生成 [名称]_public.pem 与 [名称]_private.pem） -->
+    <div class="vp-mask" id="rsan-mask"></div>
+    <div class="vp-panel" id="rsan-panel">
+      <div class="vp-inner">
+        <div class="vp-head"><span class="vp-title" data-i18n="rsa.nameTitle">保存密钥文件</span><button class="vp-close" id="rsa-name-close" aria-label="关闭">✕</button></div>
+        <p class="cp-note" data-i18n="rsa.nameHint">将生成两个文件：&lt;名称&gt;_public.pem 与 &lt;名称&gt;_private.pem</p>
+        <div class="cp-form">
+          <input id="rsa-name-input" placeholder="my_keys" />
+          <div class="btn-row"><button class="btn primary" id="rsa-name-ok" data-i18n="rsa.nameOk">保存</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RSA：查看密码对（更小弹窗，密钥截断展示） -->
+    <div class="vp-mask" id="rsav-mask"></div>
+    <div class="vp-panel rsa-view-pop" id="rsav-panel">
+      <div class="vp-inner">
+        <div class="vp-head"><span class="vp-title" data-i18n="rsa.viewTitle">查看密钥对</span><button class="vp-close" id="rsav-close" aria-label="关闭">✕</button></div>
+        <div class="key-block">
+          <div class="key-block-head"><span class="field-label" style="margin:0" data-i18n="asym.pub">公钥 (PUBLIC KEY)</span><button class="mini-btn" id="rsav-copy-pub" data-i18n="copy">复制</button></div>
+          <pre class="key-preview" id="rsav-pub"></pre>
+        </div>
+        <div class="key-block">
+          <div class="key-block-head"><span class="field-label" style="margin:0" data-i18n="asym.priv">私钥 (PRIVATE KEY)</span><button class="mini-btn" id="rsav-copy-priv" data-i18n="copy">复制</button></div>
+          <pre class="key-preview" id="rsav-priv"></pre>
+        </div>
+        <div class="btn-row rsa-view-actions">
+          <button class="btn" id="rsav-regen"><span data-i18n="asym.reGen">重新生成</span></button>
+          <button class="btn primary" id="rsav-save"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l4 4v12H5z"/><path d="M9 4v5h7"/></svg><span data-i18n="asym.saveVault">保存到密码本</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 扫描二维码浮层（摄像头 + jsQR 解码） -->
+    <div class="scan-mask" id="scan-mask"></div>
+    <div class="scan-panel" id="scan-panel">
+      <div class="vp-inner">
+        <div class="vp-head"><span class="vp-title" data-i18n="qr.scan">扫描二维码</span><button class="vp-close" id="scan-close" aria-label="关闭">✕</button></div>
+        <div class="scan-view">
+          <video id="scan-video" playsinline></video>
+          <div class="scan-frame"></div>
+        </div>
+        <p class="hint" id="scan-status" data-i18n="qr.scanTip">将二维码对准取景框</p>
+        <div class="scan-result" id="scan-result" hidden>
+          <textarea id="scan-text" readonly data-i18n-attr="placeholder:ph.scanResult" placeholder="识别结果"></textarea>
+          <div class="btn-row"><button class="btn primary" id="scan-copy" data-i18n="copy">复制结果</button></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn ghost" id="scan-upload" data-i18n="qr.scanUpload">从相册选择</button>
+          <button class="btn ghost" id="scan-stop" data-i18n="qr.scanStop">停止</button>
+        </div>
+        <input type="file" id="scan-file" accept="image/*" style="display:none" />
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <p data-i18n="footer">本工具用于<strong>学习与实践</strong>。MD5、DES、RC4、ECB 等已不安全，请勿用于保护真实机密。</p>
+  </footer>
+
+  <!-- ========== 底部导航栏（主页 + 设置；其余功能在首页网格） ========== -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="bottom-item active" data-tab="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg>
+      <span data-i18n="tab.home">主页</span>
+    </button>
+    <button class="bottom-item" data-action="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span data-i18n="set.title">设置</span>
+    </button>
+  </nav>
+
+  <!-- ========== 设置（全屏 overlay） ========== -->
+  <div id="settings-overlay" class="overlay" hidden>
+    <div class="overlay-bar">
+      <button id="settings-back" class="icon-btn">‹ <span data-i18n="set.back">返回</span></button>
+      <span id="settings-title" class="overlay-title" data-i18n="set.title">设置</span>
+    </div>
+    <div id="settings-body" class="overlay-body"></div>
+  </div>
+
+  <!-- 先加载算法库，再加载我们的逻辑 -->
+  <script src="js/vendor/crypto-js.js"></script>
+  <script src="js/vendor/qrcode-generator.js"></script>
+  <script src="js/vendor/jsqr.js"></script>
+  <script src="js/vendor/jsbarcode.all.min.js"></script>
+  <!-- SM2 国密算法（离线：sm-crypto + jsbn，依赖已 rewire 为本地文件） -->
+  <script type="module">
+    import * as smCrypto from "./js/vendor/sm-crypto.esm.js";
+    window.smCrypto = smCrypto;
+  </script>
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/settings.js"></script>
+</body>
+</html>

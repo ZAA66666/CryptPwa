@@ -1,0 +1,22 @@
+{
+  "name": "Crypto Toolbox",
+  "short_name": "CryptoBox",
+  "id": "crypto-pwa",
+  "description": "Local-first crypto & encoding toolbox: Base64 / Hash / AES / RSA / SM2 / QR & Barcode",
+  "lang": "en-US",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07c160",
+  "theme_color": "#07c160",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ],
+  "share_target": {
+    "action": "./",
+    "method": "GET",
+    "params": { "title": "title", "text": "text", "url": "url" }
+  }
+}

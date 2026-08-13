@@ -1,0 +1,22 @@
+{
+  "name": "加解密工具箱",
+  "short_name": "加密箱",
+  "id": "crypto-pwa",
+  "description": "手机上的 Base64 / 哈希 / 对称 / RSA / 二维码 工具",
+  "lang": "zh-CN",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07c160",
+  "theme_color": "#07c160",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ],
+  "share_target": {
+    "action": "./",
+    "method": "GET",
+    "params": { "title": "title", "text": "text", "url": "url" }
+  }
+}

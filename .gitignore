@@ -1,0 +1,11 @@
+# 临时文件 / 测试脚本
+_t.*.mjs
+_t.*.js
+*.tmp
+*.log
+
+# 编辑器 / 系统
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
