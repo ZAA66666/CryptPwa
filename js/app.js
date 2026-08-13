@@ -924,10 +924,18 @@ document.getElementById("sm2-run").addEventListener("click", () => {
   } catch (e) { sm2Output.value = "❌ 出错了：" + e.message; }
 });
 document.getElementById("sm2-copy").addEventListener("click", (e) => copyText(sm2Output.value, e.target));
+/* 结果区「保存到文件」：保存运算结果；密钥导出在查看弹窗里 */
 document.getElementById("sm2-export-file").addEventListener("click", () => {
+  if (sm2Output.value) saveTextFile("sm2_result.txt", sm2Output.value);
+  else alert(_t("save.empty", "请先生成或粘贴密钥"));
+});
+/* 查看弹窗里「导出密钥文件」：导出公钥/私钥 txt */
+function sm2ExportKeys() {
   if (sm2Pub.value) saveTextFile("sm2_public.txt", sm2Pub.value);
   if (sm2Priv.value) saveTextFile("sm2_private.txt", sm2Priv.value);
-});
+}
+const sm2vExport = document.getElementById("sm2v-export");
+if (sm2vExport) sm2vExport.addEventListener("click", sm2ExportKeys);
 
 /* ---------- 5.5 RSA 密钥「保存到文件」 ---------- */
 const _t = (k, f) => (window.t ? window.t(k) : f);
@@ -979,9 +987,38 @@ function rsaSaveFile() {
   };
 }
 // 「保存到密码本」：由查看密钥弹窗里的按钮触发（rsav-save / sm2v-save）
-// 「导出文件」：把当前公钥/私钥导出为 .pem 文件
+// 结果区「保存到文件」：保存运算结果（rsa-output）；密钥导出在查看弹窗里
+function rsaSaveResult() {
+  const out = rsaOutput.value.trim();
+  if (!out) { alert(_t("save.empty", "请先生成或粘贴密钥")); return; }
+  saveTextFile("rsa_result.txt", out);
+}
 const rsaExportBtn = document.getElementById("rsa-export-file");
-if (rsaExportBtn) rsaExportBtn.addEventListener("click", rsaSaveFile);
+if (rsaExportBtn) rsaExportBtn.addEventListener("click", rsaSaveResult);
+// 查看弹窗里「导出密钥文件」：把当前公钥/私钥导出为 .pem 文件
+function rsaExportKeys() {
+  const pub = rsaPub.value.trim(), priv = rsaPriv.value.trim();
+  if (!pub && !priv) { alert(_t("save.empty", "请先生成或粘贴密钥")); return; }
+  const mask = document.getElementById("rsan-mask");
+  const panel = document.getElementById("rsan-panel");
+  const input = document.getElementById("rsa-name-input");
+  input.value = getSaveBase();           // 默认带保存路径末级目录名（如 CryptoPwa）
+  panel.classList.add("show"); mask.classList.add("show");
+  const close = () => { panel.classList.remove("show"); mask.classList.remove("show"); };
+  document.getElementById("rsa-name-close").onclick = close;
+  mask.onclick = close;
+  document.getElementById("rsa-name-ok").onclick = () => {
+    let raw = input.value.trim();
+    if (!raw) raw = "my_keys";
+    const safe = raw.replace(/[\\/:*?"<>|\s]+/g, "_");   // 清洗非法字符
+    close();
+    // 存在的密钥才导出文件（一对则两个，单把则一个）
+    if (pub) saveTextFile(safe + "_public.pem", pub);
+    if (priv) saveTextFile(safe + "_private.pem", priv);
+  };
+}
+const rsavExport = document.getElementById("rsav-export");
+if (rsavExport) rsavExport.addEventListener("click", rsaExportKeys);
 function rsaToVault() {
   const pub = rsaPub.value.trim(), priv = rsaPriv.value.trim();
   if (!pub && !priv) { alert(_t("save.empty", "请先生成或粘贴密钥")); return; }
@@ -1657,7 +1694,11 @@ function setupExpanders() {
   }
 
   function weekday(d) {
-    if (window.__lang === "en") return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()];
+    const L = window.__lang;
+    if (L === "ja") return ["日", "月", "火", "水", "木", "金", "土"][d.getDay()];
+    if (L === "ko") return ["일", "월", "화", "수", "목", "금", "토"][d.getDay()];
+    if (L === "ar") return ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"][d.getDay()];
+    if (L === "en") return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()];
     return "周" + ["日", "一", "二", "三", "四", "五", "六"][d.getDay()];
   }
   function fmt(d) {
@@ -1718,6 +1759,14 @@ function setupExpanders() {
   const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
   const digit = () => Math.floor(Math.random() * 10);
   const randLower = (n) => { let s = ""; for (let i = 0; i < n; i++) s += LOWER[digit()]; return s; };
+  function countUnit() {
+    const L = window.__lang;
+    if (L === "en") return " items";
+    if (L === "ja") return " 件";
+    if (L === "ko") return " 개";
+    if (L === "ar") return " عناصر";
+    return " 条";
+  }
   function clampInt(v, lo, hi, def) {
     let n = parseInt(v, 10);
     if (!Number.isInteger(n)) n = def;
@@ -1755,7 +1804,7 @@ function setupExpanders() {
       out.push(one);
     }
     $("rand-output").value = out.join("\n");
-    addHistory({ cat: "rand", go: "rand", op: "gen", method: "str", preview: count + (window.__lang === "en" ? " items" : " 条") });
+    addHistory({ cat: "rand", go: "rand", op: "gen", method: "str", preview: count + countUnit() });
   });
 
   /* ---- 随机虚假数据生成器（无需外部库） ---- */
@@ -1827,7 +1876,7 @@ function setupExpanders() {
     const out = [];
     for (let i = 0; i < count; i++) out.push(fn());
     $("rand-output").value = out.join("\n");
-    addHistory({ cat: "rand", go: "rand", op: "gen", method: "fake:" + fakeType, preview: count + (window.__lang === "en" ? " items" : " 条") });
+    addHistory({ cat: "rand", go: "rand", op: "gen", method: "fake:" + fakeType, preview: count + countUnit() });
   }
   presetBtns.forEach((b) => b.addEventListener("click", () => {
     fakeType = b.dataset.preset;

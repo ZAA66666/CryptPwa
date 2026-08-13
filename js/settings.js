@@ -124,9 +124,13 @@
     const l = getSetting("lang", "system");
     if (l === "system") {
       const n = (navigator.language || "zh").toLowerCase();
-      return n.startsWith("zh") ? "zh" : "en";
+      if (n.startsWith("zh")) return "zh";
+      if (n.startsWith("ja")) return "ja";
+      if (n.startsWith("ko")) return "ko";
+      if (n.startsWith("ar")) return "ar";
+      return "en";
     }
-    return l === "en" ? "en" : "zh";
+    return ["zh", "en", "ja", "ko", "ar"].includes(l) ? l : "zh";
   }
   function applyLanguage() {
     window.__lang = resolveLang();
@@ -358,6 +362,9 @@
         `<button data-v="system" class="${cur === "system" ? "active" : ""}">${t("lang.system")}</button>` +
         `<button data-v="zh" class="${cur === "zh" ? "active" : ""}">${t("lang.zh")}</button>` +
         `<button data-v="en" class="${cur === "en" ? "active" : ""}">${t("lang.en")}</button>` +
+        `<button data-v="ja" class="${cur === "ja" ? "active" : ""}">${t("lang.ja")}</button>` +
+        `<button data-v="ko" class="${cur === "ko" ? "active" : ""}">${t("lang.ko")}</button>` +
+        `<button data-v="ar" class="${cur === "ar" ? "active" : ""}">${t("lang.ar")}</button>` +
         `</div></div>` +
         `<div class="settings-row"><span class="sr-label">${t("disp.font")}</span>` +
         `<div class="seg-inline" id="font-seg">` +
@@ -376,6 +383,9 @@
         `<button data-v="system" class="${cur === "system" ? "active" : ""}">${t("lang.system")}</button>` +
         `<button data-v="zh" class="${cur === "zh" ? "active" : ""}">${t("lang.zh")}</button>` +
         `<button data-v="en" class="${cur === "en" ? "active" : ""}">${t("lang.en")}</button>` +
+        `<button data-v="ja" class="${cur === "ja" ? "active" : ""}">${t("lang.ja")}</button>` +
+        `<button data-v="ko" class="${cur === "ko" ? "active" : ""}">${t("lang.ko")}</button>` +
+        `<button data-v="ar" class="${cur === "ar" ? "active" : ""}">${t("lang.ar")}</button>` +
         `</div>`;
     }
     bodyEl.innerHTML = html;

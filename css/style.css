@@ -1,5 +1,13 @@
 /* ===== 加解密工具箱 样式（微信绿 / 酷安风 · 移动端优先） ===== */
 
+/* RTL（阿拉伯语）适配：整体镜像布局 */
+html[dir="rtl"] body { direction: rtl; }
+html[dir="rtl"] .panel-head .ph-back { transform: scaleX(-1); }
+html[dir="rtl"] .si-arrow { transform: scaleX(-1); }
+html[dir="rtl"] .tool-grid, html[dir="rtl"] .btn-row, html[dir="rtl"] .key-status-row,
+html[dir="rtl"] .iv-row, html[dir="rtl"] .sym-key-actions, html[dir="rtl"] .json-fmt-actions { direction: rtl; }
+html[dir="rtl"] input, html[dir="rtl"] textarea { direction: rtl; text-align: right; }
+
 :root {
   --bg: #eef0f2;          /* 页面背景（淡灰，柔和） */
   --card: #fbfbfc;        /* 卡片背景（极淡白，柔和） */
