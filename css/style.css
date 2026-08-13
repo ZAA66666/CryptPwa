@@ -29,12 +29,16 @@ html[dir="rtl"] input, html[dir="rtl"] textarea { direction: rtl; text-align: ri
 
 * { box-sizing: border-box; }
 
-/* 全局：所有按钮 / 可点元素 - 禁用浏览器默认蓝色矩形高亮，改用贴合圆角的 :active 反馈 */
+/* 全局：所有按钮 / 可点元素 - 禁用浏览器默认蓝色矩形高亮，改用贴合圆角的 :active 反馈；
+   文字不可被选中（App 体验） */
 button, .btn, .chip, .rcs-btn, .num-btn, .bottom-item, .settings-item, .vp-item, .kv-tpl-opt,
-.seg-inline button, .sym-mode-seg button, .sym-cat-tabs button, .vault-slot-seg button, .lang-seg button {
+.seg-inline button, .sym-mode-seg button, .sym-cat-tabs button, .vault-slot-seg button, .lang-seg button,
+.ph-back, .ph-title, .app-header h1, .subtitle, .settings-group-title {
   -webkit-tap-highlight-color: transparent;
   outline: none;
   -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
   position: relative;
   overflow: hidden;
 }
@@ -158,10 +162,23 @@ body:not(.on-home) .app-header { display: none; }
   font-weight: 500;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
   transition: color 0.15s ease;
+  position: relative;
 }
-.bottom-item svg { width: 24px; height: 24px; display: block; }
-.bottom-item.active { color: var(--accent); }
+.bottom-item svg { width: 24px; height: 24px; display: block; transition: transform 0.18s; }
+/* 选中态：强调色 + 图标放大 + 顶部小圆点指示 */
+.bottom-item.active { color: var(--accent); font-weight: 600; }
+.bottom-item.active svg { transform: scale(1.1); }
+.bottom-item.active::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  width: 18px; height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
 .bottom-item:active { opacity: 0.7; }
 
 /* 进入具体功能（非主页）时隐藏底部导航栏：退出用面板内返回键；避免与主页/设置栏重复占位 */
