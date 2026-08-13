@@ -1,0 +1,16 @@
+# Capacitor 复制 web 资源时排除的路径（避免把自身/仓库文件塞进 APK）
+.git/
+.gitignore
+.github/
+node_modules/
+android/
+capacitor.config.json
+.capacitorignore
+package.json
+package-lock.json
+README.md
+README.zh-CN.md
+使用教程.md
+AI_DISCLOSURE.md
+示例备份_crypto-pwa-backup.json
+中文语言包_zh.json

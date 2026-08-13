@@ -1,11 +1,4 @@
-# 临时文件 / 测试脚本
-_t.*.mjs
-_t.*.js
-*.tmp
+# 依赖 / 生成目录
+node_modules/
+webapp/
 *.log
-
-# 编辑器 / 系统
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/

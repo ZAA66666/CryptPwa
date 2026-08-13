@@ -1,0 +1,10 @@
+{
+  "name": "cryptpwa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CryptPwa 加解密工具箱（PWA + Android App）",
+  "scripts": {
+    "sync": "node scripts/sync-web.mjs && cap sync android",
+    "apk": "cd android && ./gradlew assembleDebug"
+  }
+}
