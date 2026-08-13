@@ -293,7 +293,7 @@
   function renderMain() {
     titleEl.textContent = t("set.title");
     const groups = [
-      { title: t("set.grpGeneral"), items: ["display", "theme", "extcall", "storage"] },
+      { title: t("set.grpGeneral"), items: ["display", "theme", "extcall", "exp", "storage"] },
       { title: t("set.grpData"), items: ["common", "sync"] },
       { title: t("set.grpPrivacy"), items: ["about", "privacy", "terms", "security", "personal"] },
     ];
@@ -404,6 +404,23 @@
         `<div class="btn-row"><button class="btn ghost" id="ext-copy">${t("ext.copyExample")}</button></div>` +
         `</div>` +
         `<div class="legal-text" style="margin-top:14px">${t("ext.text")}</div>`;
+    } else if (name === "exp") {
+      titleEl.textContent = t("exp.title");
+      const inc = window.__incomingText || window.__incomingImage || "";
+      html =
+        `<div class="cp-note">${t("exp.hint")}</div>` +
+        `<div class="cp-form">` +
+        `<textarea id="exp-input" rows="3" placeholder="${t("exp.input")}">${escapeHtml(inc)}</textarea>` +
+        `<div class="btn-row"><button class="btn primary" id="exp-gen">${t("exp.genBtn")}</button>` +
+        `<button class="btn ghost" id="exp-copy">${t("exp.copy")}</button></div>` +
+        `</div>` +
+        `<label class="field-label">${t("exp.result")}</label>` +
+        `<textarea id="exp-result" readonly rows="5"></textarea>` +
+        `<label class="field-label">${t("exp.schemeTitle")}</label>` +
+        `<textarea id="exp-scheme-code" readonly rows="2" style="font-family:monospace;font-size:12px"></textarea>` +
+        `<label class="field-label">${t("exp.intentTitle")}</label>` +
+        `<textarea id="exp-intent-code" readonly rows="3" style="font-family:monospace;font-size:12px"></textarea>` +
+        `<div class="legal-text" style="margin-top:14px"><h3>${t("exp.noteTitle")}</h3><p>${t("exp.note")}</p></div>`;
     } else if (name === "display") {
       titleEl.textContent = t("display.title");
       const f = getSetting("font", "normal");
@@ -517,6 +534,21 @@
       if (exCopy) exCopy.onclick = (e) => {
         const v = bodyEl.querySelector("#ext-example").value;
         if (window.copyText) window.copyText(v, e.target);
+      };
+    } else if (name === "exp") {
+      /* 实验性：生成外部回调数据（成功/时间戳/处理后数据）+ 回调地址示例 */
+      bodyEl.querySelector("#exp-gen").onclick = () => {
+        const d = bodyEl.querySelector("#exp-input").value;
+        const payload = { ok: !!d, ts: new Date().toISOString(), data: d || "", app: "Crypto-pwa" };
+        const json = JSON.stringify(payload, null, 2);
+        const enc = encodeURIComponent(JSON.stringify(payload));
+        bodyEl.querySelector("#exp-result").value = json;
+        bodyEl.querySelector("#exp-scheme-code").value = "myapp://crypto-callback?result=" + enc;
+        bodyEl.querySelector("#exp-intent-code").value = "intent://crypto-callback?result=" + enc + "#Intent;scheme=myapp;package=com.example.caller;end";
+      };
+      bodyEl.querySelector("#exp-copy").onclick = (e) => {
+        const v = bodyEl.querySelector("#exp-result").value;
+        if (v && window.copyText) window.copyText(v, e.target);
       };
     } else if (name === "lang") {
       bodyEl.querySelectorAll("#lang-seg button").forEach((b) =>
@@ -1127,6 +1159,24 @@
         } else if (targetId) {
           const el = document.getElementById(targetId);
           if (el) { el.value = p.value; el.dispatchEvent(new Event("input")); }
+          /* 对称加/解密：填入密钥后联动「密钥长度」档位，并恢复保存的 IV（如有） */
+          if (cat === "sym" || targetId === "sym-key") {
+            const kb = utf8ByteLength(p.value);
+            const ksBox = document.getElementById("sym-keysize");
+            if (ksBox) {
+              const btn = ksBox.querySelector('button[data-bytes="' + kb + '"]');
+              if (btn) {
+                ksBox.querySelectorAll("button").forEach((x) => x.classList.remove("active"));
+                btn.classList.add("active");
+                if (window.updateKeySizeLabel) window.updateKeySizeLabel();
+              }
+            }
+            if (p.iv) {
+              const ivEl = document.getElementById("sym-iv");
+              if (ivEl) { ivEl.value = p.iv; ivEl.dispatchEvent(new Event("input")); }
+            }
+            if (window.refreshSymHints) window.refreshSymHints();
+          }
         }
         // 若「查看/修改密钥对」弹窗开着，刷新其中的密钥内容
         if (window.fillRsaView) window.fillRsaView();
@@ -1183,7 +1233,7 @@
       } else if (opts.kind === "rsa-import") {
         a.push({ kind: "rsa-import", label: n, value: opts.password, side: opts.side, cat: "rsa", slot: vaultSlot });
       } else {
-        a.push({ label: n, value: password, method: method, cat: cat, slot: vaultSlot });
+        a.push({ label: n, value: password, method: method, cat: cat, slot: vaultSlot, iv: opts.iv || null });
         if (extra) a.push({ label: n + " · " + extra.method, value: extra.password, method: extra.method, cat: cat, slot: vaultSlot });
       }
       writePasswords(a);
@@ -1261,6 +1311,24 @@
           } else {
             const el = document.getElementById(targetId);
             if (el) { el.value = fullText; el.dispatchEvent(new Event("input")); }
+            /* 对称密钥：联动密钥长度档位 + 恢复 IV */
+            if (targetId === "sym-key" || (targetId && targetId.indexOf("sym-") === 0)) {
+              const kb = utf8ByteLength(fullText);
+              const ksBox = document.getElementById("sym-keysize");
+              if (ksBox) {
+                const btn = ksBox.querySelector('button[data-bytes="' + kb + '"]');
+                if (btn) {
+                  ksBox.querySelectorAll("button").forEach((x) => x.classList.remove("active"));
+                  btn.classList.add("active");
+                  if (window.updateKeySizeLabel) window.updateKeySizeLabel();
+                }
+              }
+              if (p.iv) {
+                const ivEl = document.getElementById("sym-iv");
+                if (ivEl) { ivEl.value = p.iv; ivEl.dispatchEvent(new Event("input")); }
+              }
+              if (window.refreshSymHints) window.refreshSymHints();
+            }
             /* 填入后同步状态提示（RSA/SM2 面板的密钥框） */
             const stEl = (targetId && targetId.indexOf("sm2-") === 0) ? document.getElementById("sm2-status")
                        : (targetId && (targetId.indexOf("rsa-") === 0)) ? document.getElementById("rsa-status") : null;

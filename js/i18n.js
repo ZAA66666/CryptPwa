@@ -131,7 +131,7 @@ window.I18N = {
     "set.title": "设置", "set.back": "返回",
     "set.about": "关于", "set.privacy": "隐私政策", "set.terms": "用户协议",
     "set.security": "安全条款", "set.personal": "个人信息", "set.common": "密码本", "set.sync": "数据备份与同步",
-    "set.theme": "主题", "set.display": "显示设置", "set.about2": "关于", "set.extcall": "外部调用与分享", "set.storage": "设置路径",
+    "set.theme": "主题", "set.display": "显示设置", "set.about2": "关于", "set.extcall": "外部调用与分享", "set.storage": "设置路径", "set.exp": "实验性",
     "set.grpGeneral": "通用设置", "set.grpData": "数据隐私", "set.grpPrivacy": "隐私与条款", "set.dataEnc": "数据加密", "enc.on": "已开启数据加密，密码本将以密文保存 🔒", "enc.off": "已关闭数据加密，密码本将以明文保存",
 
     /* 主题 */
@@ -167,7 +167,7 @@ window.I18N = {
     "inc.md5": "MD5", "inc.sha256": "SHA-256", "inc.imgb64": "图片 → Base64", "inc.qr": "生成二维码",
 
     /* 外部调用 / 分享接入（URL Scheme / Intent / 系统分享） */
-    "ext.title": "外部调用与分享",
+    "ext.title": "外部调用与分享", "exp.title": "实验性", "exp.callbackTitle": "外部回调（插件用法）", "exp.hint": "作为插件被外部调用时（可传入文本 / JSON / 图片），本应用处理完可生成回调数据返回给调用方。", "exp.input": "要回调的数据（默认取外部传入内容）", "exp.genBtn": "生成回调数据", "exp.result": "回调数据（JSON）", "exp.schemeTitle": "回调地址（URL Scheme）", "exp.intentTitle": "Android Intent 示例", "exp.copy": "复制", "exp.noteTitle": "可行性说明", "exp.note": "当前为纯网页 PWA，浏览器无法直接把数据写回其它 App。支持两种方式：①调用方通过 URL Scheme / Intent 携带回调地址，本应用把结果编码进该地址后跳回；②直接复制结果手动粘贴回原应用。若以后打包为原生壳（WebView + JS Bridge，如 Capacitor），可实现真正自动回调。",
     "ext.text":
       '<h3>1. 系统分享（分享面板）</h3>' +
       '<p>在浏览器、文件管理器等里“分享”文字或网址，选择本工具（需已安装为 PWA），会自动进入「外部内容」选择器，让你挑选编码 / 加密 / 二维码等处理方式。</p>' +
@@ -418,7 +418,7 @@ window.I18N = {
     "set.title": "Settings", "set.back": "Back",
     "set.about": "About", "set.privacy": "Privacy Policy", "set.terms": "Terms of Use",
     "set.security": "Security Notes", "set.personal": "Personal Info", "set.common": "Saved Passwords", "set.sync": "Backup & Sync",
-    "set.theme": "Theme", "set.display": "Display", "set.about2": "About", "set.extcall": "External & Sharing", "set.storage": "Set path",
+    "set.theme": "Theme", "set.display": "Display", "set.about2": "About", "set.extcall": "External & Sharing", "set.storage": "Set path", "set.exp": "Experimental",
     "set.grpGeneral": "General", "set.grpData": "Data & Privacy", "set.grpPrivacy": "Privacy & Terms", "set.dataEnc": "Data encryption", "enc.on": "Encryption ON — passwords stored as ciphertext", "enc.off": "Encryption OFF — passwords stored as plain text",
 
     "theme.title": "Theme", "theme.system": "Follow device", "theme.light": "Light", "theme.dark": "Dark",
@@ -452,7 +452,7 @@ window.I18N = {
     "inc.md5": "MD5", "inc.sha256": "SHA-256", "inc.imgb64": "Image → Base64", "inc.qr": "Make QR",
 
     /* External & sharing (URL Scheme / Intent / system share) */
-    "ext.title": "External & Sharing",
+    "ext.title": "External & Sharing", "exp.title": "Experimental", "exp.callbackTitle": "External callback (plugin usage)", "exp.hint": "When called externally (text / JSON / image), this app can build a callback payload to hand back to the caller.", "exp.input": "Data to return (defaults to external input)", "exp.genBtn": "Generate callback data", "exp.result": "Callback payload (JSON)", "exp.schemeTitle": "Callback URL (URL Scheme)", "exp.intentTitle": "Android Intent example", "exp.copy": "Copy", "exp.noteTitle": "Feasibility note", "exp.note": "This is a pure-web PWA: the browser cannot write data back into another app directly. Two supported ways: ① the caller passes a callback URL via Scheme/Intent, and this app encodes the result into that URL and jumps back; ② copy the result and paste it manually. A native wrapper (WebView + JS Bridge, e.g. Capacitor) enables true auto-callback.",
     "ext.text":
       '<h3>1. System share (share sheet)</h3>' +
       '<p>Share text or a URL from a browser / file manager and pick this tool (must be installed as a PWA). It opens the “Incoming” chooser so you can pick encode / encrypt / QR, etc.</p>' +

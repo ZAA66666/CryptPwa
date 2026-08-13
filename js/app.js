@@ -662,7 +662,8 @@ function runSym(op) {
       const opName = (typeof t === "function") ? t(op === "encrypt" ? "op.encrypt" : "op.decrypt") : (op === "encrypt" ? "加密" : "解密");
       addHistory({ cat: "sym", go: "sym", op: op, method: algo, extra: mode, preview: input.slice(0, 20) });
       const methodLabel = STREAM.includes(algo) ? algo : `${algo}-${mode}`;
-      maybePromptVault({ method: methodLabel, password: key, targetId: "sym-key", cat: "sym" });
+      /* 保存密钥；若 IV 是决定值（非 ECB 且已填）则一并存入密码本，填入时可自动恢复 */
+      maybePromptVault({ method: methodLabel, password: key, targetId: "sym-key", cat: "sym", iv: (mode !== "ECB" && iv) ? iv : null });
     }
   } catch (e) {
     symOutput.value = "❌ 出错了：" + e.message;
