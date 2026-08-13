@@ -493,6 +493,7 @@ symModeBox.querySelectorAll("button[data-v]").forEach((b) => {
   b.addEventListener("click", () => {
     symModeBox.querySelectorAll("button").forEach((x) => x.classList.remove("active"));
     b.classList.add("active");
+    updateKeySizeUI();  /* 切换模式时同步刷新密钥长度档位与提示 */
     refreshSymHints();
   });
 });
@@ -1930,8 +1931,27 @@ function setupExpanders() {
     return null;
   }
 
+  /* 字符范围按钮：点击切换 active（多选） */
+  document.querySelectorAll(".rcs-btn").forEach((b) => {
+    b.addEventListener("click", () => b.classList.toggle("active"));
+  });
+  /* 数量/长度上下按钮 */
+  document.querySelectorAll(".num-btn").forEach((b) => {
+    b.addEventListener("click", () => {
+      const target = document.getElementById(b.dataset.target);
+      if (!target) return;
+      const step = parseInt(b.dataset.step, 10) || 1;
+      const min = parseInt(target.min, 10) || 0;
+      const max = parseInt(target.max, 10) || 9999;
+      let v = parseInt(target.value, 10) || 0;
+      v = Math.max(min, Math.min(max, v + step));
+      target.value = v;
+      target.dispatchEvent(new Event("input"));
+    });
+  });
+
   $("rand-gen").addEventListener("click", () => {
-    const chosen = [...document.querySelectorAll(".rcs:checked")].map((c) => c.value);
+    const chosen = [...document.querySelectorAll(".rcs-btn.active")].map((c) => c.dataset.v);
     let pool = chosen.map((k) => SETS[k] || "").join("");
     const custom = $("rand-custom").value || "";
     if (custom) pool += custom;

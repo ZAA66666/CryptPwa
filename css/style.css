@@ -28,6 +28,31 @@ html[dir="rtl"] input, html[dir="rtl"] textarea { direction: rtl; text-align: ri
 
 * { box-sizing: border-box; }
 
+/* 全局：所有按钮 / 可点元素 - 禁用浏览器默认蓝色矩形高亮，改用贴合圆角的 :active 反馈 */
+button, .btn, .chip, .rcs-btn, .num-btn, .bottom-item, .settings-item, .vp-item, .kv-tpl-opt,
+.seg-inline button, .sym-mode-seg button, .sym-cat-tabs button, .vault-slot-seg button, .lang-seg button {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  -webkit-touch-callout: none;
+  position: relative;
+  overflow: hidden;
+}
+/* 点击时的圆角高亮蒙层（用伪元素贴合圆角，不溢出） */
+.btn::after, .chip::after, .rcs-btn::after, .bottom-item::after, .settings-item::after,
+.seg-inline button::after, .sym-mode-seg button::after, .sym-cat-tabs button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity 0.12s;
+  pointer-events: none;
+}
+.btn:active::after, .chip:active::after, .rcs-btn:active::after, .bottom-item:active::after,
+.settings-item:active::after, .seg-inline button:active::after, .sym-mode-seg button:active::after,
+.sym-cat-tabs button:active::after { opacity: 0.12; }
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -1170,8 +1195,43 @@ input[type="file"] { font-size: calc(13px * var(--fs)); }
 /* ===== 随机文本生成 ===== */
 .rand-tabs { margin-bottom: 14px; }
 .rand-pane { animation: fade .18s ease; }
-.rand-charsets { display: flex; flex-wrap: wrap; gap: 10px 16px; margin: 8px 0 6px; }
+.rand-charsets { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 6px; }
 .rand-charsets .chk { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text); }
+/* 字符范围切换按钮（替代多选框） */
+.rcs-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.rcs-btn.active { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+/* 长度+数量 双列布局 */
+.rand-row { display: flex; gap: 14px; margin: 8px 0; }
+.rand-col { flex: 1; min-width: 0; }
+.rand-col .field-label { display: block; }
+/* 数量输入框：上下按钮紧贴 */
+.num-input { display: flex; align-items: stretch; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; max-width: 160px; }
+.num-input input {
+  flex: 1; min-width: 0; border: none; text-align: center;
+  padding: 8px 4px; font-size: 15px; background: var(--card); color: var(--text);
+  -moz-appearance: textfield;
+}
+.num-input input::-webkit-outer-spin-button,
+.num-input input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.num-btn {
+  width: 38px; border: none; background: var(--soft);
+  color: var(--text); font-size: 18px; font-weight: 600;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+}
+.num-btn:active { background: var(--accent-soft); }
+/* 正则约束说明文字 */
+.hint-inline { font-size: 11px; color: var(--text-soft); font-weight: normal; margin-left: 6px; }
 .rand-presets { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 14px; }
 #rand-output { min-height: 132px; }
 

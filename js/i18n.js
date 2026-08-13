@@ -76,7 +76,7 @@ window.I18N = {
     /* 随机文本生成 */
     "rand.str": "随机字符串", "rand.fake": "随机虚假数据", "rand.charset": "字符范围", "rand.digit": "数字", "rand.lower": "小写字母",
     "rand.upper": "大写字母", "rand.special": "特殊符号", "rand.custom": "自定义字符", "rand.len": "长度（字符数）", "rand.count": "生成数量",
-    "rand.regex": "正则约束（可选，生成结果需匹配）", "rand.gen": "生成", "rand.copy": "复制", "rand.out": "结果",
+    "rand.regex": "正则约束（可选）", "rand.regexHint": "生成结果需匹配此正则，常用于限定密码规则（如必须含数字+字母）", "rand.gen": "生成", "rand.copy": "复制", "rand.out": "结果",
     "rand.presets": "快捷生成常用格式", "rand.pName": "姓名", "rand.pEmail": "邮箱", "rand.pPhone": "手机号", "rand.pId": "身份证号",
     "rand.pAddr": "地址", "rand.pCompany": "公司名", "rand.pUuid": "UUID", "rand.pUrl": "网址", "rand.pBank": "银行卡号", "rand.pColor": "颜色值", "rand.pDate": "日期",
     "rand.regexFail": "未能在 500 次内生成匹配正则的内容（请放宽约束）",
@@ -323,7 +323,7 @@ window.I18N = {
     /* Random text */
     "rand.str": "Random string", "rand.fake": "Fake data", "rand.charset": "Character set", "rand.digit": "Digits", "rand.lower": "Lowercase",
     "rand.upper": "Uppercase", "rand.special": "Special", "rand.custom": "Custom chars", "rand.len": "Length", "rand.count": "Count",
-    "rand.regex": "Regex constraint (optional; output must match)", "rand.gen": "Generate", "rand.copy": "Copy", "rand.out": "Result",
+    "rand.regex": "Regex constraint (optional)", "rand.regexHint": "Output must match this regex — useful for password rules (e.g. must contain digits + letters)", "rand.gen": "Generate", "rand.copy": "Copy", "rand.out": "Result",
     "rand.presets": "Quick presets", "rand.pName": "Name", "rand.pEmail": "Email", "rand.pPhone": "Phone", "rand.pId": "ID card",
     "rand.pAddr": "Address", "rand.pCompany": "Company", "rand.pUuid": "UUID", "rand.pUrl": "URL", "rand.pBank": "Bank card", "rand.pColor": "Color", "rand.pDate": "Date",
     "rand.regexFail": "Could not satisfy the regex in 500 tries (relax the constraint)",
