@@ -405,7 +405,16 @@
         `</div>` +
         `<div class="legal-text" style="margin-top:14px">${t("ext.text")}</div>`;
     } else if (name === "exp") {
+      /* 实验性：分组入口（列表） */
       titleEl.textContent = t("exp.title");
+      html =
+        `<div class="settings-group"><ul class="settings-list">` +
+        `<li class="settings-item" id="exp-go-cb"><span>${t("exp.cb")}</span><span class="si-arrow">›</span></li>` +
+        `<li class="settings-item" id="exp-go-import"><span>${t("exp.import")}</span><span class="si-arrow">›</span></li>` +
+        `</ul></div>`;
+    } else if (name === "exp-cb") {
+      /* 数据回调：处理结果回传给调用方 */
+      titleEl.textContent = t("exp.cb");
       const inc = window.__incomingText || window.__incomingImage || "";
       html =
         `<div class="cp-note">${t("exp.hint")}</div>` +
@@ -421,6 +430,21 @@
         `<label class="field-label">${t("exp.intentTitle")}</label>` +
         `<textarea id="exp-intent-code" readonly rows="3" style="font-family:monospace;font-size:12px"></textarea>` +
         `<div class="legal-text" style="margin-top:14px"><h3>${t("exp.noteTitle")}</h3><p>${t("exp.note")}</p></div>`;
+    } else if (name === "exp-import") {
+      /* 导入方式：外部数据如何传入本应用 */
+      titleEl.textContent = t("exp.importTitle");
+      html =
+        `<div class="cp-note">${t("exp.importHint")}</div>` +
+        `<div class="legal-text" style="margin-top:10px">` +
+        `<h3>URL Scheme</h3><p>${t("exp.importUrl")}</p>` +
+        `<h3>Android Intent</h3><p>${t("exp.importIntent")}</p>` +
+        `<h3>系统分享</h3><p>${t("exp.importShare")}</p>` +
+        `<h3>剪贴板</h3><p>${t("exp.importClip")}</p>` +
+        `</div>` +
+        `<div class="cp-form" style="margin-top:12px">` +
+        `<input id="exp-import-example" readonly value="crypto-pwa://?text=hello" />` +
+        `<div class="btn-row"><button class="btn ghost" id="exp-import-copy">${t("exp.copy")}</button></div>` +
+        `</div>`;
     } else if (name === "display") {
       titleEl.textContent = t("display.title");
       const f = getSetting("font", "normal");
@@ -536,7 +560,13 @@
         if (window.copyText) window.copyText(v, e.target);
       };
     } else if (name === "exp") {
-      /* 实验性：生成外部回调数据（成功/时间戳/处理后数据）+ 回调地址示例 */
+      /* 实验性列表入口 */
+      const goCb = bodyEl.querySelector("#exp-go-cb");
+      if (goCb) goCb.onclick = () => go("exp-cb");
+      const goImp = bodyEl.querySelector("#exp-go-import");
+      if (goImp) goImp.onclick = () => go("exp-import");
+    } else if (name === "exp-cb") {
+      /* 数据回调：生成回调数据（成功/时间戳/处理后数据）+ 回调地址示例 */
       bodyEl.querySelector("#exp-gen").onclick = () => {
         const d = bodyEl.querySelector("#exp-input").value;
         const payload = { ok: !!d, ts: new Date().toISOString(), data: d || "", app: "Crypto-pwa" };
@@ -549,6 +579,13 @@
       bodyEl.querySelector("#exp-copy").onclick = (e) => {
         const v = bodyEl.querySelector("#exp-result").value;
         if (v && window.copyText) window.copyText(v, e.target);
+      };
+    } else if (name === "exp-import") {
+      /* 导入方式：复制 URL Scheme 示例 */
+      const ic = bodyEl.querySelector("#exp-import-copy");
+      if (ic) ic.onclick = (e) => {
+        const v = bodyEl.querySelector("#exp-import-example").value;
+        if (window.copyText) window.copyText(v, e.target);
       };
     } else if (name === "lang") {
       bodyEl.querySelectorAll("#lang-seg button").forEach((b) =>
