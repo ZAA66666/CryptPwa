@@ -21,6 +21,19 @@
   const VAULT_KEY = "set_vault";
   const PBKDF2_ITER = 10000;
   let sessionMaster = null; // 仅内存：解锁后的主密码
+  /* 密码本 3 套密码库：当前库号（0/1/2），localStorage 记忆；条目带 slot 字段归属 */
+  let vaultSlot = parseInt(localStorage.getItem("set_vault_slot") || "0", 10) || 0;
+  function setVaultSlot(n) {
+    vaultSlot = Math.max(0, Math.min(2, n | 0));
+    localStorage.setItem("set_vault_slot", String(vaultSlot));
+  }
+  function inSlot(p) { return (p.slot || 0) === vaultSlot; }
+  /* 已导入的语言包（{ lang: name }），localStorage 持久化 */
+  function importedLangs() {
+    try { return JSON.parse(localStorage.getItem("set_imported_langs") || "{}") || {}; }
+    catch (e) { return {}; }
+  }
+  function saveImportedLangs(o) { localStorage.setItem("set_imported_langs", JSON.stringify(o)); }
 
   function vaultExists() { return !!localStorage.getItem(VAULT_KEY); }
   function isLocked() { return vaultExists() && !sessionMaster; }
@@ -126,7 +139,9 @@
       const n = (navigator.language || "zh").toLowerCase();
       return n.startsWith("zh") ? "zh" : "en";
     }
-    return l === "en" ? "en" : "zh";
+    if (l === "zh" || l === "en") return l;
+    if (importedLangs()[l]) return l; // 已导入的语言包
+    return "zh";
   }
   function applyLanguage() {
     window.__lang = resolveLang();
@@ -352,13 +367,17 @@
       const f = getSetting("font", "normal");
       const imm = getSetting("immersive", "0") === "1";
       const cur = getSetting("lang", "system");
-      html =
-        `<div class="settings-row"><span class="sr-label">${t("disp.lang")}</span>` +
-        `<div class="seg-inline" id="lang-seg">` +
+      let langBtnsDisp =
         `<button data-v="system" class="${cur === "system" ? "active" : ""}">${t("lang.system")}</button>` +
         `<button data-v="zh" class="${cur === "zh" ? "active" : ""}">${t("lang.zh")}</button>` +
-        `<button data-v="en" class="${cur === "en" ? "active" : ""}">${t("lang.en")}</button>` +
-        `</div></div>` +
+        `<button data-v="en" class="${cur === "en" ? "active" : ""}">${t("lang.en")}</button>`;
+      const impDisp = importedLangs();
+      Object.keys(impDisp).forEach((lg) => {
+        langBtnsDisp += `<button data-v="${lg}" class="${cur === lg ? "active" : ""}">${escapeHtml(impDisp[lg])}</button>`;
+      });
+      html =
+        `<div class="settings-row"><span class="sr-label">${t("disp.lang")}</span>` +
+        `<div class="seg-inline" id="lang-seg">${langBtnsDisp}</div></div>` +
         `<div class="settings-row"><span class="sr-label">${t("disp.font")}</span>` +
         `<div class="seg-inline" id="font-seg">` +
         `<button data-v="small" class="${f === "small" ? "active" : ""}">${t("font.small")}</button>` +
@@ -371,12 +390,22 @@
     } else if (name === "lang") {
       titleEl.textContent = t("disp.lang");
       const cur = getSetting("lang", "system");
-      html =
-        `<div class="seg-inline" id="lang-seg">` +
+      let langBtns =
         `<button data-v="system" class="${cur === "system" ? "active" : ""}">${t("lang.system")}</button>` +
         `<button data-v="zh" class="${cur === "zh" ? "active" : ""}">${t("lang.zh")}</button>` +
-        `<button data-v="en" class="${cur === "en" ? "active" : ""}">${t("lang.en")}</button>` +
-        `</div>`;
+        `<button data-v="en" class="${cur === "en" ? "active" : ""}">${t("lang.en")}</button>`;
+      const imp = importedLangs();
+      Object.keys(imp).forEach((lg) => {
+        langBtns += `<button data-v="${lg}" class="${cur === lg ? "active" : ""}">${escapeHtml(imp[lg])}</button>`;
+      });
+      html =
+        `<div class="settings-row"><span class="sr-label">${t("disp.lang")}</span>` +
+        `<div class="seg-inline" id="lang-seg">${langBtns}</div></div>` +
+        `<div class="btn-row" style="margin-top:14px">` +
+        `<button class="btn ghost" id="lang-import">📦 ${t("lang.import")}</button>` +
+        `</div>` +
+        `<p class="hint" id="lang-import-hint">${t("lang.importHint")}</p>` +
+        `<input type="file" id="lang-file" accept=".json,application/json" style="display:none" />`;
     }
     bodyEl.innerHTML = html;
     attachSubview(name);
@@ -451,6 +480,46 @@
       bodyEl.querySelectorAll("#lang-seg button").forEach((b) =>
         (b.onclick = () => { setSetting("lang", b.dataset.v); applyLanguage(); render(); })
       );
+      /* 导入语言包：选择 JSON（{lang, name, data}）→ 校验 → 注册 + 持久化 + 切换 */
+      const impBtn = bodyEl.querySelector("#lang-import");
+      const impFile = bodyEl.querySelector("#lang-file");
+      if (impBtn && impFile) {
+        impBtn.onclick = () => impFile.click();
+        impFile.onchange = () => {
+          const f = impFile.files[0]; if (!f) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const o = JSON.parse(reader.result);
+              if (!o || typeof o !== "object" || Array.isArray(o)) throw new Error("bad");
+              const lg = String(o.lang || "").toLowerCase();
+              const nm = String(o.name || "").trim();
+              const data = o.data;
+              if (!/^[a-z]{2,5}$/.test(lg) || !nm || !data || typeof data !== "object" || Array.isArray(data)) throw new Error("bad");
+              if (!data.appTitle || !data["tool.hash"]) throw new Error("bad");
+              window.I18N[lg] = data;
+              const im = importedLangs(); im[lg] = nm; saveImportedLangs(im);
+              setSetting("lang", lg);
+              applyLanguage(); render();
+              alert(t("lang.importDone"));
+            } catch (e) { alert(t("lang.importFail")); }
+            impFile.value = "";
+          };
+          reader.readAsText(f);
+        };
+      }
+    } else if (name === "common") {
+      /* 长按「返回」→ toast 说明 3 套密码库 */
+      const backBtn = document.getElementById("settings-back");
+      if (backBtn) {
+        let timer = null;
+        backBtn.addEventListener("pointerdown", () => {
+          timer = setTimeout(() => { if (window.toast) window.toast(t("vault.slotHint"), 3200); }, 650);
+        });
+        ["pointerup", "pointerleave", "pointercancel"].forEach((ev) =>
+          backBtn.addEventListener(ev, () => { if (timer) { clearTimeout(timer); timer = null; } })
+        );
+      }
     } else if (name === "about") {
       /* 检测更新：对比 GitHub Releases 最新 tag 与本地 APP_VERSION */
       const btn = document.getElementById("about-check-update");
@@ -510,9 +579,15 @@
         `<div class="btn-row"><button class="btn primary" id="mp-unlock">${t("common.unlockNow")}</button></div>` +
         `</div>`;
     } else {
-      /* 已解锁：列表 + 新增 + 导入导出 + 锁/改密 */
-      const arr = readPasswords();
+      /* 已解锁：列表 + 新增 + 导入导出 + 锁/改密（按当前密码库展示） */
+      const all = readPasswords();
+      const arr = all.filter((p) => inSlot(p));
       html =
+        `<div class="seg-inline vault-slot-seg" id="vault-slot-seg">` +
+          `<button data-v="0" class="${vaultSlot === 0 ? "active" : ""}">${t("vault.slot1")}</button>` +
+          `<button data-v="1" class="${vaultSlot === 1 ? "active" : ""}">${t("vault.slot2")}</button>` +
+          `<button data-v="2" class="${vaultSlot === 2 ? "active" : ""}">${t("vault.slot3")}</button>` +
+        `</div>` +
         `<div class="cp-note">${t("common.vaultReady")}</div>` +
         `<div class="cp-form">` +
         `<input id="cp-name" placeholder="${t("common.label")}" />` +
@@ -557,12 +632,12 @@
         catch (e) { alert(t("common.importFail")); }
       };
     } else {
-      const arr = readPasswords();
       const list = bodyEl.querySelector("#cp-list");
-      // 按加密方式分组展示（对称/编码/哈希/RSA/二维码/通用）
+      // 按加密方式分组展示（对称/编码/哈希/RSA/二维码/通用），仅当前密码库
       const CAT_ORDER = { sym: 0, enc: 1, hash: 2, rsa: 3, qr: 4, generic: 5 };
-      const ordered = arr
+      const ordered = all
         .map((p, i) => ({ p, i }))
+        .filter(({ p }) => inSlot(p))
         .sort((a, b) => (CAT_ORDER[a.p.cat || "generic"] ?? 9) - (CAT_ORDER[b.p.cat || "generic"] ?? 9));
       let lastCat = null;
       ordered.forEach(({ p, i }) => {
@@ -604,8 +679,13 @@
         const m = bodyEl.querySelector("#cp-method").value.trim() || t("vp.generic");
         const cat = bodyEl.querySelector("#cp-cat") ? bodyEl.querySelector("#cp-cat").value : "generic";
         if (!name || !val) { alert(t("common.label") + " / " + t("common.value")); return; }
-        const a = readPasswords(); a.push({ label: name, value: val, method: m, cat: cat }); writePasswords(a); render();
+        const a = readPasswords(); a.push({ label: name, value: val, method: m, cat: cat, slot: vaultSlot }); writePasswords(a); render();
       };
+      /* 密码库切换：点击库号 → 记忆并重绘（展示对应库的密码） */
+      const slotSeg = bodyEl.querySelector("#vault-slot-seg");
+      if (slotSeg) slotSeg.querySelectorAll("button").forEach((b) =>
+        (b.onclick = () => { setVaultSlot(parseInt(b.dataset.v, 10) || 0); render(); })
+      );
       /* 导出（下载备份包：密码本密文 + 保存路径 + 显示设置） */
       bodyEl.querySelector("#cp-export").onclick = () => {
         const blob = new Blob([buildBackup()], { type: "application/json" });
@@ -984,12 +1064,12 @@
       const n = name || defaultName();
       const cat = filterCat || "generic";
       if (opts.kind === "rsa-pair") {
-        a.push({ kind: "rsa-pair", label: n, pub: opts.pub, priv: opts.priv, cat: "rsa" });
+        a.push({ kind: "rsa-pair", label: n, pub: opts.pub, priv: opts.priv, cat: "rsa", slot: vaultSlot });
       } else if (opts.kind === "rsa-import") {
-        a.push({ kind: "rsa-import", label: n, value: opts.password, side: opts.side, cat: "rsa" });
+        a.push({ kind: "rsa-import", label: n, value: opts.password, side: opts.side, cat: "rsa", slot: vaultSlot });
       } else {
-        a.push({ label: n, value: password, method: method, cat: cat });
-        if (extra) a.push({ label: n + " · " + extra.method, value: extra.password, method: extra.method, cat: cat });
+        a.push({ label: n, value: password, method: method, cat: cat, slot: vaultSlot });
+        if (extra) a.push({ label: n + " · " + extra.method, value: extra.password, method: extra.method, cat: cat, slot: vaultSlot });
       }
       writePasswords(a);
     }
@@ -1124,7 +1204,7 @@
           `</div>`;
         const savedTitle = filterCat ? (t("cat." + filterCat) + t("vp.book")) : t("vp.saved");
         html += `<div class="vp-saved-title">${escapeHtml(savedTitle)}</div><div id="vp-list">`;
-        const arr = readPasswords().filter((p) => matchCat(p, filterCat));
+        const arr = readPasswords().filter((p) => matchCat(p, filterCat) && inSlot(p));
         if (arr.length === 0) html += `<p class="cp-note">${t("vp.none")}</p>`;
         html += `</div>`;
         html += `<button class="btn ghost" id="vp-skip">${t("vp.skip")}</button>`;

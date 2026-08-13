@@ -85,7 +85,7 @@ body:not(.on-home) .app-header { display: none; }
   margin-left: -8px;
 }
 .ph-back:active { background: var(--accent-soft); }
-.ph-title { font-size: 17px; font-weight: 700; color: var(--text); }
+.ph-title { font-size: 17px; font-weight: 700; color: var(--text); flex: 1; text-align: center; margin-right: 38px; }
 
 /* 统一卡片：手机上铺满左右边缘（贴边，像真 App）；桌面再收一点宽度防止拉太宽 */
 .app-card {
@@ -765,9 +765,13 @@ input[type="file"] {
   padding: calc(14px + env(safe-area-inset-top)) 14px 12px;
   background: var(--accent);
   color: var(--on-accent);
+  position: relative;
 }
 .icon-btn { border: none; background: transparent; color: var(--on-accent); font-size: 16px; cursor: pointer; padding: 4px 4px; }
-.overlay-title { font-size: 17px; font-weight: 700; }
+.overlay-title { font-size: 17px; font-weight: 700; position: absolute; left: 64px; right: 64px; text-align: center; pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* 密码本 3 套密码库选择器 */
+.vault-slot-seg { margin: 2px 0 12px; }
+.vault-slot-seg button { flex: 1 1 0; }
 .overlay-body { flex: 1 1 auto; overflow-y: auto; padding: 8px 14px calc(24px + env(safe-area-inset-bottom)); }
 
 /* 设置列表项 */
