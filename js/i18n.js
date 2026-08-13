@@ -4,8 +4,8 @@
  * data-i18n 属性：纯文本标签，用 textContent 填充。
  * 法律/说明页：含 HTML，由 settings.js 用 innerHTML 填充。
  * ===================================================================== */
-/* 本项目 GitHub 仓库（Crypto-pwa）。同步到 GitHub 后把下面的“用户名”替换成自己的用户名即可。 */
-const GITHUB_REPO = "https://github.com/用户名/Crypto-pwa";
+/* 本项目 GitHub 仓库（Crypto-pwa，作者 ZAA66666）。 */
+const GITHUB_REPO = "https://github.com/ZAA66666/Crypto-pwa";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
