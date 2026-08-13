@@ -196,6 +196,8 @@
   "rsa.viewKeys": "查看/修改密钥对",
   "rsa.viewTitle": "查看/修改密钥对",
   "rsa.hideKeys": "隐藏秘钥内容",
+  "asym.fromVaultPair": "已从密码本选择：{name} 密钥对",
+  "asym.fromVaultPub": "已从密码本选择：{name}（公钥）",
   "rsa.algoRsa": "RSA",
   "rsa.algoSm2": "SM2 国密",
   "ph.sm2": "SM2",

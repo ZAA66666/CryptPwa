@@ -1047,6 +1047,14 @@
             if (el) { el.value = p.value || ""; el.dispatchEvent(new Event("input")); }
           }
           if (window.rsaSaveKeys) window.rsaSaveKeys();
+          const stR = document.getElementById("rsa-status");
+          if (stR) stR.textContent = t("asym.fromVaultPair").replace("{name}", p.label || "");
+        } else if (cat === "sm2") {
+          // SM2：密码本存的是公钥，填入公钥框并提示（不覆盖本地私钥）
+          const pubEl = document.getElementById("sm2-pub");
+          if (pubEl) { pubEl.value = p.value || ""; pubEl.dispatchEvent(new Event("input")); }
+          const stS = document.getElementById("sm2-status");
+          if (stS) stS.textContent = t("asym.fromVaultPub").replace("{name}", p.label || "");
         } else if (targetId) {
           const el = document.getElementById(targetId);
           if (el) { el.value = p.value; el.dispatchEvent(new Event("input")); }
@@ -1179,9 +1187,15 @@
             if (pubEl) { pubEl.value = p.pub; pubEl.dispatchEvent(new Event("input")); }
             if (privEl) { privEl.value = p.priv; privEl.dispatchEvent(new Event("input")); }
             if (window.rsaSaveKeys) window.rsaSaveKeys();
+            const stR = document.getElementById("rsa-status");
+            if (stR) stR.textContent = t("asym.fromVaultPair").replace("{name}", p.label || "");
           } else {
             const el = document.getElementById(targetId);
             if (el) { el.value = fullText; el.dispatchEvent(new Event("input")); }
+            /* 填入后同步状态提示（RSA/SM2 面板的密钥框） */
+            const stEl = (targetId && targetId.indexOf("sm2-") === 0) ? document.getElementById("sm2-status")
+                       : (targetId && (targetId.indexOf("rsa-") === 0)) ? document.getElementById("rsa-status") : null;
+            if (stEl) stEl.textContent = t((targetId && targetId.indexOf("sm2-") === 0) ? "asym.fromVaultPub" : "asym.fromVaultPair").replace("{name}", p.label || "");
           }
           closeVP();
         };
