@@ -6,6 +6,8 @@
  * ===================================================================== */
 /* 本项目 GitHub 仓库（Crypto-pwa，作者 ZAA66666）。 */
 const GITHUB_REPO = "https://github.com/ZAA66666/Crypto-pwa";
+/* 当前版本号（用于“检测更新”对比 GitHub Releases） */
+const APP_VERSION = "1.0.0";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
@@ -216,6 +218,7 @@ window.I18N = {
 
     /* 关于（已合并“关于软件说明”） */
     "about.title": "关于",
+    "about.update": "检测更新", "about.checking": "检查中…", "about.latest": "已是最新版本", "about.found": "发现新版本", "about.open": "前往 GitHub 查看", "about.fail": "检查更新失败：", "about.ver": "版本",
     "about.text":
       '<p>这是一个<strong>完全在您手机/电脑浏览器本地运行</strong>的加解密工具箱（PWA），用于学习与实践加解密、编码、二维码等常见操作。</p>' +
       '<h3>它能做什么</h3><ul>' +
@@ -235,7 +238,7 @@ window.I18N = {
       '<li><b><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a></b>（浏览器原生，无单独依赖）— RSA 密钥生成、加解密、签名验签。<br>引用位置：浏览器原生 <code>crypto.subtle</code>；用于「非对称加/解密 → RSA」，仅 https / localhost 可用。</li>' +
       '<li><b>本项目代码</b>（手写）— 界面、交互、历史记录、密码本、设置、主题与多语言均自行实现，未封装第三方 UI 框架。</li></ul>' +
       '<p>所有计算均在本地完成、可离线使用，不向任何服务器上传数据。</p>' +
-      '<p><strong>加解密工具箱</strong> · 版本 1.0 · <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">GitHub</a></p>',
+      '<p><strong>加解密工具箱</strong> · 版本 ' + APP_VERSION + ' · <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">GitHub</a></p>',
 
     /* 隐私政策 */
     "privacy.title": "隐私政策",
@@ -458,6 +461,7 @@ window.I18N = {
 
 
     "about.title": "About",
+    "about.update": "Check for updates", "about.checking": "Checking…", "about.latest": "You are up to date", "about.found": "New version found", "about.open": "Open GitHub releases", "about.fail": "Update check failed: ", "about.ver": "Version",
     "about.text":
       '<p>A <strong>fully local</strong> crypto toolbox (PWA) that runs entirely in your browser — for learning and practicing hashing, encoding, QR and more.</p>' +
       '<h3>What it does</h3><ul>' +
@@ -477,7 +481,7 @@ window.I18N = {
       '<li><b><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a></b> (native, no dependency) — RSA key gen, encrypt/decrypt, sign/verify. Location: native <code>crypto.subtle</code>; used by the Asymmetric → RSA pane, only on https / localhost.</li>' +
       '<li><b>This project’s code</b> (hand-written) — UI, interaction, history, password book, settings, theme and i18n are all custom; no third-party UI framework.</li></ul>' +
       '<p>Everything runs locally and offline; nothing is uploaded to any server.</p>' +
-      '<p><strong>Crypto Toolbox</strong> · v1.0 · <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">GitHub</a></p>',
+      '<p><strong>Crypto Toolbox</strong> · v' + APP_VERSION + ' · <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">GitHub</a></p>',
 
     "privacy.title": "Privacy Policy",
     "privacy.text":

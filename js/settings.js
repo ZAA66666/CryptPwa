@@ -289,6 +289,14 @@
     if (["about", "privacy", "terms", "security", "personal"].includes(name)) {
       titleEl.textContent = t(name + ".title");
       html = `<div class="legal-text">${t(name + ".text")}</div>`;
+      if (name === "about") {
+        html +=
+          `<div class="btn-row" style="margin-top:18px">` +
+          `<button class="btn primary" id="about-check-update">🔄 ${t("about.update")}</button>` +
+          `<a class="btn ghost" href="${GITHUB_REPO}/releases" target="_blank" rel="noopener">★ ${t("about.open")}</a>` +
+          `</div>` +
+          `<p class="hint" id="about-update-hint" style="margin-top:10px"></p>`;
+      }
     } else if (name === "common") {
       renderCommon();
       return;
@@ -412,6 +420,39 @@
       bodyEl.querySelectorAll("#lang-seg button").forEach((b) =>
         (b.onclick = () => { setSetting("lang", b.dataset.v); applyLanguage(); render(); })
       );
+    } else if (name === "about") {
+      /* 检测更新：对比 GitHub Releases 最新 tag 与本地 APP_VERSION */
+      const btn = document.getElementById("about-check-update");
+      if (btn) btn.onclick = async () => {
+        const hint = document.getElementById("about-update-hint");
+        btn.disabled = true;
+        const orig = btn.textContent;
+        btn.textContent = "🔄 " + t("about.checking");
+        if (hint) hint.textContent = "";
+        try {
+          const res = await fetch("https://api.github.com/repos/ZAA66666/Crypto-pwa/releases/latest");
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const rel = await res.json();
+          const tag = (rel.tag_name || "").replace(/^v/i, "");
+          const cur = String(APP_VERSION || "1.0.0").replace(/^v/i, "");
+          const cmp = tag.split(".").map(Number).concat([0, 0, 0]).slice(0, 3)
+            .map((n, i) => n - (cur.split(".").map(Number)[i] || 0));
+          const newer = cmp.some((n) => n > 0) && cmp.findIndex((n) => n !== 0) >= 0 && cmp[cmp.findIndex((n) => n !== 0)] > 0;
+          if (newer) {
+            const msg = t("about.found") + " v" + tag + "（" + t("about.ver") + " " + APP_VERSION + "）";
+            if (window.confirm(msg + "\n\n" + t("about.open") + "？")) {
+              window.open(rel.html_url || GITHUB_REPO + "/releases", "_blank");
+            }
+            if (hint) hint.textContent = t("about.found") + " v" + tag;
+          } else {
+            if (hint) hint.textContent = t("about.latest") + "（v" + APP_VERSION + "）";
+          }
+        } catch (e) {
+          if (hint) hint.textContent = t("about.fail") + e.message;
+        }
+        btn.disabled = false;
+        btn.textContent = orig;
+      };
     }
   }
 
@@ -608,46 +649,78 @@
     if (!u.endsWith(".json")) u = u.replace(/\/$/, "") + "/crypto-vault.json";
     return u;
   }
-  /* 备份包：包含密码本(密文) + 已设置的保存路径 + 显示设置(字体/主题/沉浸式/语言等) */
-  function buildBackup() {
-    const settings = {
-      savepath: getSetting("savepath", "sdcard/CryptoPwa"),
-      font: getSetting("font", "normal"),
-      theme: getSetting("theme", "system"),
-      accent: getSetting("accent", "default"),
-      immersive: getSetting("immersive", "0"),
-      lang: getSetting("lang", "system"),
-      ext_incoming: getSetting("ext_incoming", "1"),
-      ask_save: getSetting("ask_save", "1"),
-      webdav: webdavConfig(),
-    };
-    return JSON.stringify({
-      format: "crypto-pwa-backup", version: 1,
-      vault: vaultExists() ? localStorage.getItem(VAULT_KEY) : null,
-      settings: settings,
-    });
+  /* 备份包：按用户勾选的范围打包——密码本(密文) / 软件配置(路径/主题/语言/WebDAV 等) */
+  function buildBackup(opts) {
+    opts = opts || {};
+    const includeVault = opts.vault !== false;
+    const includeSettings = opts.settings !== false;
+    const out = { format: "crypto-pwa-backup", version: 1 };
+    if (includeVault) out.vault = vaultExists() ? localStorage.getItem(VAULT_KEY) : null;
+    if (includeSettings) {
+      out.settings = {
+        savepath: getSetting("savepath", "sdcard/CryptoPwa"),
+        font: getSetting("font", "normal"),
+        theme: getSetting("theme", "system"),
+        accent: getSetting("accent", "default"),
+        immersive: getSetting("immersive", "0"),
+        lang: getSetting("lang", "system"),
+        ext_incoming: getSetting("ext_incoming", "1"),
+        ask_save: getSetting("ask_save", "1"),
+        webdav: webdavConfig(),
+      };
+    }
+    return JSON.stringify(out);
   }
-  function applyBackup(str) {
+  function applyBackup(str, scope) {
     const o = JSON.parse(str);
-    if (o.vault) localStorage.setItem(VAULT_KEY, o.vault); // 密文整体写入，重新解锁即可
-    const s = o.settings || {};
-    if (s.savepath !== undefined) setSetting("savepath", s.savepath);
-    if (s.font !== undefined) setSetting("font", s.font);
-    if (s.theme !== undefined) setSetting("theme", s.theme);
-    if (s.accent !== undefined) setSetting("accent", s.accent);
-    if (s.immersive !== undefined) setSetting("immersive", s.immersive);
-    if (s.lang !== undefined) setSetting("lang", s.lang);
-    if (s.ext_incoming !== undefined) setSetting("ext_incoming", s.ext_incoming);
-    if (s.ask_save !== undefined) setSetting("ask_save", s.ask_save);
-    if (s.webdav !== undefined) saveWebdav(s.webdav);
-    applyTheme(); applyLanguage(); applyFont(); applyImmersive();
+    scope = scope || {};
+    if (scope.vault !== false && o.vault) localStorage.setItem(VAULT_KEY, o.vault); // 密文整体写入，重新解锁即可
+    if (scope.settings !== false) {
+      const s = o.settings || {};
+      if (s.savepath !== undefined) setSetting("savepath", s.savepath);
+      if (s.font !== undefined) setSetting("font", s.font);
+      if (s.theme !== undefined) setSetting("theme", s.theme);
+      if (s.accent !== undefined) setSetting("accent", s.accent);
+      if (s.immersive !== undefined) setSetting("immersive", s.immersive);
+      if (s.lang !== undefined) setSetting("lang", s.lang);
+      if (s.ext_incoming !== undefined) setSetting("ext_incoming", s.ext_incoming);
+      if (s.ask_save !== undefined) setSetting("ask_save", s.ask_save);
+      if (s.webdav !== undefined) saveWebdav(s.webdav);
+      applyTheme(); applyLanguage(); applyFont(); applyImmersive();
+    }
+  }
+  /* 备份/恢复范围选择弹窗：勾选「密码本」/「软件配置」 */
+  function pickScope(isRestore, onOk) {
+    const mask = ensureEl("scope-mask", "vp-mask");
+    const panel = ensureEl("scope-panel", "vp-panel");
+    panel.innerHTML =
+      `<div class="vp-inner">` +
+      `<div class="vp-head"><span class="vp-title">${t(isRestore ? "sync.scopeRestoreTitle" : "sync.scopeTitle")}</span><button class="vp-close" id="scope-close">✕</button></div>` +
+      `<div class="cp-form" style="padding:6px 2px">` +
+      `<label class="scope-opt"><input type="checkbox" id="scope-vault" checked /><span>${t("sync.scopeVault")}</span></label>` +
+      `<label class="scope-opt"><input type="checkbox" id="scope-settings" checked /><span>${t("sync.scopeSettings")}</span></label>` +
+      `</div>` +
+      `<div class="btn-row"><button class="btn ghost" id="scope-cancel">${t("sync.scopeCancel")}</button>` +
+      `<button class="btn primary" id="scope-ok">${t(isRestore ? "sync.scopeRestoreOk" : "sync.scopeOk")}</button></div>` +
+      `</div>`;
+    mask.classList.add("show"); panel.classList.add("show");
+    const close = () => { mask.classList.remove("show"); panel.classList.remove("show"); };
+    document.getElementById("scope-close").onclick = close;
+    document.getElementById("scope-cancel").onclick = close;
+    mask.onclick = close;
+    document.getElementById("scope-ok").onclick = () => {
+      const vault = document.getElementById("scope-vault").checked;
+      const settings = document.getElementById("scope-settings").checked;
+      close();
+      onOk({ vault: vault, settings: settings });
+    };
   }
   function isBackupBundle(str) {
     try { return JSON.parse(str).format === "crypto-pwa-backup"; } catch (e) { return false; }
   }
-  async function webdavBackup() {
+  async function webdavBackup(scope) {
     if (isLocked()) throw new Error(t("sync.needMaster"));
-    const blob = buildBackup();
+    const blob = buildBackup(scope);
     const cfg = webdavConfig();
     const res = await fetch(wdTarget(cfg), {
       method: "PUT",
@@ -656,7 +729,7 @@
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
   }
-  async function webdavRestore() {
+  async function webdavRestore(scope) {
     const cfg = webdavConfig();
     const res = await fetch(wdTarget(cfg), {
       method: "GET",
@@ -664,7 +737,7 @@
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const text = await res.text();
-    if (isBackupBundle(text)) { applyBackup(text); }
+    if (isBackupBundle(text)) { applyBackup(text, scope); }
     else {
       const master = window.prompt(t("common.masterPlaceholder"));
       if (!master) throw new Error("cancel");
@@ -710,25 +783,32 @@
       });
       alert(t("sync.saveCfg") + " ✅");
     };
-    bodyEl.querySelector("#wd-backup").onclick = async () => {
-      try { await webdavBackup(); alert(t("sync.backupDone")); }
-      catch (e) { if (e.message !== "cancel") alert(t("sync.fail") + e.message); }
+    bodyEl.querySelector("#wd-backup").onclick = () => {
+      /* 先让用户勾选备份范围（密码本 / 软件配置），再上传 WebDAV */
+      pickScope(false, async (scope) => {
+        try { await webdavBackup(scope); alert(t("sync.backupDone")); }
+        catch (e) { if (e.message !== "cancel") alert(t("sync.fail") + e.message); }
+      });
     };
-    bodyEl.querySelector("#wd-restore").onclick = async () => {
-      try { await webdavRestore(); render(); alert(t("sync.restoreDone")); }
-      catch (e) { if (e.message !== "cancel") alert(t("sync.fail") + e.message); }
+    bodyEl.querySelector("#wd-restore").onclick = () => {
+      pickScope(true, async (scope) => {
+        try { await webdavRestore(scope); render(); alert(t("sync.restoreDone")); }
+        catch (e) { if (e.message !== "cancel") alert(t("sync.fail") + e.message); }
+      });
     };
-    /* 导出本地备份（下载 JSON 文件，包含密码本密文 + 设置） */
+    /* 导出本地备份（先勾选范围，再下载 JSON 文件） */
     bodyEl.querySelector("#wd-export-local").onclick = () => {
-      const blob = new Blob([buildBackup()], { type: "application/json" });
-      const aEl = document.createElement("a");
-      aEl.href = URL.createObjectURL(blob);
-      aEl.download = "crypto-pwa-backup.json";
-      aEl.click();
-      URL.revokeObjectURL(aEl.href);
-      alert(t("sync.exportDone"));
+      pickScope(false, (scope) => {
+        const blob = new Blob([buildBackup(scope)], { type: "application/json" });
+        const aEl = document.createElement("a");
+        aEl.href = URL.createObjectURL(blob);
+        aEl.download = "crypto-pwa-backup.json";
+        aEl.click();
+        URL.revokeObjectURL(aEl.href);
+        alert(t("sync.exportDone"));
+      });
     };
-    /* 从本地导入（兼容备份包 / 旧版纯密码本） */
+    /* 从本地导入（先勾选恢复范围；兼容备份包 / 旧版纯密码本） */
     const fileInput = bodyEl.querySelector("#wd-file");
     bodyEl.querySelector("#wd-import-local").onclick = () => fileInput.click();
     fileInput.onchange = () => {
@@ -737,8 +817,10 @@
       reader.onload = () => {
         const txt = reader.result;
         if (isBackupBundle(txt)) {
-          try { applyBackup(txt); render(); alert(t("sync.importDone")); }
-          catch (e) { alert(t("sync.importFail")); }
+          pickScope(true, (scope) => {
+            try { applyBackup(txt, scope); render(); alert(t("sync.importDone")); }
+            catch (e) { alert(t("sync.importFail")); }
+          });
           return;
         }
         const master = window.prompt(t("common.masterPlaceholder"));
