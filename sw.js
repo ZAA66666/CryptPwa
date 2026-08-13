@@ -2,7 +2,7 @@
 /* 策略：网络优先（始终拿最新文件），网络不可用时回退缓存（离线可用）。
    这样每次改完代码，刷新即可看到新版，不会被旧缓存卡住。 */
 
-const CACHE_NAME = "crypto-pwa-v44";
+const CACHE_NAME = "crypto-pwa-v45";
 // 需要预缓存的「应用外壳」文件（保证断网也能首屏打开）
 const ASSETS = [
   "./",

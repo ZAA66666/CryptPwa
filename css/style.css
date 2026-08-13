@@ -9,21 +9,22 @@ html[dir="rtl"] .iv-row, html[dir="rtl"] .sym-key-actions, html[dir="rtl"] .json
 html[dir="rtl"] input, html[dir="rtl"] textarea { direction: rtl; text-align: right; }
 
 :root {
-  --bg: #eef0f2;          /* 页面背景（淡灰，柔和） */
-  --card: #fbfbfc;        /* 卡片背景（极淡白，柔和） */
-  --text: #1a1a1a;        /* 主文字（墨黑） */
-  --muted: #8a8f94;       /* 次要文字（灰） */
-  --border: #e6e8eb;      /* 分割线/边框 */
-  --danger: #fa5151;      /* 微信红（错误提示） */
-  --settings-bg: #f2f3f5; /* 设置分组选项的背景（淡灰） */
-  --link: #576b95;        /* 微信蓝（链接） */
-  --qr-bg: #ffffff;       /* 二维码底色（浅色） */
-  --qr-fg: #111111;       /* 二维码模块颜色（浅色） */
-  /* 强调色（默认墨黑；可在「设置→主题→莫奈取色」改为任意色） */
-  --accent: #1a1a1a;
+  --bg: #f5f6f8;          /* 页面背景（酷安浅灰） */
+  --card: #ffffff;        /* 卡片背景（纯白） */
+  --text: #1a1a1a;        /* 主文字 */
+  --muted: #8a9099;       /* 次要文字 */
+  --text-soft: #6b7178;   /* 辅助文字 */
+  --border: #eceef0;      /* 分割线 */
+  --danger: #fa5151;      /* 错误红 */
+  --settings-bg: #f2f3f5; /* 设置分组背景 */
+  --link: #4e6ef2;        /* 链接蓝（酷安蓝） */
+  --qr-bg: #ffffff;
+  --qr-fg: #111111;
+  /* 强调色：酷安绿（默认） */
+  --accent: #00a862;
   --on-accent: #ffffff;
-  --accent-soft: #ececec;
-  --accent-ring: rgba(0, 0, 0, 0.16);
+  --accent-soft: #e6f6ee;
+  --accent-ring: rgba(0, 168, 98, 0.18);
 }
 
 * { box-sizing: border-box; }
@@ -866,12 +867,33 @@ input[type="file"] {
   transition: opacity .2s ease, transform .2s ease; max-width: 80vw; text-align: center;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.legal-text { font-size: 14px; line-height: 1.8; color: var(--text); }
-.legal-text code { color: var(--accent); word-break: break-all; }
-.legal-text h3 { font-size: 15px; margin: 18px 0 6px; color: var(--text); }
-.legal-text p { margin: 0 0 10px; }
-.legal-text ul { padding-left: 20px; margin: 0 0 10px; }
-.legal-text a { color: var(--link); text-decoration: underline; word-break: break-all; }
+/* 说明文本（关于/外部调用/教程/法律/实验性等） */
+.legal-text {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text);
+  background: var(--card);
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.legal-text code {
+  display: block;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin: 6px 0 10px;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+.legal-text h3 { font-size: 15px; margin: 16px 0 6px; color: var(--text); font-weight: 600; }
+.legal-text p { margin: 0 0 10px; color: var(--text-soft); }
+.legal-text ul { padding-left: 20px; margin: 0 0 10px; color: var(--text-soft); }
+.legal-text a { color: var(--link); text-decoration: none; word-break: break-all; }
+.legal-text a:active { opacity: 0.6; }
 
 /* 设置内的行（标签 + 控件） */
 .settings-row {
@@ -885,9 +907,10 @@ input[type="file"] {
 .wd-local { margin-top: 6px; }
 /* 检测连接状态点：默认灰、联通绿、失败红 */
 #wd-test { display: inline-flex; align-items: center; gap: 6px; }
-.wd-dot { width: 10px; height: 10px; border-radius: 50%; background: #b9bcc3; flex: 0 0 auto; display: inline-block; }
+.wd-dot { width: 10px; height: 10px; border-radius: 50%; background: #b9bcc3; flex: 0 0 auto; display: inline-block; transition: background 0.2s; }
 .wd-dot.ok { background: #2ecc71; box-shadow: 0 0 6px rgba(46, 204, 113, .7); }
 .wd-dot.bad { background: #fa5151; box-shadow: 0 0 6px rgba(250, 81, 81, .7); }
+.wd-auto-test { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-soft); margin-top: 10px; padding: 8px 12px; background: var(--bg); border-radius: 10px; }
 /* 备份/恢复范围选择弹窗 */
 .scope-opt { display: flex; align-items: center; gap: 10px; padding: 12px 10px; border-radius: 10px; background: var(--settings-bg); cursor: pointer; font-size: 14px; color: var(--text); }
 .scope-opt input { width: 18px; height: 18px; accent-color: var(--accent); flex: 0 0 auto; }
@@ -944,7 +967,15 @@ input[type="color"] { width: 46px; height: 30px; border: 1px solid var(--border)
 
 .vp-namehint { font-size: 12px; color: var(--muted); margin: 6px 0 0; line-height: 1.5; }
 .btn.add-cp { margin-top: 14px; }
-.cp-note { font-size: 13px; color: var(--muted); line-height: 1.6; margin: 10px 0; }
+.cp-note {
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.7;
+  margin: 10px 0;
+  background: var(--accent-soft);
+  padding: 10px 12px;
+  border-radius: 10px;
+}
 
 /* 常用密码快捷填入浮层（底部抽屉） */
 .pw-picker {
@@ -1185,11 +1216,15 @@ input[type="file"] { font-size: calc(13px * var(--fs)); }
   display: flex; align-items: center; justify-content: center;
 }
 .cron-when { font-size: 14px; font-family: ui-monospace, Menlo, monospace; color: var(--text); }
-.cron-err { color: #d33; font-size: 14px; padding: 8px 10px; background: rgba(211,51,51,.08); border-radius: 10px; }
+.cron-err { color: var(--danger); font-size: 13px; padding: 10px 12px; background: rgba(250,81,81,.08); border-radius: 10px; border: 1px solid rgba(250,81,81,.18); }
 .cron-tpls { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 14px; }
-.cron-how { margin-top: 10px; }
-.cron-how summary { cursor: pointer; font-size: 14px; color: var(--accent); padding: 4px 0; }
-.cron-how .guide-body { margin-top: 8px; }
+.cron-how { margin-top: 10px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 4px 14px; }
+.cron-how summary { cursor: pointer; font-size: 14px; color: var(--text); padding: 10px 0; font-weight: 500; list-style: none; }
+.cron-how summary::-webkit-details-marker { display: none; }
+.cron-how summary::before { content: "▸ "; color: var(--muted); transition: transform 0.15s; display: inline-block; }
+.cron-how[open] summary::before { transform: rotate(90deg); }
+.cron-how .guide-body { margin: 4px 0 12px; color: var(--text-soft); font-size: 13px; line-height: 1.75; }
+.cron-how .guide-body code { color: var(--accent); background: var(--accent-soft); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
 .cron-tpls .chip.active, .rand-presets .chip.active { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 
 /* ===== 随机文本生成 ===== */

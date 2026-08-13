@@ -192,9 +192,10 @@
      从种子色生成一套 Monet 风格的同色调色板（accent / on-accent / soft / ring），
      浅色与深色分别取不同明度，保证可读。 */
   const ACCENT_PRESETS = [
-    { v: "default", bg: "#1a1a1a", name: "墨黑(默认)" },
+    { v: "default", bg: "#00a862", name: "酷安绿(默认)" },
+    { v: "#1a1a1a", bg: "#1a1a1a", name: "墨黑" },
     { v: "#07c160", bg: "#07c160", name: "微信绿" },
-    { v: "#576b95", bg: "#576b95", name: "微信蓝" },
+    { v: "#4e6ef2", bg: "#4e6ef2", name: "酷安蓝" },
     { v: "#7c5cff", bg: "#7c5cff", name: "莫奈紫" },
     { v: "#ff8a3d", bg: "#ff8a3d", name: "莫奈橙" },
     { v: "#19b3a6", bg: "#19b3a6", name: "莫奈青" },
@@ -399,7 +400,7 @@
         `<div class="sub-title" style="margin-top:22px">${t("accent.title")}</div>` +
         `<div class="accent-presets" id="accent-presets">${presetsHtml}</div>` +
         `<div class="settings-row" style="margin-top:14px"><span class="sr-label">${t("accent.pick")}</span>` +
-        `<input type="color" id="accent-color" value="${seed === "default" ? "#07c160" : seed}" /></div>`;
+        `<input type="color" id="accent-color" value="${seed === "default" ? "#00a862" : seed}" /></div>`;
     } else if (name === "extcall") {
       titleEl.textContent = t("ext.title");
       const on = getSetting("ext_incoming", "1") === "1";
@@ -412,23 +413,23 @@
         `</div>` +
         `<div class="legal-text" style="margin-top:14px">${t("ext.text")}</div>`;
     } else if (name === "exp") {
-      /* 实验性：直接进数据回调页（移除导入方式入口） */
+      /* 实验性：外部 App 调用本工具并接收回调数据的使用示例 */
       titleEl.textContent = t("exp.cb");
-      const inc = window.__incomingText || window.__incomingImage || "";
       html =
-        `<div class="cp-note">${t("exp.hint")}</div>` +
-        `<div class="cp-form">` +
-        `<textarea id="exp-input" rows="3" placeholder="${t("exp.input")}">${escapeHtml(inc)}</textarea>` +
-        `<div class="btn-row"><button class="btn primary" id="exp-gen">${t("exp.genBtn")}</button>` +
-        `<button class="btn ghost" id="exp-copy">${t("exp.copy")}</button></div>` +
-        `</div>` +
-        `<label class="field-label">${t("exp.result")}</label>` +
-        `<textarea id="exp-result" readonly rows="5"></textarea>` +
-        `<label class="field-label">${t("exp.schemeTitle")}</label>` +
-        `<textarea id="exp-scheme-code" readonly rows="2" style="font-family:monospace;font-size:12px"></textarea>` +
-        `<label class="field-label">${t("exp.intentTitle")}</label>` +
-        `<textarea id="exp-intent-code" readonly rows="3" style="font-family:monospace;font-size:12px"></textarea>` +
-        `<div class="legal-text" style="margin-top:14px"><h3>${t("exp.noteTitle")}</h3><p>${t("exp.note")}</p></div>`;
+        `<div class="legal-text">` +
+        `<p>${t("exp.usageIntro")}</p>` +
+        `<h3>1. ${t("exp.step1Title")}</h3>` +
+        `<p>${t("exp.step1Body")}</p>` +
+        `<p><code>crypto-pwa://?text=要处理的内容&amp;tab=hash&amp;run=1&amp;callback=myapp://result</code></p>` +
+        `<h3>2. ${t("exp.step2Title")}</h3>` +
+        `<p>${t("exp.step2Body")}</p>` +
+        `<p><code>{"ok":true,"ts":"2026-08-14T07:00:00Z","data":"e10adc3949ba59abbe56e057f20f883e","app":"CryptPwa"}</code></p>` +
+        `<h3>3. ${t("exp.step3Title")}</h3>` +
+        `<p>${t("exp.step3Body")}</p>` +
+        `<p><code>intent://?text=hello&amp;tab=enc&amp;callback=myapp://result#Intent;scheme=crypto-pwa;package=com.zaa.cryptpwa;end</code></p>` +
+        `<h3>${t("exp.noteTitle")}</h3>` +
+        `<p>${t("exp.note")}</p>` +
+        `</div>`;
     } else if (name === "display") {
       titleEl.textContent = t("display.title");
       const f = getSetting("font", "normal");
@@ -554,20 +555,7 @@
         if (window.copyText) window.copyText(v, e.target);
       };
     } else if (name === "exp") {
-      /* 实验性（直接数据回调页）：生成回调数据 + 回调地址示例 */
-      bodyEl.querySelector("#exp-gen").onclick = () => {
-        const d = bodyEl.querySelector("#exp-input").value;
-        const payload = { ok: !!d, ts: new Date().toISOString(), data: d || "", app: "CryptPwa" };
-        const json = JSON.stringify(payload, null, 2);
-        const enc = encodeURIComponent(JSON.stringify(payload));
-        bodyEl.querySelector("#exp-result").value = json;
-        bodyEl.querySelector("#exp-scheme-code").value = "myapp://crypto-callback?result=" + enc;
-        bodyEl.querySelector("#exp-intent-code").value = "intent://crypto-callback?result=" + enc + "#Intent;scheme=myapp;package=com.example.caller;end";
-      };
-      bodyEl.querySelector("#exp-copy").onclick = (e) => {
-        const v = bodyEl.querySelector("#exp-result").value;
-        if (v && window.copyText) window.copyText(v, e.target);
-      };
+      /* 实验性：纯展示页（使用示例），无交互按钮 */
     } else if (name === "lang") {
       bodyEl.querySelectorAll("#lang-seg button").forEach((b) =>
         (b.onclick = () => { setSetting("lang", b.dataset.v); applyLanguage(); render(); })
@@ -999,9 +987,8 @@
       `<input id="wd-pass" type="password" placeholder="${t("sync.pass")}" value="${escapeHtml(cfg.pass || "")}" />` +
       `<div class="btn-row">` +
       `<button class="btn primary" id="wd-save">${t("sync.saveCfg")}</button>` +
-      `<button class="btn ghost" id="wd-test"><span class="wd-dot" id="wd-dot"></span><span id="wd-test-label">${t("sync.test")}</span></button>` +
       `</div>` +
-      `<p class="hint" id="wd-test-hint"></p>` +
+      `<div class="wd-auto-test"><span class="wd-dot" id="wd-dot"></span><span id="wd-test-label">${t("sync.waitInput")}</span></div>` +
       `</div>` +
       `<div class="btn-row">` +
       `<button class="btn ghost" id="wd-backup">${t("sync.backup")}</button>` +
@@ -1025,41 +1012,57 @@
       });
       alert(t("sync.saveCfg") + " ✅");
     };
-    /* 检测连接：用当前输入框的地址/账号/密码发 WebDAV PROPFIND 测联通性（无需先保存） */
+    /* 连通性自动检测：地址/账号/密码都填完且失焦时自动测，无需点按钮 */
     const wdDot = bodyEl.querySelector("#wd-dot");
-    const wdTestBtn = bodyEl.querySelector("#wd-test");
-    const wdTestHint = bodyEl.querySelector("#wd-test-hint");
-    if (wdTestBtn && wdDot) {
-      wdTestBtn.onclick = async () => {
+    const wdLabel = bodyEl.querySelector("#wd-test-label");
+    const wdInputs = ["#wd-url", "#wd-user", "#wd-pass"].map((s) => bodyEl.querySelector(s)).filter(Boolean);
+    let wdTimer = null;
+    const autoTest = () => {
+      if (wdTimer) clearTimeout(wdTimer);
+      wdTimer = setTimeout(async () => {
         const cfg = {
           url: bodyEl.querySelector("#wd-url").value.trim(),
           user: bodyEl.querySelector("#wd-user").value,
           pass: bodyEl.querySelector("#wd-pass").value,
         };
-        if (!cfg.url) { alert(t("sync.needUrl")); return; }
-        wdDot.className = "wd-dot"; // 置灰（检测中）
-        if (wdTestHint) wdTestHint.textContent = t("sync.testing");
-        wdTestBtn.disabled = true;
-        const label = wdTestBtn.querySelector("#wd-test-label");
-        const orig = label ? label.textContent : "";
-        if (label) label.textContent = t("sync.testing");
+        if (!cfg.url || !cfg.user || !cfg.pass) {
+          if (wdDot) wdDot.className = "wd-dot";
+          if (wdLabel) wdLabel.textContent = t("sync.waitInput");
+          return;
+        }
+        if (wdDot) wdDot.className = "wd-dot";
+        if (wdLabel) wdLabel.textContent = t("sync.testing");
         try {
           const res = await fetch(wdTarget(cfg), {
             method: "PROPFIND",
             headers: { "Authorization": wdAuth(cfg.user, cfg.pass), "Depth": "0" },
           });
           if (!(res.ok || res.status === 207)) throw new Error("HTTP " + res.status);
-          wdDot.className = "wd-dot ok"; // 绿：联通
-          if (wdTestHint) wdTestHint.textContent = t("sync.testOk");
+          if (wdDot) wdDot.className = "wd-dot ok";
+          if (wdLabel) wdLabel.textContent = t("sync.testOk");
         } catch (e) {
-          wdDot.className = "wd-dot bad"; // 红：不联通
-          if (wdTestHint) wdTestHint.textContent = t("sync.testFail") + (e.message || "");
+          if (wdDot) wdDot.className = "wd-dot bad";
+          if (wdLabel) wdLabel.textContent = t("sync.testFail") + (e.message || "");
         }
-        wdTestBtn.disabled = false;
-        if (label) label.textContent = orig;
-      };
-    }
+      }, 600);
+    };
+    wdInputs.forEach((el) => { el.addEventListener("input", autoTest); el.addEventListener("change", autoTest); });
+    /* 首次进入页面也跑一次（已有配置则显示状态） */
+    setTimeout(autoTest, 100);
     bodyEl.querySelector("#wd-backup").onclick = () => {
+      /* 校验：是否已配置 WebDAV（保存的配置 + 当前输入框） */
+      const cfg = webdavConfig();
+      const cur = {
+        url: bodyEl.querySelector("#wd-url").value.trim(),
+        user: bodyEl.querySelector("#wd-user").value,
+        pass: bodyEl.querySelector("#wd-pass").value,
+      };
+      const ok = (cfg && cfg.url && cfg.user && cfg.pass) || (cur.url && cur.user && cur.pass);
+      if (!ok) {
+        alert(t("sync.needLoginFirst"));
+        bodyEl.querySelector("#wd-url").focus();
+        return;
+      }
       /* 先让用户勾选备份范围（密码本 / 软件配置），再上传 WebDAV */
       pickScope(false, async (scope) => {
         try { await webdavBackup(scope); alert(t("sync.backupDone")); }
@@ -1067,6 +1070,18 @@
       });
     };
     bodyEl.querySelector("#wd-restore").onclick = () => {
+      const cfg = webdavConfig();
+      const cur = {
+        url: bodyEl.querySelector("#wd-url").value.trim(),
+        user: bodyEl.querySelector("#wd-user").value,
+        pass: bodyEl.querySelector("#wd-pass").value,
+      };
+      const ok = (cfg && cfg.url && cfg.user && cfg.pass) || (cur.url && cur.user && cur.pass);
+      if (!ok) {
+        alert(t("sync.needLoginFirst"));
+        bodyEl.querySelector("#wd-url").focus();
+        return;
+      }
       pickScope(true, async (scope) => {
         try { await webdavRestore(scope); render(); alert(t("sync.restoreDone")); }
         catch (e) { if (e.message !== "cancel") alert(t("sync.fail") + e.message); }
