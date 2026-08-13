@@ -11,7 +11,7 @@
 <body class="on-home">
   <header class="app-header" id="app-header">
     <h1 data-i18n="appTitle">加解密工具箱</h1>
-    <p class="subtitle" data-i18n="appSub">哈希 · 编/解码 · 对称加/解密 · 加/解密 · 二维码/条形码</p>
+    <p class="subtitle" data-i18n="appSub">哈希 · 编/解码 · 加/解密 · 非对称加/解密 · 二维码/条形码</p>
   </header>
 
   <div class="app-card">
@@ -30,11 +30,11 @@
           </button>
           <button class="tool-card" data-go="sym">
             <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
-            <span class="tc-name" data-i18n="tool.sym">对称加密</span>
+            <span class="tc-name" data-i18n="tool.sym">加/解密</span>
           </button>
           <button class="tool-card" data-go="asym">
             <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3.6"/><path d="M11 11 20 20"/><path d="M16.5 16.5 19 14"/><path d="M14.5 14.5 17 12"/></svg></span>
-            <span class="tc-name" data-i18n="tool.asym">RSA</span>
+            <span class="tc-name" data-i18n="tool.asym">非对称加/解密</span>
           </button>
           <button class="tool-card" data-go="qr">
             <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="5" y="5" width="3" height="3" rx="0.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="5" y="16" width="3" height="3" rx="0.6"/><rect x="13" y="14" width="3" height="3" rx="1"/><path d="M14 3v9M16.5 3v9M19 3v9"/></svg></span>
@@ -140,11 +140,11 @@
         <button class="btn ghost" id="enc-copy" data-i18n="copy">复制结果</button>
       </section>
 
-      <!-- ========== 面板 3：对称加密 ========== -->
+      <!-- ========== 面板 3：加/解密（对称） ========== -->
       <section class="panel" id="panel-sym">
         <div class="panel-head">
           <button class="ph-back" aria-label="返回">‹</button>
-          <span class="ph-title" data-i18n="ph.sym">对称加密</span>
+          <span class="ph-title" data-i18n="ph.sym">加/解密</span>
         </div>
         <label class="field-label" data-i18n="sym.algo">算法</label>
         <select id="sym-algo">
@@ -209,7 +209,7 @@
       <section class="panel" id="panel-asym">
         <div class="panel-head">
           <button class="ph-back" aria-label="返回">‹</button>
-          <span class="ph-title" data-i18n="ph.asym">加/解密</span>
+          <span class="ph-title" data-i18n="ph.asym">非对称加/解密</span>
         </div>
 
         <!-- 算法切换：RSA / SM2 -->
@@ -592,12 +592,12 @@
             <p><b>是什么：</b>只是把数据<b>换一种写法</b>，可逆、<b>不需要密钥</b>。它<b>不是加密</b>，谁都能还原。</p>
             <p><b>怎么用：</b>在「编/解码」页选方式（如 Base64 编码）→ 输入 →「执行」。</p>
             <p><b>举个栗子：</b><code>Base64("hello")</code> = <code class="mono">aGVsbG8=</code>。Base32 / Base58 常用于分享密钥、区块链地址；Unicode 转义便于在代码里嵌中文；JWT 是带签名的令牌（可看 header/payload）。</p>
-            <p><b>注意：</b>编码 ≠ 加密。想保密请用下面的「对称 / 非对称」加密，别把密码只做 Base64 就当保护了。</p>
+            <p><b>注意：</b>编码 ≠ 加密。想保密请用下面的「加/解密（对称） / 非对称加/解密」，别把密码只做 Base64 就当保护了。</p>
           </div>
         </details>
 
         <details class="guide-item">
-          <summary>③ 对称加/解密（AES / DES / 3DES / Blowfish / RC4 / Rabbit）</summary>
+          <summary>③ 加/解密（AES / DES / 3DES / Blowfish / RC4 / Rabbit）—— 对称：一把密钥</summary>
           <div class="guide-body">
             <p><b>是什么：</b>加密和解密用<b>同一把密钥</b>。适合你知道对方、能安全把密钥告诉他的情况。</p>
             <p><b>怎么用：</b></p>
@@ -612,12 +612,12 @@
         </details>
 
         <details class="guide-item">
-          <summary>④ 加/解密 · RSA（非对称）—— 一把公钥、一把私钥（SM2 也在本页）</summary>
+          <summary>④ 非对称加/解密 · RSA / SM2 —— 一把公钥、一把私钥</summary>
           <div class="guide-body">
             <p><b>是什么：</b>一对钥匙：<b>公钥</b>（可公开，用来加密 / 验签）+ <b>私钥</b>（自己藏好，用来解密 / 签名）。</p>
             <p><b>怎么用（对方给你发密信）：</b></p>
             <ol>
-              <li>进入「加/解密」页会<strong>自动生成</strong>密钥对（顶部显示「已生成密钥对」）；</li>
+              <li>进入「非对称加/解密」页会<strong>自动生成</strong>密钥对（顶部显示「已生成密钥对」）；</li>
               <li>点「查看/修改密钥对」在弹窗里查看、复制或重新生成公钥/私钥；</li>
               <li>把<b>公钥</b>发给对方；</li>
               <li>对方在「加密」里用你的公钥加密，把密文发你；</li>
@@ -642,10 +642,10 @@
         </details>
 
         <details class="guide-item">
-          <summary>⑥ SM2 国密 —— 已并入「加/解密」页（顶部算法选 SM2）</summary>
+          <summary>⑥ SM2 国密 —— 已并入「非对称加/解密」页（顶部算法选 SM2）</summary>
           <div class="guide-body">
             <p><b>是什么：</b>和 RSA 一样是非对称算法（公钥加密 / 私钥解密，私钥签名 / 公钥验签），但符合<b>中国国家密码标准（国密）</b>，密文格式为 C1C3C2。</p>
-            <p><b>怎么用：</b>进「加/解密」页，顶部把算法切到 <b>SM2</b>，会自动生成密钥对（顶部显示「已生成密钥对」）。点「查看/修改密钥对」在弹窗里查看、复制、重新生成，也可「保存到密码本」；私钥建议弹窗外的「保存到文件」本地保管。选「加密 / 解密 / 签名 / 验签」→ 输入 →「执行」。</p>
+            <p><b>怎么用：</b>进「非对称加/解密」页，顶部把算法切到 <b>SM2</b>，会自动生成密钥对（顶部显示「已生成密钥对」）。点「查看/修改密钥对」在弹窗里查看、复制、重新生成，也可「保存到密码本」；私钥建议弹窗外的「保存到文件」本地保管。选「加密 / 解密 / 签名 / 验签」→ 输入 →「执行」。</p>
             <p><b>适合：</b>对接国内政务、金融等要求国密的场景。与 RSA 的区别主要在算法标准和密钥格式。</p>
           </div>
         </details>
@@ -690,7 +690,7 @@
               <li><b>明文</b>：还没处理的原始内容；<b>密文</b>：加密后的乱码。</li>
               <li><b>密钥 / 密码</b>：加密用的“钥匙”，<b>千万别用同一个当密码</b>。</li>
               <li><b>可逆 vs 不可逆</b>：加密、编码能还原；哈希不能还原。</li>
-              <li><b>该用哪个：</b>校验完整性→哈希；让数据能传输→编码；你和对方都要看原文且要保密→对称加密；只给对方看、怕中间人→RSA / SM2。</li>
+              <li><b>该用哪个：</b>校验完整性→哈希；让数据能传输→编码；你和对方都要看原文且要保密→加/解密（对称）；只给对方看、怕中间人→非对称加/解密（RSA / SM2）。</li>
             </ul>
           </div>
         </details>

@@ -165,7 +165,7 @@ function historyDisplayName(it) {
   }
   if (it.cat === "rsa") {
     const m = { encrypt: "op.encrypt", decrypt: "op.decrypt", sign: "op.sign", verify: "op.verify" }[it.op] || it.op;
-    return "RSA-" + L(m);
+    return L("cat.rsa") + "-" + L(m);
   }
   if (it.cat === "sm2") {
     const m = { encrypt: "op.encrypt", decrypt: "op.decrypt", sign: "op.sign", verify: "op.verify" }[it.op] || it.op;

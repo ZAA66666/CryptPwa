@@ -10,16 +10,16 @@ window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
     appTitle: "加解密工具箱",
-    appSub: "哈希 · 编/解码 · 对称加/解密 · 加/解密 · 二维码/条形码 · JSON · Crontab · 随机文本",
-    "tab.home": "主页", "tab.hash": "哈希", "tab.enc": "编/解码", "tab.sym": "对称加/解密",
-    "tab.asym": "加/解密", "tab.qr": "二维码", "tab.guide": "教程",
+    appSub: "哈希 · 编/解码 · 加/解密 · 非对称加/解密 · 二维码/条形码 · JSON · Crontab · 随机文本",
+    "tab.home": "主页", "tab.hash": "哈希", "tab.enc": "编/解码", "tab.sym": "加/解密",
+    "tab.asym": "非对称加/解密", "tab.qr": "二维码", "tab.guide": "教程",
     "set.gear": "设置",
 
     /* 主页 */
     "home.brand": "加解密工具箱 · 版本 1.0",
     "home.greet": "这是一个完全在您手机/电脑浏览器本地运行的加解密工具箱（PWA），用于学习与实践加解密、编码、二维码等常见操作。",
-    "tool.hash": "哈希", "tool.enc": "编/解码", "tool.sym": "对称加/解密",
-    "tool.asym": "加/解密", "tool.qr": "二维码/条形码", "tool.guide": "教程", "tool.json": "JSON", "tool.sm2": "SM2", "tool.cron": "Crontab", "tool.rand": "随机文本",
+    "tool.hash": "哈希", "tool.enc": "编/解码", "tool.sym": "加/解密",
+    "tool.asym": "非对称加/解密", "tool.qr": "二维码/条形码", "tool.guide": "教程", "tool.json": "JSON", "tool.sm2": "SM2", "tool.cron": "Crontab", "tool.rand": "随机文本",
     "home.recent": "最近使用", "home.clear": "清空",
     "home.empty": "还没有记录，去用用上面的工具吧～",
     "home.tapBack": "点击回到该功能",
@@ -41,7 +41,7 @@ window.I18N = {
     "ph.qrIn": "如：https://example.com", "ph.result": "结果将显示在这里", "ph.scanResult": "识别结果",
     "ph.bcIn": "如：123456789012 / ABC-123",
     "ph.jsonIn": "粘贴或输入 JSON，如 {\"name\":\"Tom\"}", "ph.jsonPath": "键路径，如 user.name 或 list.0", "ph.jsonCode": "生成的代码将显示在这里",
-    "hist.hash": "哈希", "hist.sym": "对称加/解密", "hist.qr": "二维码", "hist.json": "JSON", "hist.bc": "条形码",
+    "hist.hash": "哈希", "hist.sym": "加/解密", "hist.qr": "二维码", "hist.json": "JSON", "hist.bc": "条形码",
     "hist.gen": "生成", "hist.scan": "扫描", "hist.imgB64": "图片→Base64",
     /* JSON 工具 */
     "ph.json": "JSON 工具",
@@ -138,7 +138,7 @@ window.I18N = {
     "footer": "本工具用于学习与实践。MD5、DES、RC4、ECB 等已不安全，请勿用于保护真实机密。",
 
     /* 历史分类徽章 & 操作名 */
-    "cat.hash": "哈希", "cat.enc": "编/解码", "cat.sym": "对称加/解密", "cat.rsa": "加/解密(RSA)", "cat.qr": "二维码", "cat.json": "JSON", "cat.generic": "通用", "cat.cron": "Crontab", "cat.rand": "随机文本",
+    "cat.hash": "哈希", "cat.enc": "编/解码", "cat.sym": "加/解密", "cat.rsa": "非对称加/解密", "cat.qr": "二维码", "cat.json": "JSON", "cat.generic": "通用", "cat.cron": "Crontab", "cat.rand": "随机文本",
     "op.encrypt": "加密", "op.decrypt": "解密", "op.sign": "签名", "op.verify": "验签",
 
     /* 设置框架 */
@@ -154,7 +154,7 @@ window.I18N = {
     "accent.title": "强调色 · 莫奈取色", "accent.pick": "自定义取色", "accent.reset": "恢复默认",
 
     /* 功能面板顶部标题（返回键旁） */
-    "ph.hash": "哈希", "ph.enc": "编/解码", "ph.sym": "对称加/解密", "ph.asym": "加/解密", "ph.sm2": "SM2",
+    "ph.hash": "哈希", "ph.enc": "编/解码", "ph.sym": "加/解密", "ph.asym": "非对称加/解密", "ph.sm2": "SM2",
     "ph.qr": "二维码 / 条形码", "ph.guide": "使用教程", "ph.incoming": "外部内容", "ph.cron": "Crontab 定时表达式", "ph.rand": "随机文本生成",
 
     /* RSA 保存到文件 */
@@ -210,7 +210,7 @@ window.I18N = {
     "font.small": "小", "font.normal": "标准", "font.large": "大", "font.xlarge": "特大",
 
     /* 密码本 */
-    "common.title": "密码本", "common.add": "＋ 新增", "common.empty": "还没有保存的密码本。保存后，在对称加密 / RSA 的密钥框旁点「密码本」即可快速填入。",
+    "common.title": "密码本", "common.add": "＋ 新增", "common.empty": "还没有保存的密码本。保存后，在加/解密 / 非对称加/解密 的密钥框旁点「密码本」即可快速填入。",
     "common.label": "名称", "common.value": "密码 / 密钥", "common.save": "保存", "common.cancel": "取消", "common.del": "删除", "common.master": "主密码", "common.masterHint": "用于加密本地保存的密码（AES-256-CBC），忘记将无法恢复。", "common.setMaster": "设置主密码", "common.changeMaster": "修改主密码", "common.masterPlaceholder": "输入主密码", "common.confirmMaster": "确认主密码", "common.lock": "锁定", "common.unlock": "解锁", "common.unlockNow": "解锁", "common.lockedTip": "密码库已加密，输入主密码解锁后使用。", "common.masterMismatch": "两次输入不一致", "common.masterEmpty": "请输入主密码", "common.vaultReady": "密码库已就绪（密文存储，仅本机）", "common.export": "导出备份(JSON)", "common.import": "导入备份(JSON)", "common.exportDone": "已导出加密备份文件。", "common.importDone": "已导入备份。", "common.importFail": "失败：文件格式错误或主密码不对。", "sync.title": "数据备份与同步", "sync.webdav": "WebDAV", "sync.url": "服务器地址", "sync.user": "账号", "sync.pass": "密码", "sync.saveCfg": "保存配置", "sync.backup": "备份到 WebDAV", "sync.restore": "从 WebDAV 恢复", "sync.backupDone": "已备份到 WebDAV。", "sync.restoreDone": "已从 WebDAV 恢复。", "sync.fail": "操作失败：", "sync.cfgHint": "需服务器支持 WebDAV（如 Nextcloud、群晖、坚果云），并允许跨域(CORS)。", "sync.needMaster": "请先在「密码本」中设置并解锁主密码。", "sync.quick": "快捷填入服务器地址", "sync.quickJgy": "坚果云 dav.jianguoyun.com/dav/", "sync.quickNc": "Nextcloud remote.php/dav/files/", "sync.quickSyn": "群晖 /webdav", "sync.exportLocal": "导出本地备份", "sync.importLocal": "从本地导入", "sync.exportDone": "已导出本地备份文件。", "sync.importDone": "已从本地导入备份。", "sync.importFail": "导入失败：文件格式错误或主密码不对。",
 
 
@@ -221,18 +221,18 @@ window.I18N = {
       '<h3>它能做什么</h3><ul>' +
       '<li>哈希：MD5 / SHA-1/224/256/384/512 / SHA-3 / RIPEMD-160 / HMAC</li>' +
       '<li>编码：Base64 / Hex / URL，以及图片转 Base64</li>' +
-      '<li>对称加/解密：AES / DES / 3DES / Blowfish / RC4 / Rabbit</li>' +
+      '<li>加/解密：AES / DES / 3DES / Blowfish / RC4 / Rabbit</li>' +
       '<li>非对称加/解密：RSA / SM2（生成密钥、加密解密、签名验签）</li>' +
       '<li>二维码 / 条形码生成、最近使用记录、密码本、深色模式、多语言</li></ul>' +
       '<h3>项目源码</h3><p>本项目代码已同步至 GitHub，仓库名 <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">Crypto-pwa</a>。欢迎 Star / Fork / 提交 Issue。</p>' +
       '<h3>技术说明</h3><p>算法核心使用成熟的 <a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a> 库与浏览器原生 <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto</a>；二维码使用 <a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a>。所有计算均在本地完成，不依赖任何服务器。</p>' +
       '<h3>开源组件与引用位置</h3><ul>' +
-      '<li><b><a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a></b>（MIT 许可）— 哈希与对称加密算法。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/crypto-js.js" target="_blank" rel="noopener">js/vendor/crypto-js.js</a>；用于「哈希」「编码（图片转 Base64 走其编解码）」「对称加/解密」面板。</li>' +
+      '<li><b><a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a></b>（MIT 许可）— 哈希与对称加密算法。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/crypto-js.js" target="_blank" rel="noopener">js/vendor/crypto-js.js</a>；用于「哈希」「编码（图片转 Base64 走其编解码）」「加/解密」面板。</li>' +
       '<li><b><a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a></b>（MIT 许可）— 二维码生成。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/qrcode-generator.js" target="_blank" rel="noopener">js/vendor/qrcode-generator.js</a>；用于「二维码 / 条形码」面板（<code>qr-btn</code> 调用其 <code>qrcode()</code>）。</li>' +
       '<li><b><a href="https://github.com/cozmo/jsQR" target="_blank" rel="noopener">jsQR</a></b>（Apache-2.0）— 摄像头扫码解码。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsqr.js" target="_blank" rel="noopener">js/vendor/jsqr.js</a>；用于「扫描二维码」。</li>' +
       '<li><b><a href="https://github.com/lindell/JsBarcode" target="_blank" rel="noopener">JsBarcode</a></b>（MIT 许可）— 条形码生成。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbarcode.all.min.js" target="_blank" rel="noopener">js/vendor/jsbarcode.all.min.js</a>；用于「条形码」。</li>' +
-      '<li><b><a href="https://github.com/JuneAndGreen/sm-crypto" target="_blank" rel="noopener">sm-crypto</a></b>（MIT 许可）— SM2 国密算法。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/sm-crypto.esm.js" target="_blank" rel="noopener">js/vendor/sm-crypto.esm.js</a>（依赖已改引本地 <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbn.esm.js" target="_blank" rel="noopener">jsbn</a>）；用于「加/解密 → SM2」。</li>' +
-      '<li><b><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a></b>（浏览器原生，无单独依赖）— RSA 密钥生成、加解密、签名验签。<br>引用位置：浏览器原生 <code>crypto.subtle</code>；用于「加/解密 → RSA」，仅 https / localhost 可用。</li>' +
+      '<li><b><a href="https://github.com/JuneAndGreen/sm-crypto" target="_blank" rel="noopener">sm-crypto</a></b>（MIT 许可）— SM2 国密算法。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/sm-crypto.esm.js" target="_blank" rel="noopener">js/vendor/sm-crypto.esm.js</a>（依赖已改引本地 <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbn.esm.js" target="_blank" rel="noopener">jsbn</a>）；用于「非对称加/解密 → SM2」。</li>' +
+      '<li><b><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a></b>（浏览器原生，无单独依赖）— RSA 密钥生成、加解密、签名验签。<br>引用位置：浏览器原生 <code>crypto.subtle</code>；用于「非对称加/解密 → RSA」，仅 https / localhost 可用。</li>' +
       '<li><b>本项目代码</b>（手写）— 界面、交互、历史记录、密码本、设置、主题与多语言均自行实现，未封装第三方 UI 框架。</li></ul>' +
       '<p>所有计算均在本地完成、可离线使用，不向任何服务器上传数据。</p>' +
       '<p><strong>加解密工具箱</strong> · 版本 1.0 · <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">GitHub</a></p>',
@@ -318,15 +318,15 @@ window.I18N = {
 
   en: {
     appTitle: "Crypto Toolbox",
-    appSub: "Hash · Encode/Decode · Sym Enc/Dec · Encrypt/Decrypt · QR/Barcode · JSON · Crontab · Random",
+    appSub: "Hash · Encode/Decode · Encrypt/Decrypt · Asymmetric · QR/Barcode · JSON · Crontab · Random",
     "tab.home": "Home", "tab.hash": "Hash", "tab.enc": "Encode/Decode",
-    "tab.sym": "Sym Enc/Dec", "tab.asym": "Encrypt/Decrypt", "tab.qr": "QR", "tab.guide": "Guide",
+    "tab.sym": "Encrypt/Decrypt", "tab.asym": "Asymmetric", "tab.qr": "QR", "tab.guide": "Guide",
     "set.gear": "Settings",
 
     "home.greet": "Toolbox · Tap a feature below to use it",
     "home.brand": "Crypto Toolbox · v1.0",
-    "tool.hash": "Hash", "tool.enc": "Encode/Decode", "tool.sym": "Sym Enc/Dec",
-    "tool.asym": "Encrypt/Decrypt", "tool.qr": "QR / Barcode", "tool.guide": "Guide", "tool.json": "JSON", "tool.sm2": "SM2", "tool.cron": "Crontab", "tool.rand": "Random Text",
+    "tool.hash": "Hash", "tool.enc": "Encode/Decode", "tool.sym": "Encrypt/Decrypt",
+    "tool.asym": "Asymmetric", "tool.qr": "QR / Barcode", "tool.guide": "Guide", "tool.json": "JSON", "tool.sm2": "SM2", "tool.cron": "Crontab", "tool.rand": "Random Text",
     "home.recent": "Recent", "home.clear": "Clear",
     "home.empty": "No records yet — go try the tools above～",
     "home.tapBack": "Tap to open this feature",
@@ -346,7 +346,7 @@ window.I18N = {
     "ph.qrIn": "e.g. https://example.com", "ph.result": "Result will show here", "ph.scanResult": "Recognized result",
     "ph.bcIn": "e.g. 123456789012 / ABC-123",
     "ph.jsonIn": "Paste or type JSON, e.g. {\"name\":\"Tom\"}", "ph.jsonPath": "Key path, e.g. user.name or list.0", "ph.jsonCode": "Generated code will show here",
-    "hist.hash": "Hash", "hist.sym": "Symmetric", "hist.qr": "QR", "hist.json": "JSON", "hist.bc": "Barcode",
+    "hist.hash": "Hash", "hist.sym": "Encrypt/Decrypt", "hist.qr": "QR", "hist.json": "JSON", "hist.bc": "Barcode",
     "hist.gen": "Generate", "hist.scan": "Scan", "hist.imgB64": "Image→Base64",
     "hist.emptyTip": "No history yet", "hist.clearConfirm": "Clear all history?",
     /* JSON tool */
@@ -396,7 +396,7 @@ window.I18N = {
 
     "footer": "For learning & practice. MD5, DES, RC4, ECB, etc. are insecure — do not use them to protect real secrets.",
 
-    "cat.hash": "Hash", "cat.enc": "Encode/Decode", "cat.sym": "Sym Enc/Dec", "cat.rsa": "RSA", "cat.qr": "QR", "cat.json": "JSON", "cat.generic": "General", "cat.cron": "Crontab", "cat.rand": "Random",
+    "cat.hash": "Hash", "cat.enc": "Encode/Decode", "cat.sym": "Encrypt/Decrypt", "cat.rsa": "Asymmetric", "cat.qr": "QR", "cat.json": "JSON", "cat.generic": "General", "cat.cron": "Crontab", "cat.rand": "Random",
     "op.encrypt": "Encrypt", "op.decrypt": "Decrypt", "op.sign": "Sign", "op.verify": "Verify",
 
     "set.title": "Settings", "set.back": "Back",
@@ -409,7 +409,7 @@ window.I18N = {
     "accent.title": "Accent · Monet color", "accent.pick": "Custom color", "accent.reset": "Reset",
 
     /* Feature panel titles (next to back button) */
-    "ph.hash": "Hash", "ph.enc": "Encode/Decode", "ph.sym": "Sym Enc/Dec", "ph.asym": "Encrypt/Decrypt", "ph.sm2": "SM2",
+    "ph.hash": "Hash", "ph.enc": "Encode/Decode", "ph.sym": "Encrypt/Decrypt", "ph.asym": "Asymmetric", "ph.sm2": "SM2",
     "ph.qr": "QR / Barcode", "ph.guide": "Guide", "ph.incoming": "Incoming", "ph.cron": "Crontab schedule", "ph.rand": "Random text",
 
     /* RSA save to file */
@@ -453,7 +453,7 @@ window.I18N = {
     "lang.system": "Follow system", "lang.zh": "简体中文", "lang.en": "English (US)",
     "font.small": "Small", "font.normal": "Normal", "font.large": "Large", "font.xlarge": "Extra large",
 
-    "common.title": "Saved Passwords", "common.add": "＋ Add", "common.empty": "No saved passwords yet. After saving, tap “Saved passwords” next to the key field in Symmetric / RSA to fill instantly.",
+    "common.title": "Saved Passwords", "common.add": "＋ Add", "common.empty": "No saved passwords yet. After saving, tap “Saved passwords” next to the key field in Encrypt/Decrypt or Asymmetric to fill instantly.",
     "common.label": "Name", "common.value": "Password / Key", "common.save": "Save", "common.cancel": "Cancel", "common.del": "Delete", "common.master": "Master password", "common.masterHint": "Used to encrypt locally saved passwords (AES-256-CBC). If forgotten, data cannot be recovered.", "common.setMaster": "Set master password", "common.changeMaster": "Change master", "common.masterPlaceholder": "Enter master password", "common.confirmMaster": "Confirm password", "common.lock": "Lock", "common.unlock": "Unlock", "common.unlockNow": "Unlock", "common.lockedTip": "The vault is encrypted. Enter the master password to unlock.", "common.masterMismatch": "Passwords do not match", "common.masterEmpty": "Please enter a master password", "common.vaultReady": "Vault ready (encrypted, on-device)", "common.export": "Export backup (JSON)", "common.import": "Import backup (JSON)", "common.exportDone": "Encrypted backup exported.", "common.importDone": "Backup imported.", "common.importFail": "Failed: bad file or wrong master password.", "sync.title": "Backup & Sync", "sync.webdav": "WebDAV", "sync.url": "Server URL", "sync.user": "User", "sync.pass": "Password", "sync.saveCfg": "Save config", "sync.backup": "Backup to WebDAV", "sync.restore": "Restore from WebDAV", "sync.backupDone": "Backed up to WebDAV.", "sync.restoreDone": "Restored from WebDAV.", "sync.fail": "Operation failed: ", "sync.cfgHint": "Server must support WebDAV (e.g. Nextcloud, Synology, Nutstore) and allow CORS.", "sync.needMaster": "Set and unlock the master password in Saved Passwords first.", "sync.quick": "Quick fill server URL", "sync.quickJgy": "Nutstore dav.jianguoyun.com/dav/", "sync.quickNc": "Nextcloud remote.php/dav/files/", "sync.quickSyn": "Synology /webdav", "sync.exportLocal": "Export local backup", "sync.importLocal": "Import from local", "sync.exportDone": "Local backup exported.", "sync.importDone": "Local backup imported.", "sync.importFail": "Import failed: bad file or wrong master password.",
 
 
@@ -463,18 +463,18 @@ window.I18N = {
       '<h3>What it does</h3><ul>' +
       '<li>Hash: MD5 / SHA-1/224/256/384/512 / SHA-3 / RIPEMD-160 / HMAC</li>' +
       '<li>Encode: Base64 / Hex / URL, plus image-to-Base64</li>' +
-      '<li>Symmetric: AES / DES / 3DES / Blowfish / RC4 / Rabbit</li>' +
+      '<li>Encrypt/Decrypt (symmetric): AES / DES / 3DES / Blowfish / RC4 / Rabbit</li>' +
       '<li>Asymmetric: RSA / SM2 (key gen, encrypt/decrypt, sign/verify)</li>' +
       '<li>QR / Barcode generation, recent history, saved passwords, dark mode, multi-language</li></ul>' +
       '<h3>Source code</h3><p>This project is open source on GitHub, repo <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">Crypto-pwa</a>. Star / Fork / Issues welcome.</p>' +
       '<h3>Tech notes</h3><p>Core algorithms use the mature <a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a> library and native <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto</a>; QR uses <a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a>. Everything runs locally, no server involved.</p>' +
       '<h3>Open-source & where used</h3><ul>' +
-      '<li><b><a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a></b> (MIT) — hashing & symmetric. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/crypto-js.js" target="_blank" rel="noopener">js/vendor/crypto-js.js</a>; used by Hash, Encode (image-to-Base64), and Symmetric panels.</li>' +
+      '<li><b><a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a></b> (MIT) — hashing & symmetric. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/crypto-js.js" target="_blank" rel="noopener">js/vendor/crypto-js.js</a>; used by Hash, Encode (image-to-Base64), and Encrypt/Decrypt panels.</li>' +
       '<li><b><a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a></b> (MIT) — QR generation. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/qrcode-generator.js" target="_blank" rel="noopener">js/vendor/qrcode-generator.js</a>; used by the QR / Barcode panel (<code>qr-btn</code> calls its <code>qrcode()</code>).</li>' +
       '<li><b><a href="https://github.com/cozmo/jsQR" target="_blank" rel="noopener">jsQR</a></b> (Apache-2.0) — camera QR scanning. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsqr.js" target="_blank" rel="noopener">js/vendor/jsqr.js</a>; used by “Scan QR”.</li>' +
       '<li><b><a href="https://github.com/lindell/JsBarcode" target="_blank" rel="noopener">JsBarcode</a></b> (MIT) — barcode generation. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbarcode.all.min.js" target="_blank" rel="noopener">js/vendor/jsbarcode.all.min.js</a>; used by the Barcode panel.</li>' +
-      '<li><b><a href="https://github.com/JuneAndGreen/sm-crypto" target="_blank" rel="noopener">sm-crypto</a></b> (MIT) — SM2 national crypto. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/sm-crypto.esm.js" target="_blank" rel="noopener">js/vendor/sm-crypto.esm.js</a> (dependency rewired to local <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbn.esm.js" target="_blank" rel="noopener">jsbn</a>); used by Encrypt/Decrypt → SM2.</li>' +
-      '<li><b><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a></b> (native, no dependency) — RSA key gen, encrypt/decrypt, sign/verify. Location: native <code>crypto.subtle</code>; used by the Encrypt/Decrypt → RSA pane, only on https / localhost.</li>' +
+      '<li><b><a href="https://github.com/JuneAndGreen/sm-crypto" target="_blank" rel="noopener">sm-crypto</a></b> (MIT) — SM2 national crypto. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/sm-crypto.esm.js" target="_blank" rel="noopener">js/vendor/sm-crypto.esm.js</a> (dependency rewired to local <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbn.esm.js" target="_blank" rel="noopener">jsbn</a>); used by Asymmetric → SM2.</li>' +
+      '<li><b><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a></b> (native, no dependency) — RSA key gen, encrypt/decrypt, sign/verify. Location: native <code>crypto.subtle</code>; used by the Asymmetric → RSA pane, only on https / localhost.</li>' +
       '<li><b>This project’s code</b> (hand-written) — UI, interaction, history, password book, settings, theme and i18n are all custom; no third-party UI framework.</li></ul>' +
       '<p>Everything runs locally and offline; nothing is uploaded to any server.</p>' +
       '<p><strong>Crypto Toolbox</strong> · v1.0 · <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">GitHub</a></p>',
