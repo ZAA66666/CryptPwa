@@ -1,0 +1,71 @@
+name: Build Android APK
+
+# 每次推送 main 分支自动构建安卓 APK；也可在 Actions 页面手动运行
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java (Android SDK 构建用)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install Capacitor
+        run: |
+          npm init -y
+          npm install @capacitor/core @capacitor/android
+          npm install -D @capacitor/cli
+
+      - name: Init Capacitor & Add Android platform
+        run: |
+          # 把网页资源收集到 webapp/（避免把 android/ 自身复制进资产）
+          mkdir -p webapp
+          cp -r index.html css js manifest.webmanifest manifest-en.webmanifest sw.js webapp/
+          npx cap init "CryptPwa" "com.zaa.cryptpwa" --web-dir "webapp"
+          npx cap add android
+          npx cap sync android
+
+      - name: Build debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Tag & Publish Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v$(date +'%Y%m%d-%H%M%S')"
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          if [ ! -f "$APK" ]; then
+            echo "::error::APK not found: $APK"
+            find android/app/build/outputs -name "*.apk" 2>/dev/null || true
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG"
+          git push origin "$TAG"
+          gh release create "$TAG" "$APK" \
+            --title "CryptPwa $TAG" \
+            --notes "自动构建安卓 APK（debug 签名，允许未知来源即可安装）。
+
+- 构建时间：$(date -u +'%Y-%m-%d %H:%M UTC')
+- 说明：由 GitHub Actions 在推送 main 后自动生成；如需正式签名版请配置 Keystore。"
