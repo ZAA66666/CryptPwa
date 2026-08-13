@@ -1,4 +1,4 @@
-package com.getcapacitor.myapp;
+package com.zaa.cryptpwa;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -11,7 +11,7 @@ const APP_VERSION = "1.0.0";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
-    appTitle: "加解密工具箱",
+    appTitle: "哈机码",
     appSub: "哈希 · 编/解码 · 加/解密 · 非对称加/解密 · 二维码/条形码 · JSON · Crontab · 随机文本",
     "tab.home": "主页", "tab.hash": "哈希", "tab.enc": "编/解码", "tab.sym": "加/解密",
     "tab.asym": "非对称加/解密", "tab.qr": "二维码", "tab.guide": "教程",

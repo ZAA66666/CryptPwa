@@ -1,6 +1,6 @@
 {
-  "name": "加解密工具箱",
-  "short_name": "加密箱",
+  "name": "哈机码",
+  "short_name": "哈机码",
   "id": "crypto-pwa",
   "description": "手机上的 Base64 / 哈希 / 对称 / RSA / 二维码 工具",
   "lang": "zh-CN",
