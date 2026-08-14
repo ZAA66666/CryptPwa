@@ -874,7 +874,6 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
       const slotName = t("vault.slot" + (vaultSlot + 1)) || ("库 " + (vaultSlot + 1));
       html +=
         `<div class="vault-cur">📚 <b>${escapeHtml(slotName)}</b><span class="vc-count">${arr.length} 条</span></div>` +
-        `<p class="hint" style="margin:0 4px 8px">${t("vault.hint")}</p>` +
         `<div id="vault-mgr" class="vault-mgr" hidden>` +
         `<div class="vault-mgr-title">${t("vault.manage")}</div>` +
         `<div class="vault-mgr-list">` +
@@ -903,11 +902,6 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
       html += `<div id="cp-list"></div>`;
       html +=
         `<div class="btn-row" style="margin-top:14px">` +
-        `<button class="btn ghost" id="cp-export">${t("common.export")}</button>` +
-        `<button class="btn ghost" id="cp-import">${t("common.import")}</button>` +
-        `</div>` +
-        `<input type="file" id="cp-file" accept="application/json,.json" style="display:none" />` +
-        `<div class="btn-row">` +
         `<button class="btn ghost" id="mp-change">${t("common.changeMaster")}</button>` +
         `<button class="btn ghost" id="mp-lock">${t("common.lock")}</button>` +
         `</div>`;
@@ -1014,63 +1008,6 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
           const m = bodyEl.querySelector("#vault-mgr");
           if (m) { m.hidden = !m.hidden; if (window.toast) window.toast(m.hidden ? t("vault.mgrOff") : t("vault.mgrOn")); }
         }
-      };
-      /* 导出（CryptoData.json：弹窗选 加密保存 / 明文保存） */
-      bodyEl.querySelector("#cp-export").onclick = () => {
-        if (isLocked()) { alert(t("exp.locked")); return; }
-        const mask = ensureEl("exp-mask", "vp-mask");
-        const panel = ensureEl("exp-panel", "vp-panel");
-        panel.innerHTML =
-          `<div class="vp-inner">` +
-          `<div class="vp-head"><span class="vp-title">${t("exp.title")}</span><button class="vp-close" id="exp-close">✕</button></div>` +
-          `<div class="kv-tpl-list">` +
-          `<button class="kv-tpl-opt" id="exp-enc">${t("exp.enc")}</button>` +
-          `<button class="kv-tpl-opt" id="exp-plain">${t("exp.plain")}</button>` +
-          `</div></div>`;
-        mask.classList.add("show"); panel.classList.add("show");
-        const close = () => { mask.classList.remove("show"); panel.classList.remove("show"); };
-        panel.querySelector("#exp-close").onclick = close;
-        mask.onclick = close;
-        const doExport = (enc) => {
-          const arr = readPasswords();
-          const ud = enc ? encryptVault(arr, sessionMaster) : JSON.stringify(arr);
-          window.downloadJson("CryptoData.json", JSON.stringify({ Version: "V1.0", UpdateTime: new Date().toISOString(), UserData: ud }, null, 2));
-          alert(t("exp.done"));
-          close();
-        };
-        panel.querySelector("#exp-enc").onclick = () => doExport(true);
-        panel.querySelector("#exp-plain").onclick = () => doExport(false);
-      };
-      /* 导入（CryptoData 加密/明文 + 兼容旧备份包） */
-      const fileInput = bodyEl.querySelector("#cp-file");
-      bodyEl.querySelector("#cp-import").onclick = () => fileInput.click();
-      fileInput.onchange = () => {
-        const f = fileInput.files[0]; if (!f) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          const txt = reader.result;
-          try {
-            if (isBackupBundle(txt)) { applyBackup(txt); render(); alert(t("common.importDone")); return; }
-            const o = JSON.parse(txt);
-            if (!o || o.Version !== "V1.0" || typeof o.UserData !== "string") throw new Error("fmt");
-            const ud = JSON.parse(o.UserData);
-            if (ud && typeof ud === "object" && ud.ct && ud.salt && ud.iv) {
-              /* 加密文件：输入主密码解密后写入 */
-              const doImp = (master) => {
-                if (!master) return;
-                writePasswords(decryptVault(o.UserData, master));
-                render(); alert(t("common.importDone"));
-              };
-              if (window.dialog) window.dialog.prompt(t("common.masterPlaceholder")).then(doImp);
-              else doImp(window.prompt(t("common.masterPlaceholder")));
-              return;
-            } else if (Array.isArray(ud)) {
-              writePasswords(ud); // 明文文件
-            } else throw new Error("fmt");
-            render(); alert(t("common.importDone"));
-          } catch (e) { alert(t("common.importFail")); }
-        };
-        reader.readAsText(f);
       };
       /* 修改主密码 */
       bodyEl.querySelector("#mp-change").onclick = () => {
@@ -1239,7 +1176,7 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
       `<div class="btn-row">` +
       `<button class="btn primary" id="wd-save">${t("sync.saveCfg")}</button>` +
       `</div>` +
-      `<div class="wd-auto-test"><span class="wd-dot" id="wd-dot"></span><span id="wd-test-label">${t("sync.waitInput")}</span></div>` +
+      `<div class="wd-auto-test"><span class="wd-dot" id="wd-dot"></span><span class="wd-test-label" id="wd-test-label">${t("sync.waitInput")}</span></div>` +
       `</div>` +
       `<div class="btn-row">` +
       `<button class="btn ghost" id="wd-backup">${t("sync.backup")}</button>` +

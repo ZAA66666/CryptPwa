@@ -1901,11 +1901,12 @@ function applyLaunchParams() {
 }
 
 /* 全局 data-fill 委托：所有页面的"密码本"快速按钮（sym/asym 等）都生效
- * 点击 → __vaultApi.listAll(cat) 列出条目 → dialog.sheet 选 → 填到目标 input */
+ * 只处理带 data-cat 的（密码本填充）；WebDAV 快捷 chip 等无 data-cat 的走各自原有行为 */
 (function () {
   document.addEventListener("click", async (e) => {
     const b = e.target.closest("[data-fill]");
     if (!b) return;
+    if (!b.dataset.cat) return;   // 非密码本填充（如坚果云快捷地址）→ 交给原按钮自己的 handler
     e.preventDefault();
     e.stopPropagation();
     const targetId = b.dataset.fill;
