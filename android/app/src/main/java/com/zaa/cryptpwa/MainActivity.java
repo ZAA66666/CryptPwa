@@ -2,6 +2,7 @@ package com.zaa.cryptpwa;
 
 import android.content.ClipData;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.view.DragEvent;
 import android.view.View;
@@ -11,16 +12,30 @@ import com.getcapacitor.BridgeActivity;
 
 import org.json.JSONObject;
 
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
+
 /**
  * MainActivity：Capacitor 桥。
- * 1) 小窗/分屏拖放接收：文字或图片拖入小窗时，OnDragListener 捕获 ClipData → JS。
- * 2) 系统分享接收：其他 App 分享文本/图片（ACTION_SEND）→ JS __sharedText。
+ * 1) 状态栏：透明背景 + 文字色跟随系统暗色模式（启动时一次性设置）。
+ * 2) 小窗/分屏拖放接收：文字或图片拖入小窗时，OnDragListener 捕获 ClipData → JS。
+ * 3) 系统分享接收：其他 App 分享文本/图片（ACTION_SEND）→ JS __sharedText。
  */
 public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /* 状态栏：透明背景 + 文字色跟随系统暗色模式（启动时一次性设置） */
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
+        int night = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK);
+        boolean lightBars = (night != Configuration.UI_MODE_NIGHT_YES);
+        WindowInsetsControllerCompat ctrl = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        if (ctrl != null) {
+            ctrl.setAppearanceLightStatusBars(lightBars);
+            ctrl.setAppearanceLightNavigationBars(lightBars);
+        }
         handleSharedIntent(getIntent());
     }
 

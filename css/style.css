@@ -78,6 +78,14 @@ body {
   -webkit-overflow-scrolling: auto;
   overflow: hidden;
 }
+main {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
 
 /* 顶部 Toolbar（全宽，像原生 App 顶栏；主页显示；右上角三点菜单入口） */
 .app-header {
@@ -173,10 +181,15 @@ body:not(.on-home) .panel.active { padding-top: calc(env(safe-area-inset-top) + 
   display: none;
   padding: 18px 18px 22px;
   background: var(--card);
+  overflow-y: auto;          /* 内容超出时可上下滑动 */
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
-/* 面板切换动画：从右滑入（配合安卓预测性返回手势） */
 .panel.active {
   display: block;
+  height: 100%;
   animation: panelIn 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 @keyframes panelIn {
@@ -1087,11 +1100,14 @@ input[type="color"] { width: 46px; height: 30px; border: 1px solid var(--border)
 .exp-panel.show { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
 .exp-panel .vp-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 8px; margin: 0; }
 .exp-panel .vp-title { font-size: 16px; font-weight: 700; color: var(--text); }
-.exp-panel .vp-close {
+.exp-panel .exp-collapse {
   border: none; background: var(--settings-bg); color: var(--muted);
-  width: 30px; height: 30px; border-radius: 50%;
-  font-size: 15px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
 }
+.exp-panel .exp-collapse svg { width: 20px; height: 20px; }
+.exp-panel .exp-done { min-width: 80px; padding: 10px 18px; border-radius: 22px; }
 .exp-panel .exp-text {
   flex: 1 1 auto; min-height: 0; overflow-y: auto;
   width: auto; margin: 4px 18px 12px;
@@ -1103,7 +1119,10 @@ input[type="color"] { width: 46px; height: 30px; border: 1px solid var(--border)
   color: var(--text); resize: none; box-sizing: border-box;
   word-break: break-all; white-space: pre-wrap;
 }
-.exp-panel .btn-row { display: flex; gap: 10px; padding: 0 18px 18px; margin: 0; }
+.exp-panel .exp-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px 10px; margin: 0;
+}
 .exp-panel .btn-row .btn { flex: 1 1 auto; }
 
 /* 扫描二维码浮层（摄像头取景框 + 相册识别） */

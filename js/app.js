@@ -1832,7 +1832,7 @@ function ensureExpEl(id, cls) {
   if (!el) { el = document.createElement("div"); el.id = id; el.className = cls; document.body.appendChild(el); }
   return el;
 }
-// 全屏编辑/查看窗口：editable=true 时可改并写回；否则只读 + 复制
+// 全屏编辑/查看窗口：仿微信输入框全屏样式（左下角收起 + 右上角完成）
 function openEditor(ta, editable) {
   const mask = ensureExpEl("exp-mask", "exp-mask");
   const panel = ensureExpEl("exp-panel", "exp-panel");
@@ -1844,34 +1844,30 @@ function openEditor(ta, editable) {
     if (r && r.top > vh / 2) panel.classList.add("from-bottom");
     else if (r) panel.classList.add("from-top");
   } catch (e) {}
-  const title = (typeof t === "function") ? t("ui.full") : "全屏编辑";
-  if (editable) {
-    const doneLbl = (typeof t === "function") ? t("ui.done") : "完成";
-    panel.innerHTML =
-      `<div class="vp-head"><span class="vp-title">${escapeHtml(title)}</span><button class="vp-close" id="exp-close" aria-label="关闭">✕</button></div>` +
-      `<textarea class="exp-text" id="exp-edit">${escapeHtml(ta.value)}</textarea>` +
-      `<div class="btn-row"><button class="btn primary" id="exp-ok">${escapeHtml(doneLbl)}</button></div>`;
-    panel.classList.add("show"); mask.classList.add("show");
-    const close = () => { panel.classList.remove("show"); mask.classList.remove("show"); };
-    panel.querySelector("#exp-close").onclick = close;
-    mask.onclick = close;
-    panel.querySelector("#exp-ok").onclick = () => {
-      ta.value = panel.querySelector("#exp-edit").value;
+  const doneLbl = (typeof t === "function") ? t("ui.done") : "完成";
+  const closeLbl = (typeof t === "function") ? t("ui.collapse", "收起") : "收起";
+  panel.innerHTML =
+    `<div class="exp-head">` +
+      `<button class="exp-collapse" id="exp-close" aria-label="${closeLbl}" title="${closeLbl}">` +
+      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>` +
+      `</button>` +
+      `<button class="btn primary exp-done" id="exp-ok">${escapeHtml(doneLbl)}</button>` +
+    `</div>` +
+    `<textarea class="exp-text" id="exp-edit" ${editable ? "" : "readonly"}>${escapeHtml(ta.value)}</textarea>`;
+  panel.classList.add("show"); mask.classList.add("show");
+  const close = () => { panel.classList.remove("show"); mask.classList.remove("show"); };
+  const editArea = panel.querySelector("#exp-edit");
+  if (editable) setTimeout(() => { editArea.focus(); editArea.setSelectionRange(editArea.value.length, editArea.value.length); }, 60);
+  panel.querySelector("#exp-close").onclick = close;
+  mask.onclick = close;
+  panel.querySelector("#exp-ok").onclick = () => {
+    if (editable) {
+      ta.value = editArea.value;
       ta.dispatchEvent(new Event("input"));
-      close(); ta.focus();
-    };
-  } else {
-    const copyLbl = (typeof t === "function") ? t("copy") : "复制结果";
-    panel.innerHTML =
-      `<div class="vp-head"><span class="vp-title">${escapeHtml(title)}</span><button class="vp-close" id="exp-close" aria-label="关闭">✕</button></div>` +
-      `<textarea class="exp-text" readonly>${escapeHtml(ta.value)}</textarea>` +
-      `<div class="btn-row"><button class="btn primary" id="exp-copy">${escapeHtml(copyLbl)}</button></div>`;
-    panel.classList.add("show"); mask.classList.add("show");
-    const close = () => { panel.classList.remove("show"); mask.classList.remove("show"); };
-    panel.querySelector("#exp-close").onclick = close;
-    mask.onclick = close;
-    panel.querySelector("#exp-copy").onclick = (e) => copyText(ta.value, e.target);
-  }
+    }
+    close();
+    if (editable) ta.focus();
+  };
 }
 function setupExpanders() {
   document.querySelectorAll("textarea").forEach((ta) => {

@@ -252,14 +252,18 @@
         ? { accent: "#f2f2f2", onAccent: "#111111", soft: "#2c2c2e", ring: "rgba(255,255,255,0.20)" }
         : { accent: "#1a1a1a", onAccent: "#ffffff", soft: "#ececec", ring: "rgba(0,0,0,0.16)" };
     }
-    const { h, s, l } = rgbToHsl(hexToRgb(seed).r, hexToRgb(seed).g, hexToRgb(seed).b);
-    const sat = clamp(s, 0.45, 0.95);
-    const lightAccent = hslToHex(h, sat, 0.52);
-    const darkAccent = hslToHex(h, sat, 0.72);
+    const rgb = hexToRgb(seed);
+    const { h, s, l } = rgbToHsl(rgb.r, rgb.g, rgb.b);
+    /* 极端明度（接近纯黑/纯白/纯灰）保持原色，不强制饱和度（避免黑色被变红褐） */
+    const isNeutral = s < 0.06;
+    const sat = isNeutral ? 0 : clamp(s, 0.45, 0.95);
+    const lC = Math.max(0.08, Math.min(0.92, l || 0.5));
+    const lightAccent = isNeutral ? hslToHex(0, 0, lC) : hslToHex(h, sat, 0.52);
+    const darkAccent = isNeutral ? hslToHex(0, 0, Math.min(0.95, lC + 0.18)) : hslToHex(h, sat, 0.72);
     const onLight = relLuminance(lightAccent) < 0.45 ? "#ffffff" : "#1a1a1a";
     const onDark = relLuminance(darkAccent) < 0.45 ? "#ffffff" : "#1a1a1a";
-    const softLight = hslToHex(h, clamp(s, 0.4, 0.9), 0.93);
-    const softDark = hslToHex(h, clamp(s, 0.3, 0.7), 0.22);
+    const softLight = isNeutral ? hslToHex(0, 0, Math.min(0.95, lC + 0.18)) : hslToHex(h, clamp(s, 0.4, 0.9), 0.93);
+    const softDark = isNeutral ? hslToHex(0, 0, Math.max(0.12, lC - 0.2)) : hslToHex(h, clamp(s, 0.3, 0.7), 0.22);
     return {
       accent: dark ? darkAccent : lightAccent,
       onAccent: dark ? onDark : onLight,
