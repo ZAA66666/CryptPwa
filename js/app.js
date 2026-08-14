@@ -120,6 +120,13 @@ function showPanel(name) {
   panel.classList.add("active");
   // 主页才显示顶部 Toolbar（含三点菜单）；进入功能页时隐藏，用面板内返回键
   document.body.classList.toggle("on-home", name === "home");
+  // 状态栏文字色：on-home 黑底 → 白字；其他白底 → 黑字
+  try {
+    const sb = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar;
+    if (sb && sb.setStyle) {
+      sb.setStyle({ style: name === "home" ? "DARK" : "LIGHT" }).catch(() => {});
+    }
+  } catch (e) {}
   // 进入「加/解密」面板：恢复上次类别，并按算法确保密钥存在
   if (name === "sym") setSymCat(symCat);
   window.scrollTo(0, 0);
@@ -746,6 +753,30 @@ function base64ToUtf8(b64) {
 
 /* ---------- 4. 对称加密面板（AES/DES/3DES/Blowfish/RC4/Rabbit） ---------- */
 const symAlgo = document.getElementById("sym-algo");
+const symAlgoBtn = document.getElementById("sym-algo-btn");
+const symAlgoLabel = document.getElementById("sym-algo-label");
+const SYM_ALGOS = [
+  { v: "AES",      label: "AES（密钥 16/24/32 字节）" },
+  { v: "DES",      label: "DES（密钥 8 字节）" },
+  { v: "3DES",     label: "3DES（密钥 24 字节）" },
+  { v: "Blowfish", label: "Blowfish（密钥 1~56 字节）" },
+  { v: "RC4",      label: "RC4（流密码）" },
+  { v: "Rabbit",   label: "Rabbit（流密码）" },
+];
+function refreshSymAlgoLabel() {
+  const cur = SYM_ALGOS.find((a) => a.v === symAlgo.value);
+  if (cur && symAlgoLabel) symAlgoLabel.textContent = cur.label;
+}
+if (symAlgoBtn) symAlgoBtn.addEventListener("click", async () => {
+  if (!window.dialog) return;
+  const items = SYM_ALGOS.map((a) => ({ label: a.label, desc: "" }));
+  const res = await window.dialog.sheet(items, t("sym.algo"));
+  if (res == null || res < 0) return;
+  symAlgo.value = SYM_ALGOS[res].v;
+  refreshSymAlgoLabel();
+  updateKeySizeUI(); refreshSymHints();
+});
+refreshSymAlgoLabel();
 const symKey = document.getElementById("sym-key");
 const symKeyHint = document.getElementById("sym-key-hint");
 const symModeBox = document.getElementById("sym-mode");

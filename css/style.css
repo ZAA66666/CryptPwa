@@ -71,7 +71,7 @@ body {
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   /* 顶部状态栏安全区：内容不贴状态栏 / 返回键不压在状态栏上方 */
-  padding-top: calc(env(safe-area-inset-top) + 52px);  /* 52px = app-header 高度（含 padding），让主页不被 Toolbar 遮挡 */
+  padding-top: calc(env(safe-area-inset-top) + 60px);  /* 60px = app-header 实际高度（含 padding+border+阴影），让主页不被 Toolbar 遮挡 */
   padding-bottom: env(safe-area-inset-bottom);
   /* 禁用网页橡皮筋滚动 / 整页 overscroll（App 体验） */
   overscroll-behavior: none;
@@ -106,7 +106,7 @@ main {
   gap: 8px;
   background: var(--accent);
   color: var(--on-accent);
-  padding: calc(env(safe-area-inset-top) + 10px) 14px 10px;
+  padding: calc(env(safe-area-inset-top) + 6px) 14px 6px;
   box-shadow: 0 2px 12px var(--accent-ring);
 }
 .tb-title { font-size: 17px; font-weight: 700; letter-spacing: 0.5px; padding: 0 4px; user-select: none; -webkit-user-select: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

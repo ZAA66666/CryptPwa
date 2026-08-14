@@ -189,14 +189,11 @@
         <!-- 子面板：对称加密 -->
         <div class="asym-pane" id="sym-pane-sym">
         <label class="field-label" data-i18n="sym.algo">算法</label>
-        <select id="sym-algo">
-          <option value="AES" selected>AES（密钥 16/24/32 字节）</option>
-          <option value="DES">DES（密钥 8 字节）</option>
-          <option value="3DES">3DES（密钥 24 字节）</option>
-          <option value="Blowfish">Blowfish（密钥 1~56 字节）</option>
-          <option value="RC4">RC4（流密码）</option>
-          <option value="Rabbit">Rabbit（流密码）</option>
-        </select>
+        <button type="button" class="picker-btn" id="sym-algo-btn">
+          <span class="picker-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+          <span class="picker-label" id="sym-algo-label">AES（密钥 16/24/32 字节）</span>
+        </button>
+        <input type="hidden" id="sym-algo" value="AES" />
 
         <label class="field-label" data-i18n="sym.key">密钥</label>
         <input id="sym-key" type="text" data-i18n-attr="placeholder:ph.symKey" placeholder="如：1234567890123456" />
