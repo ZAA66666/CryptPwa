@@ -332,6 +332,25 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
     feedback: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.3c-1 0-2-.2-2.9-.5L3 21l1.8-5.6A8.3 8.3 0 0 1 4 11.5 8.4 8.4 0 0 1 12.5 3.2a8.4 8.4 0 0 1 8.5 8.3z"/><path d="M8.5 10.5h7"/><path d="M8.5 14h4"/></svg>',
   };
 
+  function settingsItemValue(it) {
+    if (it === "display") {
+      const l = getSetting("lang", "system");
+      if (l === "system") return t("lang.system");
+      if (l === "zh") return t("lang.zh");
+      if (l === "en") return t("lang.en");
+      const imp = importedLangs();
+      if (imp[l]) return imp[l];
+      return l;
+    }
+    if (it === "theme") {
+      const th = getSetting("theme", "system");
+      if (th === "light") return t("theme.light");
+      if (th === "dark") return t("theme.dark");
+      return t("theme.system");
+    }
+    return "";
+  }
+
   function renderMain() {
     titleEl.textContent = t("set.title");
     const groups = [
@@ -345,7 +364,8 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
       g.items.forEach((it) => {
         const label = t("set." + it) || t(it + ".title") || it;
         const ico = SETTINGS_ICONS[it] || "";
-        html += `<li class="settings-item" data-go="${it}"><span class="si-icon">${ico}</span><span class="si-text">${escapeHtml(label)}</span><span class="si-arrow">›</span></li>`;
+        const meta = settingsItemValue(it);
+        html += `<li class="settings-item" data-go="${it}"><span class="si-icon">${ico}</span><span class="si-text">${escapeHtml(label)}</span>${meta ? `<span class="si-meta">${escapeHtml(meta)}</span>` : ""}<span class="si-arrow">›</span></li>`;
       });
       html += "</ul></div>";
     });
