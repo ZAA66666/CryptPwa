@@ -50,8 +50,18 @@ if ($LASTEXITCODE -ne 0) { Write-Host "      build-tools;36.0.0 不可用，回�
 
 # 5) 写 android/local.properties（告诉 gradle SDK 位置）
 $localProps = Join-Path $proj "android\local.properties"
-"sdk.dir=D:\\Program Files\\Android\\Sdk" | Set-Content -Path $localProps -Encoding ASCII
+# 注意：Properties 文件里反斜杠需转义，必须用双反斜杠，否则 Gradle 解析路径会出错
+'sdk.dir=D:\\Program Files\\Android\\Sdk' | Set-Content -Path $localProps -Encoding ASCII
 Write-Host "`n[5/5] 已写入 $localProps"
+
+# 6) 修正 User 级 ANDROID_HOME（之前误指向空的 D:\Android\Sdk），并把 platform-tools 加入 PATH
+[Environment]::SetEnvironmentVariable("ANDROID_HOME", "D:\Program Files\Android\Sdk", "User")
+Write-Host "      已修正 ANDROID_HOME(用户级) = D:\Program Files\Android\Sdk"
+$pt = Join-Path $sdkRoot "platform-tools"
+$paths = ([Environment]::GetEnvironmentVariable("Path", "User") -split ";") | Where-Object { $_ -and $_ -ne $pt }
+$paths += $pt
+[Environment]::SetEnvironmentVariable("Path", ($paths -join ";"), "User")
+Write-Host "      已把 $pt 加入用户 PATH（adb 可用）"
 
 Write-Host "`n========== Android SDK 安装完成 =========="
 Write-Host "接下来在本机终端（有网）编译并装到手机："
