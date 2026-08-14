@@ -289,8 +289,20 @@
   const bodyEl = document.getElementById("settings-body");
   let stack = [];
 
-  function openSettings(target) { stack = target ? ["main", target] : ["main"]; render(); overlay.classList.add("show"); overlay.removeAttribute("hidden"); }
-  function closeSettings() { overlay.classList.remove("show"); overlay.setAttribute("hidden", ""); stack = []; }
+function openSettings(target) {
+  stack = target ? ["main", target] : ["main"]; render(); overlay.classList.add("show"); overlay.removeAttribute("hidden");
+  /* 设置 overlay-bar 黑色 → 状态栏白字（DARK）；关闭时恢复（已在 showPanel 处理 LIGHT） */
+  try {
+    const sb = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar;
+    if (sb && sb.setStyle) sb.setStyle({ style: "DARK" }).catch(() => {});
+  } catch (e) {}
+}
+function closeSettings() { overlay.classList.remove("show"); overlay.setAttribute("hidden", ""); stack = [];
+  try {
+    const sb = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar;
+    if (sb && sb.setStyle) sb.setStyle({ style: "LIGHT" }).catch(() => {});
+  } catch (e) {}
+}
   function go(name) { stack.push(name); render(); }
   function back() { stack.pop(); if (stack.length === 0) { closeSettings(); return; } render(); }
   window.settingsBack = back; // 安卓返回键用：设置页逐级返回 / 关闭
@@ -1353,8 +1365,15 @@
           try { importVault(txt, master); render(); alert(t("sync.importDone")); }
           catch (e) { alert(t("sync.importFail")); }
         };
-        if (window.dialog) window.dialog.prompt(t("common.masterPlaceholder")).then(doImp);
-        else doImp(window.prompt(t("common.masterPlaceholder")));
+        /* 旧版密码本备份文件：导入会覆盖现有数据 + 需要主密码，先二次确认 */
+        if (window.dialog) {
+          window.dialog.confirm(t("common.import") + "：导入将覆盖现有密码本，是否继续？", { title: t("common.import") })
+            .then((ok) => { if (ok) window.dialog.prompt(t("common.masterPlaceholder")).then(doImp); });
+        } else {
+          if (confirm(t("common.import") + "：导入将覆盖现有密码本，是否继续？")) {
+            window.dialog.prompt(t("common.masterPlaceholder")).then(doImp);
+          }
+        }
       };
       reader.readAsText(f);
     };
