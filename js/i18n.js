@@ -7,7 +7,7 @@
 /* 本项目 GitHub 仓库（CryptPwa，作者 ZAA66666）。 */
 const GITHUB_REPO = "https://github.com/ZAA66666/CryptPwa";
 /* 当前版本号（用于“检测更新”对比 GitHub Releases） */
-const APP_VERSION = "1.2.0";
+const APP_VERSION = "1.3.0";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
@@ -25,11 +25,11 @@ window.I18N = {
     "home.recent": "最近使用", "home.clear": "清空",
     "home.empty": "还没有记录，去用用上面的工具吧～",
     "home.tapBack": "点击回到该功能",
-    "ui.expand": "展开查看全文", "ui.full": "全屏编辑", "ui.clear": "清空", "ui.done": "完成",
+    "ui.expand": "展开查看全文", "ui.full": "全屏编辑", "ui.clear": "清空", "ui.done": "完成", "back.pressAgain": "再按一次返回退出",
 
     /* 哈希 */
     "hash.in": "输入文本", "hash.algo": "算法", "hash.key": "密钥（HMAC 需要）",
-    "hash.btn": "计算哈希", "hash.out": "结果（十六进制）", "copy": "复制结果",
+    "hash.btn": "计算哈希", "hash.out": "结果（十六进制）", "copy": "复制结果", "copy.bigFileAsk": "内容较大（超过约 5000 字节，剪贴板可能放不下）\n是否保存为文件？",
 
     /* 编码 */
     "enc.in": "输入", "enc.mode": "方式", "enc.imgLabel": "图片转 Base64（可选）",
@@ -152,14 +152,18 @@ window.I18N = {
 
     /* 文件保存路径设置 */
     "storage.title": "内容保存路径",
-    "storage.hint": "RSA 密钥等「保存到文件」时的默认路径（如 sdcard/CrytoPwa）。受浏览器限制无法强制写入任意目录：Android Chrome 安装为 App 后可弹出位置选择；其它浏览器将按此名称下载到默认文件夹。",
+    "storage.hint": "保存目录用于存放：加/解密结果、编/解码等大内容（超过剪贴板限制会自动提示另存为文件）、RSA/SM2 密钥导出文件、WebDAV 备份文件。默认 sdcard/CrytoPwa。",
     "storage.locHint": "本地生成的加/解密、编/解码等结果数据，会保存到上方设置的路径下；备份文件同理。",
+    "storage.usageTitle": "什么内容会存到这里？",
+    "storage.usage1": "加密/解密后的结果内容，超过约 5000 字节（剪贴板放不下）时，自动提示保存为文件到此目录",
+    "storage.usage2": "RSA / SM2 密钥「导出到文件」时保存的 .pem / .txt 文件",
+    "storage.usage3": "WebDAV 备份、本地导出等生成的 JSON 备份文件",
     "storage.pick": "选择文件夹", "storage.reset": "恢复默认",
     "storage.pickFail": "选择失败：", "storage.pickUnsupported": "当前浏览器不支持直接选目录，请手动输入路径。",
     "save.savedDoc": "已保存到系统文档目录：", "save.fail": "保存失败：", "storage.androidHint": "安卓版：请在下方直接手动填写保存路径（系统不支持文件夹选择）。", "storage.saved": "已保存默认保存路径",
 
     /* 外部内容选择器（URL Scheme / Intent / 系统分享） */
-    "inc.title": "外部内容", "inc.from": "收到内容", "inc.none": "（无内容）",
+    "inc.title": "外部内容", "inc.from": "收到内容", "inc.none": "（无内容）", "inc.dragOk": "已接收拖入的内容",
     "inc.pickImg": "选择图片文件", "inc.quick": "快捷编码", "inc.encrypt": "快捷加密",
     "inc.hash": "哈希", "inc.other": "其他",
     "inc.b64enc": "Base64 编码", "inc.b64dec": "Base64 解码", "inc.hexenc": "Hex 编码", "inc.urlenc": "URL 编码",
@@ -167,7 +171,7 @@ window.I18N = {
     "inc.md5": "MD5", "inc.sha256": "SHA-256", "inc.imgb64": "图片 → Base64", "inc.qr": "生成二维码",
 
     /* 外部调用 / 分享接入（URL Scheme / Intent / 系统分享） */
-    "ext.title": "外部调用与分享", "exp.title": "实验性", "exp.callbackTitle": "外部回调（插件用法）", "exp.hint": "作为插件被外部调用时（可传入文本 / JSON / 图片），本应用处理完可生成回调数据返回给调用方。", "exp.input": "要回调的数据（默认取外部传入内容）", "exp.genBtn": "生成回调数据", "exp.result": "回调数据（JSON）", "exp.schemeTitle": "回调地址（URL Scheme）", "exp.intentTitle": "Android Intent 示例", "exp.copy": "复制", "exp.noteTitle": "可行性说明", "exp.note": "当前为纯网页 PWA，浏览器无法直接把数据写回其它 App。支持两种方式：①调用方通过 URL Scheme / Intent 携带回调地址，本应用把结果编码进该地址后跳回；②直接复制结果手动粘贴回原应用。若以后打包为原生壳（WebView + JS Bridge，如 Capacitor），可实现真正自动回调。", "exp.usageIntro": "外部 App 调用本工具处理数据并接收回调结果的使用方法：调用方通过 URL Scheme 或 Intent 启动本工具，处理完成后本工具把结果（含执行状态、时间戳、处理后数据）回传给调用方指定的回调地址。", "exp.step1Title": "调用方发起调用", "exp.step1Body": "外部 App 通过 URL Scheme 启动本工具，传入要处理的文本和目标功能，并携带回调地址（callback 参数）。本工具处理完成后，会把结果拼接到回调地址后跳回。", "exp.step2Title": "回调数据格式", "exp.step2Body": "本工具处理完成后，回调地址会带上 result 参数（URL 编码的 JSON），包含 ok（是否成功）、ts（时间戳）、data（处理后的数据）、app（应用标识）。调用方解析后即可拿到处理结果。", "exp.step3Title": "Android Intent 调用示例", "exp.step3Body": "安卓 App 也可用 Intent 调起本工具（需打包为 App 后注册 intent-filter）。处理完成同样以回调地址返回结果。", "exp.cb": "数据回调", "exp.import": "导入方式", "exp.importTitle": "导入方式", "exp.importHint": "外部数据可通过以下方式传入本应用：", "exp.importUrl": "URL Scheme：crypto-pwa://?text=要处理的内容（也支持 url / title 参数，可传 JSON、图片 data URL）", "exp.importIntent": "Android Intent：其它应用「分享」到本应用（打包为 App 后注册 intent-filter）", "exp.importShare": "系统分享：在任意应用选「分享」→ 选择本应用（PWA 安装后出现在分享列表）", "exp.importClip": "剪贴板：复制文本 / JSON 后直接粘贴到对应工具的输入框",
+    "ext.title": "外部调用与分享", "exp.title": "实验性", "exp.callbackTitle": "外部回调（插件用法）", "exp.hint": "开启后允许外部 App 通过 URL Scheme / Intent 调用本工具处理数据，并接收回调结果。", "exp.input": "要回调的数据（默认取外部传入内容）", "exp.genBtn": "生成回调数据", "exp.result": "回调数据（JSON）", "exp.schemeTitle": "回调地址（URL Scheme）", "exp.intentTitle": "Android Intent 示例", "exp.copy": "复制", "exp.noteTitle": "可行性说明", "exp.note": "当前为纯网页 PWA，浏览器无法直接把数据写回其它 App。支持两种方式：①调用方通过 URL Scheme / Intent 携带回调地址，本应用把结果编码进该地址后跳回；②直接复制结果手动粘贴回原应用。若以后打包为原生壳（WebView + JS Bridge，如 Capacitor），可实现真正自动回调。", "exp.usageIntro": "外部 App 调用本工具处理数据并接收回调结果的使用方法：调用方通过 URL Scheme 或 Intent 启动本工具，处理完成后本工具把结果（含执行状态、时间戳、处理后数据）回传给调用方指定的回调地址。", "exp.step1Title": "调用方发起调用", "exp.step1Body": "外部 App 通过 URL Scheme 启动本工具，传入要处理的文本和目标功能，并携带回调地址（callback 参数）。本工具处理完成后，会把结果拼接到回调地址后跳回。", "exp.step2Title": "回调数据格式", "exp.step2Body": "本工具处理完成后，回调地址会带上 result 参数（URL 编码的 JSON），包含 ok（是否成功）、ts（时间戳）、data（处理后的数据）、app（应用标识）。调用方解析后即可拿到处理结果。", "exp.step3Title": "Android Intent 调用示例", "exp.step3Body": "安卓 App 也可用 Intent 调起本工具（需打包为 App 后注册 intent-filter）。处理完成同样以回调地址返回结果。", "exp.cb": "数据回调", "exp.import": "导入方式", "exp.importTitle": "导入方式", "exp.importHint": "外部数据可通过以下方式传入本应用：", "exp.importUrl": "URL Scheme：crypto-pwa://?text=要处理的内容（也支持 url / title 参数，可传 JSON、图片 data URL）", "exp.importIntent": "Android Intent：其它应用「分享」到本应用（打包为 App 后注册 intent-filter）", "exp.importShare": "系统分享：在任意应用选「分享」→ 选择本应用（PWA 安装后出现在分享列表）", "exp.importClip": "剪贴板：复制文本 / JSON 后直接粘贴到对应工具的输入框",
     "ext.text":
       '<h3>1. 系统分享（分享面板）</h3>' +
       '<p>在浏览器、文件管理器等里“分享”文字或网址，选择本工具（需已安装为 PWA），会自动进入「外部内容」选择器，让你挑选编码 / 加密 / 二维码等处理方式。</p>' +
@@ -224,8 +228,7 @@ window.I18N = {
       '<li><b><a href="https://github.com/JuneAndGreen/sm-crypto" target="_blank" rel="noopener">sm-crypto</a></b>（MIT 许可）— SM2 国密算法。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/sm-crypto.esm.js" target="_blank" rel="noopener">js/vendor/sm-crypto.esm.js</a>（依赖已改引本地 <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbn.esm.js" target="_blank" rel="noopener">jsbn</a>）；用于「非对称加/解密 → SM2」。</li>' +
       '<li><b><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a></b>（浏览器原生，无单独依赖）— RSA 密钥生成、加解密、签名验签。<br>引用位置：浏览器原生 <code>crypto.subtle</code>；用于「非对称加/解密 → RSA」，仅 https / localhost 可用。</li>' +
       '<li><b>本项目代码</b>（手写）— 界面、交互、历史记录、密码本、设置、主题与多语言均自行实现，未封装第三方 UI 框架。</li></ul>' +
-      '<p>所有计算均在本地完成、可离线使用，不向任何服务器上传数据。</p>' +
-      '<p><strong>加解密工具箱</strong> · 版本 ' + APP_VERSION + ' · <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">GitHub</a></p>',
+      '<p>所有计算均在本地完成、可离线使用，不向任何服务器上传数据。</p>',
 
     /* 隐私政策 */
     "privacy.title": "隐私政策",
@@ -339,10 +342,10 @@ window.I18N = {
     "home.recent": "Recent", "home.clear": "Clear",
     "home.empty": "No records yet — go try the tools above～",
     "home.tapBack": "Tap to open this feature",
-    "ui.expand": "Expand", "ui.full": "Fullscreen edit", "ui.clear": "Clear", "ui.done": "Done",
+    "ui.expand": "Expand", "ui.full": "Fullscreen edit", "ui.clear": "Clear", "ui.done": "Done", "back.pressAgain": "Press back again to exit",
 
     "hash.in": "Input text", "hash.algo": "Algorithm", "hash.key": "Key (for HMAC)",
-    "hash.btn": "Compute hash", "hash.out": "Result (hex)", "copy": "Copy result",
+    "hash.btn": "Compute hash", "hash.out": "Result (hex)", "copy": "Copy result", "copy.bigFileAsk": "Content is large (over ~5000 bytes, clipboard may not fit)\nSave it as a file instead?",
 
     "enc.in": "Input", "enc.mode": "Mode", "enc.imgLabel": "Image to Base64 (optional)",
     "enc.imgBtn": "Image → Base64", "enc.run": "Run", "enc.out": "Result",
@@ -437,14 +440,18 @@ window.I18N = {
 
     /* Save path setting */
     "storage.title": "Content save path",
-    "storage.hint": "Default path for “Save to file” (e.g. sdcard/CrytoPwa). Browsers cannot force a directory: on Android Chrome installed as an app a location picker appears; other browsers download with this name.",
+    "storage.hint": "Save directory for: encrypt/decrypt results, large encode/decode content (auto-prompted to save as file when exceeding clipboard limit), RSA/SM2 exported key files, and WebDAV backups. Default: sdcard/CrytoPwa.",
     "storage.locHint": "Results you generate locally (encrypt/decrypt, encode/decode, backups) are saved under the path above.",
+    "storage.usageTitle": "What gets saved here?",
+    "storage.usage1": "Encrypted/decrypted result content over ~5000 bytes (too large for clipboard) — auto-prompt to save as a file to this folder",
+    "storage.usage2": ".pem / .txt files exported from RSA / SM2 keys",
+    "storage.usage3": "JSON backup files from WebDAV backup and local export",
     "storage.pick": "Pick folder", "storage.reset": "Reset to default",
     "storage.pickFail": "Pick failed: ", "storage.pickUnsupported": "This browser cannot pick a folder directly — please type the path manually.",
     "save.savedDoc": "Saved to system Documents: ", "save.fail": "Save failed: ", "storage.androidHint": "Android: type the path manually below (folder picker is not available).", "storage.saved": "Default save path saved",
 
     /* Incoming content chooser (URL Scheme / Intent / system share) */
-    "inc.title": "Incoming", "inc.from": "Received", "inc.none": "(no content)",
+    "inc.title": "Incoming", "inc.from": "Received", "inc.none": "(no content)", "inc.dragOk": "Dropped content received",
     "inc.pickImg": "Pick image file", "inc.quick": "Quick encode", "inc.encrypt": "Quick encrypt",
     "inc.hash": "Hash", "inc.other": "Other",
     "inc.b64enc": "Base64 encode", "inc.b64dec": "Base64 decode", "inc.hexenc": "Hex encode", "inc.urlenc": "URL encode",
@@ -452,7 +459,7 @@ window.I18N = {
     "inc.md5": "MD5", "inc.sha256": "SHA-256", "inc.imgb64": "Image → Base64", "inc.qr": "Make QR",
 
     /* External & sharing (URL Scheme / Intent / system share) */
-    "ext.title": "External & Sharing", "exp.title": "Experimental", "exp.callbackTitle": "External callback (plugin usage)", "exp.hint": "When called externally (text / JSON / image), this app can build a callback payload to hand back to the caller.", "exp.input": "Data to return (defaults to external input)", "exp.genBtn": "Generate callback data", "exp.result": "Callback payload (JSON)", "exp.schemeTitle": "Callback URL (URL Scheme)", "exp.intentTitle": "Android Intent example", "exp.copy": "Copy", "exp.noteTitle": "Feasibility note", "exp.note": "This is a pure-web PWA: the browser cannot write data back into another app directly. Two supported ways: ① the caller passes a callback URL via Scheme/Intent, and this app encodes the result into that URL and jumps back; ② copy the result and paste it manually. A native wrapper (WebView + JS Bridge, e.g. Capacitor) enables true auto-callback.", "exp.usageIntro": "How an external app calls this tool, processes data, and receives the callback result: the caller launches this tool via URL Scheme or Intent with the data and a callback URL; after processing, this tool returns the result (status, timestamp, processed data) to the callback URL.", "exp.step1Title": "Caller initiates the call", "exp.step1Body": "An external app launches this tool via URL Scheme with the text to process, the target feature, and a callback URL (the callback parameter). After processing, this tool appends the result to the callback URL and jumps back.", "exp.step2Title": "Callback data format", "exp.step2Body": "After processing, the callback URL carries a result parameter (URL-encoded JSON) containing ok (success), ts (timestamp), data (processed data), and app (app id). The caller parses it to get the result.", "exp.step3Title": "Android Intent example", "exp.step3Body": "Android apps can also launch this tool via Intent (requires registering an intent-filter after packaging). The result is returned via the callback URL the same way.", "exp.cb": "Data callback", "exp.import": "Import methods", "exp.importTitle": "Import methods", "exp.importHint": "External data can be passed into this app via:", "exp.importUrl": "URL Scheme: crypto-pwa://?text=content (also url / title params; JSON and image data URLs work too)", "exp.importIntent": "Android Intent: share to this app from other apps (requires an intent-filter once packaged)", "exp.importShare": "System share: pick “Share” in any app → choose this app (appears after PWA install)", "exp.importClip": "Clipboard: copy text / JSON and paste it into the tool input box",
+    "ext.title": "External & Sharing", "exp.title": "Experimental", "exp.callbackTitle": "External callback (plugin usage)", "exp.hint": "When enabled, external apps can invoke this tool via URL Scheme / Intent to process data and receive callback results.", "exp.input": "Data to return (defaults to external input)", "exp.genBtn": "Generate callback data", "exp.result": "Callback payload (JSON)", "exp.schemeTitle": "Callback URL (URL Scheme)", "exp.intentTitle": "Android Intent example", "exp.copy": "Copy", "exp.noteTitle": "Feasibility note", "exp.note": "This is a pure-web PWA: the browser cannot write data back into another app directly. Two supported ways: ① the caller passes a callback URL via Scheme/Intent, and this app encodes the result into that URL and jumps back; ② copy the result and paste it manually. A native wrapper (WebView + JS Bridge, e.g. Capacitor) enables true auto-callback.", "exp.usageIntro": "How an external app calls this tool, processes data, and receives the callback result: the caller launches this tool via URL Scheme or Intent with the data and a callback URL; after processing, this tool returns the result (status, timestamp, processed data) to the callback URL.", "exp.step1Title": "Caller initiates the call", "exp.step1Body": "An external app launches this tool via URL Scheme with the text to process, the target feature, and a callback URL (the callback parameter). After processing, this tool appends the result to the callback URL and jumps back.", "exp.step2Title": "Callback data format", "exp.step2Body": "After processing, the callback URL carries a result parameter (URL-encoded JSON) containing ok (success), ts (timestamp), data (processed data), and app (app id). The caller parses it to get the result.", "exp.step3Title": "Android Intent example", "exp.step3Body": "Android apps can also launch this tool via Intent (requires registering an intent-filter after packaging). The result is returned via the callback URL the same way.", "exp.cb": "Data callback", "exp.import": "Import methods", "exp.importTitle": "Import methods", "exp.importHint": "External data can be passed into this app via:", "exp.importUrl": "URL Scheme: crypto-pwa://?text=content (also url / title params; JSON and image data URLs work too)", "exp.importIntent": "Android Intent: share to this app from other apps (requires an intent-filter once packaged)", "exp.importShare": "System share: pick “Share” in any app → choose this app (appears after PWA install)", "exp.importClip": "Clipboard: copy text / JSON and paste it into the tool input box",
     "ext.text":
       '<h3>1. System share (share sheet)</h3>' +
       '<p>Share text or a URL from a browser / file manager and pick this tool (must be installed as a PWA). It opens the “Incoming” chooser so you can pick encode / encrypt / QR, etc.</p>' +
@@ -496,8 +503,7 @@ window.I18N = {
       '<li><b><a href="https://github.com/JuneAndGreen/sm-crypto" target="_blank" rel="noopener">sm-crypto</a></b> (MIT) — SM2 national crypto. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/sm-crypto.esm.js" target="_blank" rel="noopener">js/vendor/sm-crypto.esm.js</a> (dependency rewired to local <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbn.esm.js" target="_blank" rel="noopener">jsbn</a>); used by Asymmetric → SM2.</li>' +
       '<li><b><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a></b> (native, no dependency) — RSA key gen, encrypt/decrypt, sign/verify. Location: native <code>crypto.subtle</code>; used by the Asymmetric → RSA pane, only on https / localhost.</li>' +
       '<li><b>This project’s code</b> (hand-written) — UI, interaction, history, password book, settings, theme and i18n are all custom; no third-party UI framework.</li></ul>' +
-      '<p>Everything runs locally and offline; nothing is uploaded to any server.</p>' +
-      '<p><strong>Crypto Toolbox</strong> · v' + APP_VERSION + ' · <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">GitHub</a></p>',
+      '<p>Everything runs locally and offline; nothing is uploaded to any server.</p>',
 
     "privacy.title": "Privacy Policy",
     "privacy.text":

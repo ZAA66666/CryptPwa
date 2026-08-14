@@ -285,7 +285,7 @@
   const bodyEl = document.getElementById("settings-body");
   let stack = [];
 
-  function openSettings() { stack = ["main"]; render(); overlay.classList.add("show"); overlay.removeAttribute("hidden"); }
+  function openSettings(target) { stack = target ? ["main", target] : ["main"]; render(); overlay.classList.add("show"); overlay.removeAttribute("hidden"); }
   function closeSettings() { overlay.classList.remove("show"); overlay.setAttribute("hidden", ""); stack = []; }
   function go(name) { stack.push(name); render(); }
   function back() { stack.pop(); if (stack.length === 0) { closeSettings(); return; } render(); }
@@ -312,40 +312,38 @@
         html += `<li class="settings-item" data-go="${it}"><span>${escapeHtml(label)}</span><span class="si-arrow">›</span></li>`;
       });
       html += "</ul>";
-      /* 数据加密开关（数据隐私组末尾） */
-      if (g.items.indexOf("sync") >= 0) {
-        html += `<div class="settings-row" id="enc-row"><span class="sr-label">${t("set.dataEnc")}</span><label class="switch"><input type="checkbox" id="enc-toggle" ${dataEncEnabled() ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label></div>`;
-      }
       html += "</div>";
     });
     bodyEl.innerHTML = html;
     bodyEl.querySelectorAll(".settings-item").forEach((li) => (li.onclick = () => go(li.dataset.go)));
-    /* 数据加密开关：默认开启；切换时在 密文(主密码) / 明文 之间迁移 */
+  }
+
+  /* 数据加密开关：绑定到「密码本」页（已从主菜单移入）；切换时在 密文(主密码) / 明文 之间迁移 */
+  function bindEncToggle() {
     const encToggle = document.getElementById("enc-toggle");
-    if (encToggle) {
-      encToggle.onchange = () => {
-        const on = encToggle.checked;
-        if (on) {
-          const master = window.prompt(t("common.setMaster") + "：" + t("common.masterPlaceholder"));
-          if (!master) { encToggle.checked = false; return; }
-          const plain = localStorage.getItem(PLAIN_KEY);
-          const arr = plain ? JSON.parse(plain) : [];
-          localStorage.removeItem(PLAIN_KEY);
-          setDataEnc(true);
-          setupVault(master);
-          writePasswords(arr);
-          alert(t("enc.on"));
-        } else {
-          if (isLocked()) { alert(t("exp.locked")); encToggle.checked = true; return; }
-          const arr = vaultExists() ? readPasswords() : [];
-          setDataEnc(false);
-          localStorage.setItem(PLAIN_KEY, JSON.stringify(arr));
-          sessionMaster = null;
-          alert(t("enc.off"));
-        }
-        render();
-      };
-    }
+    if (!encToggle) return;
+    encToggle.onchange = () => {
+      const on = encToggle.checked;
+      if (on) {
+        const master = window.prompt(t("common.setMaster") + "：" + t("common.masterPlaceholder"));
+        if (!master) { encToggle.checked = false; return; }
+        const plain = localStorage.getItem(PLAIN_KEY);
+        const arr = plain ? JSON.parse(plain) : [];
+        localStorage.removeItem(PLAIN_KEY);
+        setDataEnc(true);
+        setupVault(master);
+        writePasswords(arr);
+        alert(t("enc.on"));
+      } else {
+        if (isLocked()) { alert(t("exp.locked")); encToggle.checked = true; return; }
+        const arr = vaultExists() ? readPasswords() : [];
+        setDataEnc(false);
+        localStorage.setItem(PLAIN_KEY, JSON.stringify(arr));
+        sessionMaster = null;
+        alert(t("enc.off"));
+      }
+      render();
+    };
   }
 
   function renderSubview(name) {
@@ -354,12 +352,15 @@
       titleEl.textContent = t(name + ".title");
       html = `<div class="legal-text">${t(name + ".text")}</div>`;
       if (name === "about") {
-        html +=
-          `<div class="btn-row" style="margin-top:18px">` +
+        /* 版本 + GitHub + 检测更新 置顶（“他能做什么”上方） */
+        html =
+          `<div class="about-hero">` +
+          `<div class="about-logo">🔐</div>` +
+          `<div class="about-ver">${t("appTitle")} · <a href="${GITHUB_REPO}" target="_blank" rel="noopener">V${APP_VERSION} · GitHub</a></div>` +
           `<button class="btn primary" id="about-check-update">🔄 ${t("about.update")}</button>` +
-          `<a class="btn ghost" href="${GITHUB_REPO}/releases" target="_blank" rel="noopener">★ ${t("about.open")}</a>` +
+          `<p class="hint" id="about-update-hint" style="margin-top:8px"></p>` +
           `</div>` +
-          `<p class="hint" id="about-update-hint" style="margin-top:10px"></p>`;
+          `<div class="legal-text">${t(name + ".text")}</div>`;
       }
     } else if (name === "common") {
       renderCommon();
@@ -370,10 +371,8 @@
     } else if (name === "storage") {
       titleEl.textContent = t("storage.title");
       const path = getSetting("savepath", "sdcard/CrytoPwa");
-      const isCap = !!(window.Capacitor && window.Capacitor.Plugins);
       html =
         `<div class="cp-note">${t("storage.hint")}</div>` +
-        `<div class="cp-note">${t("storage.locHint")}</div>` +
         `<div class="cp-form">` +
         `<input id="sp-path" value="${escapeHtml(path)}" placeholder="sdcard/CrytoPwa" />` +
         `<div class="btn-row">` +
@@ -382,7 +381,8 @@
         `</div>` +
         `</div>` +
         `<div class="btn-row"><button class="btn primary" id="sp-save">${t("common.save")}</button></div>` +
-        `<p class="hint" id="sp-pick-hint"></p>`;
+        `<p class="hint" id="sp-pick-hint"></p>` +
+        `<div class="legal-text" style="margin-top:14px"><h3>${t("storage.usageTitle")}</h3><ul><li>${t("storage.usage1")}</li><li>${t("storage.usage2")}</li><li>${t("storage.usage3")}</li></ul></div>`;
     } else if (name === "theme") {
       titleEl.textContent = t("theme.title");
       const cur = getSetting("theme", "system");
@@ -413,11 +413,31 @@
         `</div>` +
         `<div class="legal-text" style="margin-top:14px">${t("ext.text")}</div>`;
     } else if (name === "exp") {
-      /* 实验性：外部 App 调用本工具并接收回调数据的使用示例 */
-      titleEl.textContent = t("exp.cb");
+      /* 实验性：数据回调开关 + 调试功能开关（开启后可查看日志等） */
+      titleEl.textContent = t("exp.title");
+      const cbOn = getSetting("exp_callback", "1") === "1";
+      const dbgOn = getSetting("exp_debug", "0") === "1";
       html =
-        `<div class="legal-text">` +
-        `<p>${t("exp.usageIntro")}</p>` +
+        `<div class="cp-note">${t("exp.hint")}</div>` +
+        `<div class="settings-row exp-cb-row" id="exp-cb-row">` +
+        `<span class="sr-label">${t("exp.cb")}</span>` +
+        `<label class="switch"><input type="checkbox" id="exp-cb-toggle" ${cbOn ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label>` +
+        `</div>` +
+        `<p class="hint" style="margin:2px 4px 10px">${t("exp.longPressHint")}</p>` +
+        `<div class="settings-row" id="exp-dbg-row">` +
+        `<span class="sr-label">${t("exp.debug")}</span>` +
+        `<label class="switch"><input type="checkbox" id="exp-dbg-toggle" ${dbgOn ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label>` +
+        `</div>` +
+        `<p class="hint" style="margin:2px 4px 10px">${t("exp.debugHint")}</p>` +
+        `<div class="exp-debug-panel" id="exp-debug-panel" ${dbgOn ? "" : "hidden"}>` +
+        `<div class="btn-row">` +
+        `<button class="btn ghost" id="exp-log-view">📋 ${t("exp.logView")}</button>` +
+        `<button class="btn ghost" id="exp-log-clear">🗑 ${t("exp.logClear")}</button>` +
+        `</div>` +
+        `<textarea id="exp-log-box" readonly rows="8" placeholder="${t("exp.logEmpty")}"></textarea>` +
+        `</div>` +
+        `<div class="legal-text" id="exp-detail">` +
+        `<h3>${t("exp.usageIntro")}</h3>` +
         `<h3>1. ${t("exp.step1Title")}</h3>` +
         `<p>${t("exp.step1Body")}</p>` +
         `<p><code>crypto-pwa://?text=要处理的内容&amp;tab=hash&amp;run=1&amp;callback=myapp://result</code></p>` +
@@ -503,11 +523,13 @@
             /* 失败则降级到 input[file][webkitdirectory] */
           }
         }
-        /* 安卓 WebView / 不支持 FS Access：用隐藏 input 选目录 */
+        /* 安卓 WebView / 不支持 FS Access：用隐藏 input 选目录（需挂到 DOM 才能调起系统选择器） */
         const inp = document.createElement("input");
         inp.type = "file";
         inp.setAttribute("webkitdirectory", "");
-        inp.setAttribute("directory", "");
+        inp.style.position = "fixed";
+        inp.style.left = "-9999px";
+        document.body.appendChild(inp);
         inp.onchange = () => {
           const f = inp.files && inp.files[0];
           if (f) {
@@ -519,8 +541,11 @@
             setSetting("savepath", dir);
             if (pickHint) pickHint.textContent = "✅ " + seg;
           }
+          setTimeout(() => { try { document.body.removeChild(inp); } catch (e) {} }, 0);
         };
         inp.click();
+        /* 超时兜底：用户取消选择后移除临时 input */
+        setTimeout(() => { try { if (inp.parentNode) document.body.removeChild(inp); } catch (e) {} }, 60000);
       };
       const resetBtn = document.getElementById("sp-reset");
       if (resetBtn) resetBtn.onclick = () => {
@@ -555,7 +580,54 @@
         if (window.copyText) window.copyText(v, e.target);
       };
     } else if (name === "exp") {
-      /* 实验性：纯展示页（使用示例），无交互按钮 */
+      /* 数据回调开关 + 长按「数据回调」行查看完整使用示例 */
+      const cbToggle = bodyEl.querySelector("#exp-cb-toggle");
+      if (cbToggle) cbToggle.onchange = () => {
+        setSetting("exp_callback", cbToggle.checked ? "1" : "0");
+        if (window.toast) window.toast(t("common.savedOk"));
+      };
+      const cbRow = bodyEl.querySelector("#exp-cb-row");
+      if (cbRow) {
+        let timer = null;
+        const viewDetail = () => {
+          /* 长按后弹出全屏编辑窗口展示使用示例 */
+          const detail = bodyEl.querySelector("#exp-detail");
+          if (detail && window.openEditor) {
+            const tmp = { value: detail.innerText.trim(), readOnly: true };
+            window.openEditor(tmp, false);
+          }
+        };
+        cbRow.addEventListener("touchstart", (e) => {
+          timer = setTimeout(viewDetail, 550);
+        }, { passive: true });
+        cbRow.addEventListener("touchend", () => clearTimeout(timer));
+        cbRow.addEventListener("touchmove", () => clearTimeout(timer), { passive: true });
+        cbRow.addEventListener("contextmenu", (e) => { e.preventDefault(); clearTimeout(timer); viewDetail(); });
+      }
+      /* 调试功能开关：开启后显示日志查看面板 */
+      const dbgToggle = bodyEl.querySelector("#exp-dbg-toggle");
+      const dbgPanel = bodyEl.querySelector("#exp-debug-panel");
+      const logBox = bodyEl.querySelector("#exp-log-box");
+      const renderLog = () => {
+        if (!logBox) return;
+        const lines = (window.__getLog ? window.__getLog() : []);
+        logBox.value = lines.slice(-200).map((l) => `[${l.ts.slice(5, 19).replace("T", " ")}] ${l.tag}: ${l.msg}`).join("\n") || "";
+      };
+      if (dbgToggle) dbgToggle.onchange = () => {
+        const on = dbgToggle.checked;
+        setSetting("exp_debug", on ? "1" : "0");
+        if (dbgPanel) dbgPanel.hidden = !on;
+        if (on && window.__log) window.__log("debug", "调试功能开启");
+        if (on) renderLog();
+        if (window.toast) window.toast(t("common.savedOk"));
+      };
+      if (bodyEl.querySelector("#exp-log-view")) bodyEl.querySelector("#exp-log-view").onclick = () => { renderLog(); if (logBox) logBox.focus(); };
+      if (bodyEl.querySelector("#exp-log-clear")) bodyEl.querySelector("#exp-log-clear").onclick = () => {
+        if (window.__clearLog) window.__clearLog();
+        if (window.__log) window.__log("debug", "日志已清空");
+        renderLog();
+        if (window.toast) window.toast(t("exp.logCleared"));
+      };
     } else if (name === "lang") {
       bodyEl.querySelectorAll("#lang-seg button").forEach((b) =>
         (b.onclick = () => { setSetting("lang", b.dataset.v); applyLanguage(); render(); })
@@ -641,9 +713,14 @@
     titleEl.textContent = t("common.title");
     let html = "";
 
+    /* 数据加密开关（已从主菜单移入密码本页顶部） */
+    html =
+      `<div class="settings-row" id="enc-row" style="margin-bottom:6px"><span class="sr-label">${t("set.dataEnc")}</span>` +
+      `<label class="switch"><input type="checkbox" id="enc-toggle" ${dataEncEnabled() ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label></div>`;
+
     if (!vaultExists() && dataEncEnabled()) {
       /* 首次使用：设置主密码，之后才创建空库（仅加密模式） */
-      html =
+      html +=
         `<div class="cp-note">${t("common.masterHint")}</div>` +
         `<div class="cp-form">` +
         `<input id="mp1" type="password" placeholder="${t("common.masterPlaceholder")}" />` +
@@ -652,24 +729,30 @@
         `</div>`;
     } else if (isLocked()) {
       /* 已加密但未解锁 */
-      html =
+      html +=
         `<div class="cp-note">${t("common.lockedTip")}</div>` +
         `<div class="cp-form">` +
         `<input id="mpu" type="password" placeholder="${t("common.masterPlaceholder")}" />` +
         `<div class="btn-row"><button class="btn primary" id="mp-unlock">${t("common.unlockNow")}</button></div>` +
         `</div>`;
     } else {
-      /* 已解锁：列表 + 新增 + 导入导出 + 锁/改密（按当前密码库展示） */
+      /* 已解锁：直接展示当前密码库条目（默认第一个库）；连按标题 10 次触发库管理 */
       const all = readPasswords();
       const arr = all.filter((p) => inSlot(p));
-      html =
-        `<div class="seg-inline vault-slot-seg" id="vault-slot-seg">` +
-          `<button data-v="0" class="${vaultSlot === 0 ? "active" : ""}">${t("vault.slot1")}</button>` +
-          `<button data-v="1" class="${vaultSlot === 1 ? "active" : ""}">${t("vault.slot2")}</button>` +
-          `<button data-v="2" class="${vaultSlot === 2 ? "active" : ""}">${t("vault.slot3")}</button>` +
+      const slotName = t("vault.slot" + (vaultSlot + 1)) || ("库 " + (vaultSlot + 1));
+      html +=
+        `<div class="vault-cur">📚 <b>${escapeHtml(slotName)}</b><span class="vc-count">${arr.length} 条</span></div>` +
+        `<p class="hint" style="margin:0 4px 8px">${t("vault.hint")}</p>` +
+        `<div id="vault-mgr" class="vault-mgr" hidden>` +
+        `<div class="vault-mgr-title">${t("vault.manage")}</div>` +
+        `<div class="vault-mgr-list">` +
+          `<button data-v="0" class="chip${vaultSlot === 0 ? " active" : ""}">${t("vault.slot1")}</button>` +
+          `<button data-v="1" class="chip${vaultSlot === 1 ? " active" : ""}">${t("vault.slot2")}</button>` +
+          `<button data-v="2" class="chip${vaultSlot === 2 ? " active" : ""}">${t("vault.slot3")}</button>` +
         `</div>` +
-        `<div class="cp-note">${t("common.vaultReady")}</div>` +
-        `<button class="btn ghost" id="cp-new" style="margin:4px 0 10px">＋ ${t("common.new")}</button>` +
+        `<button class="btn ghost" id="vault-add">＋ ${t("vault.addSlot")}</button>` +
+        `</div>` +
+        `<button class="btn ghost" id="cp-new" style="margin:2px 0 10px">＋ ${t("common.new")}</button>` +
         `<div class="cp-form" id="cp-form" style="display:none">` +
         `<input id="cp-name" placeholder="${t("common.label")}" />` +
         `<select id="cp-cat">` +
@@ -699,6 +782,7 @@
     }
     bodyEl.innerHTML = html;
     appendAskToggle();
+    bindEncToggle();
 
     if (!vaultExists() && dataEncEnabled()) {
       bodyEl.querySelector("#mp-set").onclick = () => {
@@ -774,11 +858,28 @@
         if (!name || !val) { alert(t("common.label") + " / " + t("common.value")); return; }
         const a = readPasswords(); a.push({ label: name, value: val, method: m, cat: cat, slot: vaultSlot }); writePasswords(a); render();
       };
-      /* 密码库切换：点击库号 → 记忆并重绘（展示对应库的密码） */
-      const slotSeg = bodyEl.querySelector("#vault-slot-seg");
-      if (slotSeg) slotSeg.querySelectorAll("button").forEach((b) =>
-        (b.onclick = () => { setVaultSlot(parseInt(b.dataset.v, 10) || 0); render(); })
-      );
+      /* 库管理（连按标题 10 次后显示）：切换库 + 新增库 */
+      const mgr = bodyEl.querySelector("#vault-mgr");
+      if (mgr) {
+        mgr.querySelectorAll(".chip").forEach((b) =>
+          (b.onclick = () => { setVaultSlot(parseInt(b.dataset.v, 10) || 0); render(); })
+        );
+        mgr.querySelector("#vault-add").onclick = () => {
+          if (window.toast) window.toast(t("vault.max3"));
+        };
+      }
+      /* 连按标题 10 次 → 展开/收起库管理 */
+      let tapCount = 0, tapTimer = null;
+      titleEl.onclick = () => {
+        tapCount++;
+        clearTimeout(tapTimer);
+        tapTimer = setTimeout(() => { tapCount = 0; }, 600);
+        if (tapCount >= 10) {
+          tapCount = 0;
+          const m = bodyEl.querySelector("#vault-mgr");
+          if (m) { m.hidden = !m.hidden; if (window.toast) window.toast(m.hidden ? t("vault.mgrOff") : t("vault.mgrOn")); }
+        }
+      };
       /* 导出（CryptoData.json：弹窗选 加密保存 / 明文保存） */
       bodyEl.querySelector("#cp-export").onclick = () => {
         if (isLocked()) { alert(t("exp.locked")); return; }
@@ -844,8 +945,12 @@
         localStorage.setItem(VAULT_KEY, encryptVault(arr, nw));
         alert(t("common.changeMaster") + " ✅"); render();
       };
-      /* 锁定（清空内存中的主密码） */
-      bodyEl.querySelector("#mp-lock").onclick = () => { lock(); render(); };
+      /* 锁定（清空内存中的主密码）：加反馈提示 */
+      bodyEl.querySelector("#mp-lock").onclick = () => {
+        lock();
+        render();
+        if (window.toast) window.toast(t("common.locked") + " 🔒");
+      };
     }
   }
 

@@ -54,6 +54,17 @@ jobs:
           echo "BT=$BT" >> "$GITHUB_OUTPUT"
           echo "构建类型: $BT"
 
+      - name: Restore signing keystore (from Actions secret)
+        env:
+          P12_B64: ${{ secrets.CRYPTPWA_P12 }}
+        run: |
+          if [ -n "$P12_B64" ]; then
+            echo "$P12_B64" | base64 -d > android/app/cryptpwa-release.p12
+            echo "keystore restored from secret"
+          else
+            echo "::warning::CRYPTPWA_P12 secret not set — signing will fail"
+          fi
+
       - name: Build APK
         run: |
           cd android

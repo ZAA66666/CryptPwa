@@ -2,3 +2,4 @@
 node_modules/
 webapp/
 *.log
+cryptpwa-release.p12

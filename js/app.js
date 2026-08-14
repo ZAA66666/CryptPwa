@@ -9,9 +9,44 @@
 
 /* ---------- 0. 通用小工具 ---------- */
 
+/* ---------- 全局日志：无论开关都记录（localStorage 环形缓冲 500 条），便于问题排查 ---------- */
+(function () {
+  const LKEY = "crypto_log_v1";
+  window.__log = function (tag, msg) {
+    try {
+      let arr = [];
+      try { arr = JSON.parse(localStorage.getItem(LKEY) || "[]"); } catch (e) { arr = []; }
+      arr.push({ ts: new Date().toISOString(), tag: String(tag), msg: String(msg).slice(0, 500) });
+      if (arr.length > 500) arr = arr.slice(-500);
+      localStorage.setItem(LKEY, JSON.stringify(arr));
+    } catch (e) {}
+  };
+  window.__getLog = function () { try { return JSON.parse(localStorage.getItem(LKEY) || "[]"); } catch (e) { return []; } };
+  window.__clearLog = function () { try { localStorage.removeItem(LKEY); } catch (e) {} };
+  window.addEventListener("error", function (e) {
+    try { window.__log("error", (e.message || "") + " @" + (e.filename || "") + ":" + (e.lineno || "")); } catch (x) {}
+  });
+  window.addEventListener("unhandledrejection", function (e) {
+    try { window.__log("error", "unhandledrejection: " + String(e.reason && e.reason.message || e.reason)); } catch (x) {}
+  });
+  let ver = "";
+  try { ver = window.APP_VERSION || (typeof APP_VERSION !== "undefined" ? APP_VERSION : ""); } catch (e) {}
+  window.__log("app", "启动 v" + ver + " UA=" + (navigator.userAgent || "").slice(0, 100));
+})();
+
 // 复制文本到剪贴板（兼容非安全上下文的降级方案）
+/* 复制上限：超过该字节数视为大内容（剪贴板受限），提示改为保存文件 */
+const COPY_FILE_LIMIT = 5000;
 function copyText(text, btn) {
   if (!text) return;
+  /* 大内容：自动判别是否超过剪贴板限制 → 提示另存为文件（保存到设置的保存路径） */
+  if (utf8ByteLength(text) > COPY_FILE_LIMIT) {
+    const ok = window.confirm(_t("copy.bigFileAsk", "内容较大（超过约 5000 字节，剪贴板可能放不下）\n是否保存为文件？"));
+    if (!ok) return;
+    const name = "result_" + new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19).replace("T", "_") + ".txt";
+    saveTextFile(name, text);
+    return;
+  }
   const done = () => { const o = btn.textContent; btn.textContent = "✅ 已复制"; setTimeout(() => (btn.textContent = o), 1200); };
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
@@ -73,11 +108,8 @@ function showPanel(name) {
   const panel = document.getElementById("panel-" + name);
   if (!panel) return;
   document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
-  document.querySelectorAll(".bottom-item").forEach((b) => b.classList.remove("active"));
   panel.classList.add("active");
-  const nav = document.querySelector(`.bottom-item[data-tab="${name}"]`);
-  if (nav) nav.classList.add("active");
-  // 主页才显示顶部大标题；进入具体功能时隐藏，把空间让给功能面板
+  // 主页才显示顶部 Toolbar（含三点菜单）；进入功能页时隐藏，用面板内返回键
   document.body.classList.toggle("on-home", name === "home");
   // 进入「加/解密」面板：恢复上次类别，并按算法确保密钥存在
   if (name === "sym") setSymCat(symCat);
@@ -91,13 +123,32 @@ document.querySelectorAll("#sym-cat button").forEach((b) => {
 document.querySelectorAll("#asym-algo button").forEach((b) => {
   b.addEventListener("click", () => setAsymAlgo(b.dataset.v));
 });
-// 底部导航栏：点击切面板（或打开设置）
-document.querySelectorAll(".bottom-item").forEach((tab) => {
-  tab.addEventListener("click", () => {
-    if (tab.dataset.action === "settings") { if (window.openSettings) window.openSettings(); return; }
-    if (tab.dataset.tab) showPanel(tab.dataset.tab);
+
+/* ---------- Toolbar 三点菜单（设置入口） ---------- */
+(function () {
+  const moreBtn = document.getElementById("tb-more");
+  const menu = document.getElementById("tb-menu");
+  if (!moreBtn || !menu) return;
+  const close = () => menu.setAttribute("hidden", "");
+  moreBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (menu.hasAttribute("hidden")) menu.removeAttribute("hidden");
+    else close();
   });
-});
+  document.getElementById("tb-menu-settings").addEventListener("click", () => {
+    close();
+    if (window.openSettings) window.openSettings();
+    else location.href = "#settings";
+  });
+  document.getElementById("tb-menu-about").addEventListener("click", () => {
+    close();
+    if (window.openSettings) window.openSettings("about");
+  });
+  document.addEventListener("click", (e) => {
+    if (!menu.hasAttribute("hidden") && !menu.contains(e.target) && e.target !== moreBtn) close();
+  });
+  document.addEventListener("scroll", close, { passive: true });
+})();
 // 主页工具卡片：点击跳到对应面板（含底部栏没有的「教程」）
 document.querySelectorAll(".tool-card").forEach((card) => {
   card.addEventListener("click", () => showPanel(card.dataset.go));
@@ -1426,8 +1477,7 @@ function applyLaunchParams() {
   }
 
   // 无共享内容：兼容旧的精确深链（如其它模块/文档里写死的 URL Scheme）
-  const tab = p.get("tab");
-  if (tab && ["hash", "enc", "sym", "asym", "qr", "guide", "json", "sm2", "cron", "rand"].includes(tab)) {
+  const tab = p.get("tab");  if (tab && ["hash", "enc", "sym", "asym", "qr", "guide", "json", "sm2", "cron", "rand"].includes(tab)) {
     const setVal = (el, v) => { if (v !== null && el) el.value = v; };
     const setSel = (el, v) => { if (v !== null && el && [...el.options].some((o) => o.value === v)) el.value = v; };
     if (tab === "hash") { setVal(hashInput, p.get("text")); setSel(hashAlgo, p.get("algo")); }
@@ -1453,6 +1503,30 @@ function applyLaunchParams() {
     }
   }
 }
+
+/* 小窗/分屏拖放接收：安卓原生把拖入的文字/图片 URI 推到这里 */
+window.__dragDrop = function (text) {
+  try {
+    if (window.__log) window.__log("drag", String(text).slice(0, 200));
+  } catch (e) {}
+  const s = String(text || "").trim();
+  if (!s) return;
+  if (s.startsWith("data:image")) {
+    window.__incomingImage = s;
+    window.__incomingText = "";
+  } else if (s.startsWith("content://") || /\.(png|jpe?g|gif|webp)$/i.test(s)) {
+    /* 图片 URI：尝试按图片接收（无法跨进程读取时仅展示路径） */
+    window.__incomingImage = "";
+    window.__incomingText = s;
+  } else {
+    window.__incomingImage = "";
+    window.__incomingText = s;
+  }
+  try { if (window.toast) toast(typeof t === "function" ? t("inc.dragOk") : "已接收拖入的内容"); } catch (e) {}
+  wireIncomingChips();
+  showPanel("incoming");
+  renderIncoming();
+};
 
 /* ---------- 7.5 编辑框增强：清空按钮 + 全屏编辑 ---------- */
 // 给所有 textarea 包一层 .expand-wrap：
@@ -2101,7 +2175,13 @@ if ("serviceWorker" in navigator) {
       showPanel("home");
       return;
     }
-    /* 4. 主页 → 退出 App */
-    window.Capacitor.Plugins.App.exitApp();
+    /* 4. 主页 → 双击返回才退出（2 秒内再按一次） */
+    const now = Date.now();
+    if (window.__lastBackExit && now - window.__lastBackExit < 2000) {
+      window.Capacitor.Plugins.App.exitApp();
+      return;
+    }
+    window.__lastBackExit = now;
+    if (window.toast) toast(typeof t === "function" ? t("back.pressAgain") : "再按一次返回退出");
   });
 })();
