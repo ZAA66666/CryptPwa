@@ -7,11 +7,11 @@
 /* 本项目 GitHub 仓库（CryptPwa，作者 ZAA66666）。 */
 const GITHUB_REPO = "https://github.com/ZAA66666/CryptPwa";
 /* 当前版本号（用于“检测更新”对比 GitHub Releases） */
-const APP_VERSION = "v260815_0340";
+const APP_VERSION = "v260815_0111";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
-    appTitle: "哈机码",
+    appTitle: "加解密工具箱",
     appSub: "哈希 · 编/解码 · 加/解密 · 非对称加/解密 · 二维码/条形码 · JSON · Crontab · 随机文本",
     "tab.home": "主页", "tab.hash": "哈希", "tab.enc": "编/解码", "tab.sym": "加/解密",
     "tab.asym": "非对称加/解密", "tab.qr": "二维码", "tab.guide": "教程",
@@ -37,7 +37,7 @@ window.I18N = {
     "enc.b64": "Base64", "enc.hex": "Hex", "enc.url": "URL", "enc.encode": "编码", "enc.decode": "解码",
     "enc.b32": "Base32", "enc.b58": "Base58", "enc.unicode": "Unicode", "enc.jwt": "JWT", "enc.oct": "Octal", "enc.ascii": "ASCII", "enc.htmlent": "HTML 实体", "enc.utf16": "UTF-16", "enc.roman": "罗马数字", "sym.hintKey": "密钥需 {need}；当前已填 {cur}", "sym.hintIv": "IV 需正好 {block} 字节（当前 {cur} 字节）", "sym.errKeyLen": "❌ 密钥长度不对：AES 需要 {need} 字节（{bits} 位），当前 {cur} 字节", "sym.errKeyExact": "❌ 密钥长度不对：需要 {need} 字节，当前 {cur} 字节", "sym.errBlowfish": "❌ Blowfish 密钥需 {min}~{max} 字节，当前 {cur} 字节", "sym.errIvLen": "❌ IV 需正好 {block} 字节，当前 {cur} 字节", "rsa.trunc": "（已省略中间 {n} 个字符）", "kv.string": "字符串", "kv.number": "数字", "kv.boolean": "布尔", "kv.null": "空",
     "enc.help": "编码：把文本转成另一种表示；解码：还原。",
-    "enc.okEnc": "✅ 编码完成", "enc.okDec": "✅ 解码完成", "enc.fail": "❌ 处理失败：", "enc.empty": "请输入要编码/解码的内容",
+    "enc.okEnc": "✅ 编码完成", "enc.okDec": "✅ 解码完成", "enc.fail": "❌ 处理失败：", "enc.empty": "请输入要编码/解码的内容", "enc.chooseFile": "选择文件", "enc.noImg": "❌ 请先选择一张图片", "enc.readFail": "❌ 读取图片失败",
     "ph.hashIn": "要计算哈希的文本，如 hello", "ph.encIn": "要编码或解码的内容（支持中文）",
     "ph.symIn": "加密时填明文；解密时填 Base64 密文", "ph.rsaIn": "加密填明文；解密填 Base64 密文；签名填待签名文本",
     "ph.hashKey": "HMAC 密钥", "ph.symKey": "如：1234567890123456", "ph.symIv": "CBC/CTR/CFB/OFB 模式必填",
@@ -85,6 +85,13 @@ window.I18N = {
 
     /* 对称 */
     "sym.algo": "算法", "sym.key": "密钥", "symFill": "密码本",
+    "sym.descAes": "AES（密钥 16/24/32 字节）", "sym.descDes": "DES（密钥 8 字节）",
+    "sym.desc3des": "3DES（密钥 24 字节）", "sym.descBlowfish": "Blowfish（密钥 1~56 字节）",
+    "sym.descRc4": "RC4（流密码）", "sym.descRabbit": "Rabbit（流密码）",
+    "sym.streamHint": "流密码，密钥长度任意。", "sym.byte": "字节", "sym.bit": "位",
+    "sym.decFail": "❌ 解密失败：密钥/模式/IV 不正确，或密文非法。",
+    "sym.decFailKey": "❌ 解密失败：密钥不正确或密文非法。",
+    "sym.decFailIv": "❌ 解密失败：密钥或 IV 不正确（或密文非法）。",
     "sym.catSym": "对称加密", "sym.catAsym": "非对称加密",
     "sym.randKey": "随机密钥", "sym.randIv": "随机IV",
     "sym.mode": "分组模式", "sym.iv": "初始向量 IV", "sym.in": "输入",
@@ -437,7 +444,8 @@ window.I18N = {
     "vp.generic": "通用",
     "vp.rsaPriv": "RSA 私钥",
     "common.askSave": "加密后询问保存到密码本",
-    "common.savedOk": "已保存到密码本。"
+    "common.savedOk": "已保存到密码本。",
+    "vault.manage": "密码库管理", "vault.addSlot": "新增密码库", "vault.max3": "最多 3 个密码库", "vault.mgrOff": "已收起库管理", "vault.mgrOn": "已展开库管理", "common.locked": "已锁定"
   },
 
   en: {
@@ -482,7 +490,7 @@ window.I18N = {
     "enc.b64": "Base64", "enc.hex": "Hex", "enc.url": "URL", "enc.encode": "Encode", "enc.decode": "Decode",
     "enc.b32": "Base32", "enc.b58": "Base58", "enc.unicode": "Unicode", "enc.jwt": "JWT", "enc.oct": "Octal", "enc.ascii": "ASCII", "enc.htmlent": "HTML entities", "enc.utf16": "UTF-16", "enc.roman": "Roman numerals", "sym.hintKey": "Key needs {need}; currently {cur}", "sym.hintIv": "IV must be exactly {block} bytes (currently {cur})", "sym.errKeyLen": "❌ Wrong key length: AES needs {need} bytes ({bits} bits), got {cur} bytes", "sym.errKeyExact": "❌ Wrong key length: needs {need} bytes, got {cur} bytes", "sym.errBlowfish": "❌ Blowfish key needs {min}-{max} bytes, got {cur} bytes", "sym.errIvLen": "❌ IV must be exactly {block} bytes, got {cur} bytes", "rsa.trunc": "(omitted {n} chars)", "kv.string": "string", "kv.number": "number", "kv.boolean": "boolean", "kv.null": "null",
     "enc.help": "Encode: transform text into another representation; decode reverses it.",
-    "enc.okEnc": "✅ Encode done", "enc.okDec": "✅ Decode done", "enc.fail": "❌ Failed: ", "enc.empty": "Enter text to encode/decode",
+    "enc.okEnc": "✅ Encode done", "enc.okDec": "✅ Decode done", "enc.fail": "❌ Failed: ", "enc.empty": "Enter text to encode/decode", "enc.chooseFile": "Choose File", "enc.noImg": "❌ Please select an image first", "enc.readFail": "❌ Failed to read image",
     "ph.hashIn": "Text to hash, e.g. hello", "ph.encIn": "Content to encode/decode (Chinese supported)",
     "ph.symIn": "Plaintext to encrypt; Base64 ciphertext to decrypt", "ph.rsaIn": "Plaintext to encrypt; Base64 ciphertext to decrypt; message to sign",
     "ph.hashKey": "HMAC key", "ph.symKey": "e.g. 1234567890123456", "ph.symIv": "Required for CBC/CTR/CFB/OFB",
@@ -510,6 +518,13 @@ window.I18N = {
     "json.emptyKey": "Empty key skipped", "json.imported": "Imported N rows", "json.copied": "Copied",
 
     "sym.algo": "Algorithm", "sym.key": "Key", "symFill": "Saved passwords",
+    "sym.descAes": "AES (key 16/24/32 bytes)", "sym.descDes": "DES (key 8 bytes)",
+    "sym.desc3des": "3DES (key 24 bytes)", "sym.descBlowfish": "Blowfish (key 1~56 bytes)",
+    "sym.descRc4": "RC4 (stream cipher)", "sym.descRabbit": "Rabbit (stream cipher)",
+    "sym.streamHint": "Stream cipher: any key length.", "sym.byte": "bytes", "sym.bit": "bits",
+    "sym.decFail": "❌ Decryption failed: wrong key/mode/IV or invalid ciphertext.",
+    "sym.decFailKey": "❌ Decryption failed: wrong key or invalid ciphertext.",
+    "sym.decFailIv": "❌ Decryption failed: wrong key or IV (or invalid ciphertext).",
     "sym.catSym": "Symmetric", "sym.catAsym": "Asymmetric",
     "sym.randKey": "Random key", "sym.randIv": "Random IV",
     "sym.mode": "Mode", "sym.iv": "IV", "sym.in": "Input",
@@ -839,7 +854,8 @@ window.I18N = {
     "vp.generic": "General",
     "vp.rsaPriv": "RSA Private Key",
     "common.askSave": "Ask to save after encrypting",
-    "common.savedOk": "Saved to password book."
+    "common.savedOk": "Saved to password book.",
+    "vault.manage": "Vault manager", "vault.addSlot": "Add vault", "vault.max3": "Max 3 vaults", "vault.mgrOff": "Vault manager hidden", "vault.mgrOn": "Vault manager shown", "common.locked": "Locked"
   }
 };
 

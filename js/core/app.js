@@ -147,6 +147,7 @@ function showPanel(name) {
   panel.classList.add("active");
   // 主页才显示顶部 Toolbar（含三点菜单）；进入功能页时隐藏，用面板内返回键
   document.body.classList.toggle("on-home", name === "home");
+  if (name === "home") renderHistory(); // 返回主页时刷新「最近使用」
   // 状态栏：主页绿底 / 功能页浅底 / 设置页浅底——统一用深色字（DARK）保证时钟电池等图标始终可见
   setStatusBar(name === "home" ? "home" : "tool");
   // 进入「加/解密」面板：恢复上次类别，并按算法确保密钥存在
@@ -205,10 +206,12 @@ function saveHistory(arr) {
   try { localStorage.setItem(HKEY, JSON.stringify(arr.slice(0, 50))); } catch (e) {}
 }
 function addHistory(item) {
-  const arr = loadHistory();
-  arr.unshift({ t: Date.now(), ...item });
-  saveHistory(arr);
-  renderHistory();
+  try {
+    const arr = loadHistory();
+    arr.unshift({ t: Date.now(), ...item });
+    saveHistory(arr);
+    renderHistory();
+  } catch (e) { /* 记录失败不应影响主功能流程 */ }
 }
 function fmtHistoryTime(ts) {
   const d = new Date(ts);

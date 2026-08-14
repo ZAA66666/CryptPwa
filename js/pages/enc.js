@@ -240,14 +240,16 @@ function encDo(action) {
     }
     out.value = result;
     if (!out.value.startsWith("❌")) {
-      const methodName = { b64: "Base64", hex: "Hex", url: "URL", b32: "Base32", b58: "Base58", unicode: "Unicode", jwt: "JWT", oct: "Octal", ascii: "ASCII", htmlent: "HTML 实体", utf16: "UTF-16", roman: "罗马数字" }[method];
+      const ENC_METHODS = { b64: "Base64", hex: "Hex", url: "URL", b32: "Base32", b58: "Base58", unicode: "Unicode", jwt: "JWT", oct: "Octal", ascii: "ASCII", utf16: "UTF-16", htmlent: "HTML Entity", roman: "Roman Numerals" };
+      const ENC_METHODS_ZH = { htmlent: "HTML 实体", roman: "罗马数字" };
+      const methodName = (window.__lang === "zh" ? (ENC_METHODS_ZH[method] || ENC_METHODS[method]) : ENC_METHODS[method]) || method;
       addHistory({ cat: "enc", go: "enc", op: action, method: methodName, preview: inp.slice(0, 24) });
       // 编码没有密码概念，不提示保存到密码本（仅加解密相关功能才会提示）
       if (window.toast) toast(t(action === "enc" ? "enc.okEnc" : "enc.okDec"));
     }
   } catch (e) {
-    out.value = "❌ 处理失败：" + e.message;
-    if (window.toast) toast((typeof t === "function" ? t("enc.fail") : "❌ 处理失败：") + e.message);
+    out.value = t("enc.fail") + e.message;
+    if (window.toast) toast(t("enc.fail") + e.message);
   }
 }
 document.getElementById("enc-encode").addEventListener("click", () => encDo("enc"));
@@ -257,13 +259,13 @@ document.getElementById("enc-decode").addEventListener("click", () => encDo("dec
 document.getElementById("enc-img-b64").addEventListener("click", () => {
   const file = document.getElementById("enc-file").files[0];
   const out = document.getElementById("enc-output");
-  if (!file) { out.value = "❌ 请先选择一张图片"; return; }
+  if (!file) { out.value = t("enc.noImg"); return; }
   const reader = new FileReader();
   reader.onload = () => {
     out.value = reader.result;
     addHistory({ cat: "enc", go: "enc", op: "imgb64", preview: file.name });
   };
-  reader.onerror = () => { out.value = "❌ 读取图片失败"; };
+  reader.onerror = () => { out.value = t("enc.readFail"); };
   reader.readAsDataURL(file);
 });
 const encOutput = document.getElementById("enc-output");

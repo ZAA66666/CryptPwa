@@ -270,6 +270,12 @@ textarea, input, select {
   resize: vertical;
 }
 textarea { min-height: 96px; }
+/* 文本统计：字号缩小，统计条更紧凑 */
+.txt-stats { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 6px; margin: 8px 0 6px; font-size: 12px; color: var(--muted); }
+.txt-stats .stat-chip { font-size: 12px; color: var(--muted); }
+.txt-stats b { font-size: 14px; font-weight: 600; color: var(--text); margin-right: 12px; }
+/* 字数统计编辑框：默认更高，可向下拖拽延伸 */
+#txt-count-input { min-height: 200px; resize: vertical; }
 textarea:focus, input:focus, select:focus {
   outline: none;
   border-color: var(--accent);

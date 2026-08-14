@@ -11,20 +11,20 @@ const symAlgo = document.getElementById("sym-algo");
 const symAlgoBtn = document.getElementById("sym-algo-btn");
 const symAlgoLabel = document.getElementById("sym-algo-label");
 const SYM_ALGOS = [
-  { v: "AES",      label: "AES（密钥 16/24/32 字节）" },
-  { v: "DES",      label: "DES（密钥 8 字节）" },
-  { v: "3DES",     label: "3DES（密钥 24 字节）" },
-  { v: "Blowfish", label: "Blowfish（密钥 1~56 字节）" },
-  { v: "RC4",      label: "RC4（流密码）" },
-  { v: "Rabbit",   label: "Rabbit（流密码）" },
+  { v: "AES",      labelKey: "sym.descAes" },
+  { v: "DES",      labelKey: "sym.descDes" },
+  { v: "3DES",     labelKey: "sym.desc3des" },
+  { v: "Blowfish", labelKey: "sym.descBlowfish" },
+  { v: "RC4",      labelKey: "sym.descRc4" },
+  { v: "Rabbit",   labelKey: "sym.descRabbit" },
 ];
 function refreshSymAlgoLabel() {
-  const cur = SYM_ALGOS.find((a) => a.v === symAlgo.value);
-  if (cur && symAlgoLabel) symAlgoLabel.textContent = cur.label;
+  const a = SYM_ALGOS.find((x) => x.v === symAlgo.value);
+  if (a && symAlgoLabel) symAlgoLabel.textContent = t(a.labelKey);
 }
 if (symAlgoBtn) symAlgoBtn.addEventListener("click", async () => {
   if (!window.dialog) return;
-  const items = SYM_ALGOS.map((a) => ({ label: a.label, desc: "" }));
+  const items = SYM_ALGOS.map((a) => ({ label: t(a.labelKey), desc: "" }));
   const res = await window.dialog.sheet(items, t("sym.algo"));
   if (res == null || res < 0) return;
   symAlgo.value = SYM_ALGOS[res].v;
@@ -141,7 +141,7 @@ function refreshSymHints() {
   const algo = symAlgo.value, mode = getSymMode();
   const rule = symKeyRule(algo);
   if (rule.flex) {
-    symKeyHint.textContent = "流密码，密钥长度任意。";
+    symKeyHint.textContent = t("sym.streamHint");
     symKeyHint.classList.remove("error");
     symModeLabel.style.display = "none"; symModeBox.style.display = "none";
     symIvWrap.style.display = "none";
@@ -151,9 +151,9 @@ function refreshSymHints() {
   let need;
   if (rule.sizes) {
     const sel = getSymKeySize();
-    need = `${sel} 字节（${sel * 8} 位）`;
-  } else if (rule.exact) need = rule.exact.join(" / ") + " 字节";
-  else need = `${rule.min}~${rule.max} 字节`;
+    need = `${sel} ${t("sym.byte")}（${sel * 8} ${t("sym.bit")}）`;
+  } else if (rule.exact) need = rule.exact.join(" / ") + " " + t("sym.byte");
+  else need = `${rule.min}~${rule.max} ${t("sym.byte")}`;
 
   const cur = utf8ByteLength(symKey.value);
   const ok = rule.sizes ? rule.sizes.includes(cur)
@@ -221,6 +221,12 @@ function validateSym(op) {
 }
 
 function runSym(op) {
+  /* 加密且非 ECB 模式、IV 为空时自动生成随机 IV 并回填，保证一定能出结果 */
+  if (op === "encrypt" && getSymMode() !== "ECB" && !(symIv.value || "").trim()) {
+    const rule = symKeyRule(symAlgo.value);
+    symIv.value = randStr(rule.block || 16);
+    refreshSymHints();
+  }
   const cfg = validateSym(op);
   if (!cfg) { symOutput.value = ""; return; }
   const { algo, mode, key, iv } = cfg;
@@ -232,7 +238,7 @@ function runSym(op) {
       // 流密码：直接把密钥当字符串传入
       const ct = CryptoJS[algo].encrypt(input, key).toString();
       const pt = CryptoJS[algo].decrypt(input, key).toString(CryptoJS.enc.Utf8);
-      outVal = op === "encrypt" ? ct : (pt || "❌ 解密失败：密钥不正确或密文非法。");
+      outVal = op === "encrypt" ? ct : (pt || t("sym.decFailKey"));
     } else {
       const keyWA = CryptoJS.enc.Utf8.parse(key);
       const options = { mode: CryptoJS.mode[mode], padding: CryptoJS.pad.Pkcs7 };
@@ -246,10 +252,10 @@ function runSym(op) {
           outVal2 = (mode !== "ECB") ? "v1:" + CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(iv)) + ":" + ct : ct;
         } else {
           const pt = CryptoJS[algo].decrypt(ctIn, keyWA, options).toString(CryptoJS.enc.Utf8);
-          outVal2 = pt || "❌ 解密失败：密钥/模式/IV 不正确，或密文非法。";
+          outVal2 = pt || t("sym.decFail");
         }
       } catch (e) {
-        outVal2 = "❌ 解密失败：密钥或 IV 不正确（或密文非法）。";
+        outVal2 = t("sym.decFailIv");
       }
       outVal = outVal2;
     }
