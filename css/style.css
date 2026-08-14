@@ -1399,7 +1399,7 @@ input[type="file"] { font-size: calc(13px * var(--fs)); }
 .dlg-mask.show { opacity: 1; pointer-events: auto; }
 .dlg-box {
   position: fixed; left: 50%; top: 50%;
-  width: min(86vw, 400px);
+  width: min(92vw, 520px);
   transform: translate(-50%, -50%) scale(0.85);
   background: var(--card); color: var(--text);
   border-radius: 20px; padding: 20px 20px 16px;
@@ -1410,7 +1410,7 @@ input[type="file"] { font-size: calc(13px * var(--fs)); }
 }
 .dlg-box.show { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
 .dlg-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
-.dlg-body { font-size: 14px; line-height: 1.7; color: var(--text); margin-bottom: 4px; word-break: break-all; }
+.dlg-body { font-size: 14px; line-height: 1.7; color: var(--text); margin-bottom: 4px; word-break: break-all; max-height: 58vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .dlg-box input {
   width: 100%; margin-top: 10px; padding: 11px 12px; box-sizing: border-box;
   font-size: 15px; border: 1px solid var(--border); border-radius: 12px;

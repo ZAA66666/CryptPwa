@@ -7,7 +7,7 @@
 /* 本项目 GitHub 仓库（CryptPwa，作者 ZAA66666）。 */
 const GITHUB_REPO = "https://github.com/ZAA66666/CryptPwa";
 /* 当前版本号（用于“检测更新”对比 GitHub Releases） */
-const APP_VERSION = "2.0.4";
+const APP_VERSION = "2.0.5";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
@@ -390,7 +390,7 @@ window.I18N = {
       '<li>MD5、SHA-1、DES、3DES、RC4、ECB 等已被证明不安全，仅用于<strong>学习与非机密校验</strong>，请勿用于保护真实机密。</li>' +
       '<li>对称加密请优先使用 <strong>AES</strong> + CBC/CTR 等模式，并妥善保管密钥与 IV。</li>' +
       '<li>RSA 建议 2048 位及以上，用于加密小段数据或交换密钥。</li></ul>' +
-      '<h3>2. 运行环境</h3><p>RSA 依赖系统原生 Web Crypto，仅在 <strong>https 或 localhost</strong> 环境可用；通过局域网 http 访问时该页面不可用。</p>' +
+      '<h3>2. 运行环境</h3><p>RSA/SM2 使用系统原生 Web Crypto（WebCrypto API）。本 App 为原生 WebView 封装（capacitor://localhost 本地安全上下文），<strong>在 App 内即可正常使用，无需额外部署 https</strong>；仅在浏览器中通过局域网 http 访问网页版时不可用。</p>' +
       '<h3>3. 使用建议</h3><ul>' +
       '<li>不要在公用、被监控或不可信的设备上输入真实密钥/明文；</li>' +
       '<li>本工具默认不存储您的对称密钥，除非您主动存入「密码本」；</li>' +
@@ -794,7 +794,7 @@ window.I18N = {
       '<li>MD5, SHA-1, DES, 3DES, RC4, ECB are known insecure — use only for <strong>learning and non-secret checks</strong>.</li>' +
       '<li>Prefer <strong>AES</strong> + CBC/CTR, and keep the key & IV safe.</li>' +
       '<li>RSA: 2048-bit or above; good for small data or key exchange.</li></ul>' +
-      '<h3>2. Runtime</h3><p>RSA needs native Web Crypto, available only on <strong>https or localhost</strong>; it is unavailable over plain LAN http.</p>' +
+      '<h3>2. Runtime</h3><p>RSA/SM2 use the native Web Crypto (WebCrypto API). This app is a native WebView wrapper (capacitor://localhost — a secure local context), so <strong>everything works inside the app with no extra https deployment</strong>; it is only unavailable in a browser over plain LAN http.</p>' +
       '<h3>3. Recommendations</h3><ul>' +
       '<li>Don’t enter real keys/plaintext on shared or untrusted devices;</li>' +
       '<li>This tool does not store your symmetric keys unless you add them to “Saved passwords”;</li>' +

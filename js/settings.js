@@ -458,42 +458,31 @@
         `</div>` +
         `<div class="legal-text" style="margin-top:14px">${t("ext.text")}</div>`;
     } else if (name === "exp") {
-      /* 实验性：数据回调开关 + 调试功能开关（开启后可查看日志等） */
+      /* 实验性：纯列表 2 项（数据回调 / 调试功能），点行才弹说明 */
       titleEl.textContent = t("exp.title");
       const cbOn = getSetting("exp_callback", "1") === "1";
       const dbgOn = getSetting("exp_debug", "0") === "1";
       html =
-        `<div class="cp-note">${t("exp.hint")}</div>` +
-        `<div class="settings-row exp-cb-row" id="exp-cb-row">` +
-        `<span class="sr-label">${t("exp.cb")}</span>` +
+        `<ul class="settings-list exp-list">` +
+        `<li class="settings-item" id="exp-cb-row">` +
+        `<span class="si-icon">${SETTINGS_ICONS.extcall}</span>` +
+        `<span class="si-text">${t("exp.cb")}</span>` +
+        `<span class="si-arrow">›</span>` +
         `<label class="switch"><input type="checkbox" id="exp-cb-toggle" ${cbOn ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label>` +
-        `</div>` +
-        `<p class="hint" style="margin:2px 4px 10px">${t("exp.longPressHint")}</p>` +
-        `<div class="settings-row" id="exp-dbg-row">` +
-        `<span class="sr-label">${t("exp.debug")}</span>` +
+        `</li>` +
+        `<li class="settings-item" id="exp-dbg-row">` +
+        `<span class="si-icon">${SETTINGS_ICONS.exp}</span>` +
+        `<span class="si-text">${t("exp.debug")}</span>` +
+        `<span class="si-arrow">›</span>` +
         `<label class="switch"><input type="checkbox" id="exp-dbg-toggle" ${dbgOn ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label>` +
-        `</div>` +
-        `<p class="hint" style="margin:2px 4px 10px">${t("exp.debugHint")}</p>` +
+        `</li>` +
+        `</ul>` +
         `<div class="exp-debug-panel" id="exp-debug-panel" ${dbgOn ? "" : "hidden"}>` +
         `<div class="btn-row">` +
         `<button class="btn ghost" id="exp-log-view">📋 ${t("exp.logView")}</button>` +
         `<button class="btn ghost" id="exp-log-clear">🗑 ${t("exp.logClear")}</button>` +
         `</div>` +
         `<textarea id="exp-log-box" readonly rows="8" placeholder="${t("exp.logEmpty")}"></textarea>` +
-        `</div>` +
-        `<div class="legal-text" id="exp-detail">` +
-        `<h3>${t("exp.usageIntro")}</h3>` +
-        `<h3>1. ${t("exp.step1Title")}</h3>` +
-        `<p>${t("exp.step1Body")}</p>` +
-        `<p><code>crypto-pwa://?text=要处理的内容&amp;tab=hash&amp;run=1&amp;callback=myapp://result</code></p>` +
-        `<h3>2. ${t("exp.step2Title")}</h3>` +
-        `<p>${t("exp.step2Body")}</p>` +
-        `<p><code>{"ok":true,"ts":"2026-08-14T07:00:00Z","data":"e10adc3949ba59abbe56e057f20f883e","app":"CryptPwa"}</code></p>` +
-        `<h3>3. ${t("exp.step3Title")}</h3>` +
-        `<p>${t("exp.step3Body")}</p>` +
-        `<p><code>intent://?text=hello&amp;tab=enc&amp;callback=myapp://result#Intent;scheme=crypto-pwa;package=com.zaa.cryptpwa;end</code></p>` +
-        `<h3>${t("exp.noteTitle")}</h3>` +
-        `<p>${t("exp.note")}</p>` +
         `</div>`;
     } else if (name === "display") {
       titleEl.textContent = t("display.title");
@@ -643,29 +632,31 @@
         if (window.copyText) window.copyText(v, e.target);
       };
     } else if (name === "exp") {
-      /* 数据回调开关 + 长按「数据回调」行查看完整使用示例 */
+      /* 数据回调开关 + 点行弹说明 */
       const cbToggle = bodyEl.querySelector("#exp-cb-toggle");
       if (cbToggle) cbToggle.onchange = () => {
         setSetting("exp_callback", cbToggle.checked ? "1" : "0");
         if (window.toast) window.toast(t("common.savedOk"));
       };
+      /* 点击「数据回调」行（非开关区）→ 弹说明；开关区点击不弹 */
       const cbRow = bodyEl.querySelector("#exp-cb-row");
       if (cbRow) {
-        let timer = null;
-        const viewDetail = () => {
-          /* 长按后弹出全屏编辑窗口展示使用示例 */
-          const detail = bodyEl.querySelector("#exp-detail");
-          if (detail && window.openEditor) {
-            const tmp = { value: detail.innerText.trim(), readOnly: true };
-            window.openEditor(tmp, false);
+        cbRow.addEventListener("click", (e) => {
+          if (e.target.closest(".switch")) return;
+          if (window.dialog) {
+            const lines = [
+              t("exp.usageIntro"), "",
+              "1. " + t("exp.step1Title"), t("exp.step1Body"),
+              "   crypto-pwa://?text=<内容>&tab=hash&run=1&callback=myapp://result", "",
+              "2. " + t("exp.step2Title"), t("exp.step2Body"),
+              '   {"ok":true,"ts":"2026-08-14T07:00:00Z","data":"...","app":"CryptPwa"}', "",
+              "3. " + t("exp.step3Title"), t("exp.step3Body"),
+              "   intent://?text=hello&tab=enc&callback=myapp://result#Intent;scheme=crypto-pwa;package=com.zaa.cryptpwa;end", "",
+              t("exp.noteTitle"), t("exp.note"),
+            ];
+            window.dialog.alert(lines.join("\n"), { title: t("exp.cb") });
           }
-        };
-        cbRow.addEventListener("touchstart", (e) => {
-          timer = setTimeout(viewDetail, 550);
-        }, { passive: true });
-        cbRow.addEventListener("touchend", () => clearTimeout(timer));
-        cbRow.addEventListener("touchmove", () => clearTimeout(timer), { passive: true });
-        cbRow.addEventListener("contextmenu", (e) => { e.preventDefault(); clearTimeout(timer); viewDetail(); });
+        });
       }
       /* 调试功能开关：开启后显示日志查看面板 */
       const dbgToggle = bodyEl.querySelector("#exp-dbg-toggle");
