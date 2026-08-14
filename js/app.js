@@ -1629,9 +1629,9 @@ window.__dragDrop = function (text) {
     window.__incomingImage = s;
     window.__incomingText = "";
   } else if (s.startsWith("content://") || /\.(png|jpe?g|gif|webp)$/i.test(s)) {
-    /* 图片 URI：尝试按图片接收（无法跨进程读取时仅展示路径） */
-    window.__incomingImage = "";
-    window.__incomingText = s;
+    /* 图片 URI：content:// 可直接作为 <img> src 显示（拖放系统已授予读取权限） */
+    window.__incomingImage = s;
+    window.__incomingText = "";
   } else {
     window.__incomingImage = "";
     window.__incomingText = s;
