@@ -4,7 +4,7 @@
   "webDir": "webapp",
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 150,
+      "launchShowDuration": 1200,
       "launchAutoHide": true,
       "backgroundColor": "#00a862",
       "androidScaleType": "CENTER_CROP",

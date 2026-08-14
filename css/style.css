@@ -1,4 +1,15 @@
-/* ===== 加解密工具箱 样式（微信绿 / 酷安风 · 移动端优先） ===== */
+/* ===== 加解密工具箱 样式（微信绿 / 酷安风 · 移动端优先） =====
+ * ── 布局系统总览（看不懂项目先看这里）──
+ * 1) 主页与所有功能页共用同一个 WebView。body 是竖向 flex 列：顶部 .app-header（绿色工具栏，仅主页显示）
+ *    + .app-card（所有内容容器，flex:1 占满剩余高度）。
+ * 2) 滑动链（缺一环节就不滚动）：body(flex列) → app-card(flex:1,min-height:0) →
+ *    main(flex:1,min-height:0) → .panel.active(flex:1,min-height:0,overflow-y:auto)。
+ *    每个工具是一个 <section class="panel">，同一时刻只有一个带 .active。
+ * 3) 设置是另一个全屏 overlay（#settings-overlay，fixed inset:0 的 flex 列），内部 .overlay-bar + .overlay-body(滚动)。
+ * 4) 状态栏：主页黑字(DARK)，功能页/设置白字(LIGHT)，由 app.js 调 StatusBar.setStyle 控制。
+ * 5) 弹窗统一 .vp-* / .exp-* / .scan-* / .dlg-* 系列，中心扩散或底部上滑动画。
+ * 6) 闪屏：Capacitor SplashScreen 插件（绿色，见 capacitor.config.json）；html 底色预置绿色防首帧白闪。
+ */
 
 /* RTL（阿拉伯语）适配：整体镜像布局 */
 html[dir="rtl"] body { direction: rtl; }
@@ -26,6 +37,10 @@ html[dir="rtl"] input, html[dir="rtl"] textarea { direction: rtl; text-align: ri
   --accent-soft: #e6f6ee;
   --accent-ring: rgba(0, 168, 98, 0.18);
 }
+
+/* 首屏防白闪：WebView 首帧绘制前，html 底色设为与启动闪屏一致的强调绿，
+   避免原生闪屏消失瞬间露出白色 WebView 造成“闪一下白屏”。 */
+html { background: #00a862; }
 
 * { box-sizing: border-box; }
 
@@ -836,7 +851,10 @@ input[type="file"] {
 /* 密码本 3 套密码库选择器 */
 .vault-slot-seg { margin: 2px 0 12px; }
 .vault-slot-seg button { flex: 1 1 0; }
-.overlay-body { flex: 1 1 auto; overflow-y: auto; padding: 0 calc(14px + env(safe-area-inset-left)) calc(24px + env(safe-area-inset-bottom)); margin: 0; background: var(--bg); }
+/* 设置页主体：可滚动的弹性列容器。flex:1 占满 overlay 剩余高度；overflow-y:auto 让超限内容滚动；
+   ::after 占位让短页面（如“关于”）也能撑满到屏幕底部，解决“页面没铺满 / 底部没见底”的观感。 */
+.overlay-body { flex: 1 1 auto; overflow-y: auto; display: flex; flex-direction: column; padding: 0 calc(14px + env(safe-area-inset-left)) calc(24px + env(safe-area-inset-bottom)); margin: 0; background: var(--bg); }
+.overlay-body::after { content: ""; flex: 1 1 auto; min-height: 8px; }
 
 /* 设置列表项 */
 .settings-list { margin: 0; padding: 0; list-style: none; background: var(--card); border-radius: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04), 0 2px 12px rgba(0,0,0,0.03); overflow: hidden; }
@@ -1081,12 +1099,13 @@ input[type="color"] { width: 46px; height: 30px; border: 1px solid var(--border)
 .expand-btn:active { filter: brightness(0.94); }
 .exp-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 80; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
 .exp-mask.show { opacity: 1; pointer-events: auto; }
+/* 全屏编辑/查看框（微信式沉浸式）：占满整屏，编辑区 flex 撑满，顶部按钮 + 底部 复制/保存 操作行。 */
 .exp-panel {
-  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -48%) scale(0.98);
-  width: 92vw; height: 80vh;
-  max-width: 720px;
+  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.98);
+  width: 100vw; height: 100dvh;
+  max-width: none; border-radius: 0;
   overflow: hidden;
-  background: var(--card); border-radius: 18px; padding: 0; z-index: 81;
+  background: var(--card); padding: 0; z-index: 81;
   box-shadow: 0 12px 40px rgba(0,0,0,0.35);
   opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease;
   display: flex; flex-direction: column;
@@ -1437,11 +1456,11 @@ input[type="file"] { font-size: calc(13px * var(--fs)); }
 .vp-panel.show, .exp-panel.show, .scan-panel.show, .rsan-panel.show {
   transform: translate(-50%, -50%) scale(1) !important;
 }
-/* 全屏编辑延伸：上方触发 → 从顶部下滑；下方触发 → 从底部上滑 */
-.exp-panel.from-top { transform: translate(-50%, -108%) scale(0.92) !important; }
-.exp-panel.from-top.show { transform: translate(-50%, -50%) scale(1) !important; }
-.exp-panel.from-bottom { transform: translate(-50%, 8%) scale(0.92) !important; }
-.exp-panel.from-bottom.show { transform: translate(-50%, -50%) scale(1) !important; }
+/* 全屏编辑框进出场：从顶部下滑 / 从底部上滑（微信输入式），退出时反向。 */
+.exp-panel.from-top { transform: translate(-50%, -150%) !important; }
+.exp-panel.from-top.show { transform: translate(-50%, -50%) !important; }
+.exp-panel.from-bottom { transform: translate(-50%, 60%) !important; }
+.exp-panel.from-bottom.show { transform: translate(-50%, -50%) !important; }
 
 /* About 页调用方法引用：加粗 + 底部横线（替代 code 样式） */
 .legal-text b.ref { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; color: var(--accent); }

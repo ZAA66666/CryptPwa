@@ -2721,6 +2721,20 @@ ensureRsaKeys();   // 若本机无 RSA 密钥，默认生成一对
 setupExpanders();  // 给 textarea 加“展开查看全文”
 applyLaunchParams();
 
+/* 首屏闪屏：本机 UI 与 WebView 就绪后主动隐藏闪屏（不再死等定时器），
+   避免闪屏消失瞬间露出未绘制好的 WebView 造成“闪一下”。插件不可用或异常时静默忽略。 */
+(function () {
+  try {
+    const SP = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SplashScreen;
+    if (SP && SP.hide) {
+      const hideSplash = () => { try { SP.hide(); } catch (e) {} };
+      if (document.readyState === "complete") hideSplash();
+      else window.addEventListener("load", hideSplash);
+      setTimeout(hideSplash, 2500); // 兜底：最多 2.5s 强制隐藏，防插件异常卡死闪屏
+    }
+  } catch (e) {}
+})();
+
 /* ---------- 9. Service Worker（离线 + 可添加到主屏幕） ---------- */
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

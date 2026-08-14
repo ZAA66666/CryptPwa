@@ -1,4 +1,17 @@
 <!DOCTYPE html>
+<!--
+  加解密工具箱 · 单页应用外壳（SPA shell）
+  文件地图（看不懂项目先读 css/style.css 顶部的“布局系统总览”注释）：
+    index.html       本文件：所有页面的 DOM 骨架（主页 + 各功能 panel + 设置 overlay + 弹窗），脚本在 </body> 前加载
+    css/style.css    全部样式（含布局系统总览 + 各区作用注释）
+    js/i18n.js       多语言词条 + 全局 APP_VERSION（版本号唯一真相源）
+    js/tools.js      通用工具（驼峰命名、toast、统一 dialog 弹窗等）
+    js/app.js        主逻辑：面板切换、各工具算法、状态栏、弹窗、返回键、SW 注册
+    js/settings.js   设置模块：主题/语言/字体/沉浸式/密码本/关于·隐私·协议
+    sw.js            Service Worker：离线缓存（CACHE_NAME 改动必 +1）
+  原生层（Capacitor）：android/ 下 MainActivity 壳 + 原生插件（FolderPicker 等）；
+                     构建时 npx cap sync 把本目录 web 资源灌进 android 打包件。
+-->
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
