@@ -19,7 +19,7 @@ window.I18N = {
 
     /* 主页 */
     "home.brand": "加解密工具箱 · 版本 1.0",
-    "home.greet": "这是一个完全在您手机/电脑浏览器本地运行的加解密工具箱（PWA），用于学习与实践加解密、编码、二维码等常见操作。",
+    "home.greet": "这是一个完全在您的手机/电脑上本地运行的加解密工具箱（PWA），用于学习与实践加解密、编码、二维码等常见操作。",
     "tool.hash": "哈希", "tool.enc": "编/解码", "tool.sym": "加/解密",
     "tool.asym": "非对称加/解密", "tool.qr": "二维码/条形码", "tool.guide": "教程", "tool.json": "JSON", "tool.sm2": "SM2", "tool.cron": "Crontab", "tool.rand": "随机文本",
     "home.recent": "最近使用", "home.clear": "清空",
@@ -110,7 +110,7 @@ window.I18N = {
     "rsa.badgeExt": "外", "rsa.rename": "改名", "rsa.sidePub": "公钥", "rsa.sidePriv": "私钥",
 
     /* 二维码 */
-    "qr.in": "内容（文本 / 网址 / 任意字符串）", "qr.ec": "纠错等级",
+    "qr.in": "内容（文本 / 网址 / 任意字符串）", "qr.ec": "纠错等级", "qr.ecL": "L（低，7%）", "qr.ecM": "M（中，15%）", "qr.ecQ": "Q（较高，25%）", "qr.ecH": "H（高，30%）",
     "qr.gen": "生成二维码", "qr.out": "二维码", "qr.dl": "下载 SVG",
     "qr.tabQr": "二维码",
     "bc.tab": "条形码", "bc.in": "内容（条形码编码的数据）", "bc.fmt": "编码格式",
@@ -132,7 +132,7 @@ window.I18N = {
     "set.about": "关于", "set.privacy": "隐私政策", "set.terms": "用户协议",
     "set.security": "安全条款", "set.personal": "个人信息", "set.common": "密码本", "set.sync": "数据备份与同步",
     "set.theme": "主题", "set.display": "显示设置", "set.about2": "关于", "set.extcall": "外部调用与分享", "set.storage": "设置路径", "set.exp": "实验性",
-    "set.grpGeneral": "通用设置", "set.grpData": "数据隐私", "set.grpPrivacy": "隐私与条款", "set.dataEnc": "数据加密", "enc.on": "已开启数据加密，密码本将以密文保存 🔒", "enc.off": "已关闭数据加密，密码本将以明文保存",
+    "set.grpGeneral": "通用设置", "set.grpData": "数据隐私", "set.grpPrivacy": "隐私与条款", "set.dataEnc": "数据加密", "set.cache": "清理缓存", "enc.on": "已开启数据加密，密码本将以密文保存 🔒", "enc.off": "已关闭数据加密，密码本将以明文保存", "cache.title": "清理缓存", "cache.hint": "清理日志等临时数据，不影响密码本、设置与已保存的文件。", "cache.lastClear": "上次清理时间", "cache.never": "从未清理", "cache.clearBtn": "立即清理", "cache.done": "已清理 ✅",
 
     /* 主题 */
     "theme.title": "主题", "theme.system": "跟随设备", "theme.light": "浅色", "theme.dark": "深色",
@@ -159,7 +159,7 @@ window.I18N = {
     "storage.usage2": "RSA / SM2 密钥「导出到文件」时保存的 .pem / .txt 文件",
     "storage.usage3": "WebDAV 备份、本地导出等生成的 JSON 备份文件",
     "storage.pick": "选择文件夹", "storage.reset": "恢复默认",
-    "storage.pickFail": "选择失败：", "storage.pickUnsupported": "当前浏览器不支持直接选目录，请手动输入路径。",
+    "storage.pickFail": "选择失败：", "storage.pickUnsupported": "当前设备不支持直接选目录，请手动输入路径。",
     "save.savedDoc": "已保存到系统文档目录：", "save.fail": "保存失败：", "storage.androidHint": "安卓版：请在下方直接手动填写保存路径（系统不支持文件夹选择）。", "storage.saved": "已保存默认保存路径",
 
     /* 外部内容选择器（URL Scheme / Intent / 系统分享） */
@@ -171,10 +171,10 @@ window.I18N = {
     "inc.md5": "MD5", "inc.sha256": "SHA-256", "inc.imgb64": "图片 → Base64", "inc.qr": "生成二维码",
 
     /* 外部调用 / 分享接入（URL Scheme / Intent / 系统分享） */
-    "ext.title": "外部调用与分享", "exp.title": "实验性", "exp.callbackTitle": "外部回调（插件用法）", "exp.hint": "开启后允许外部 App 通过 URL Scheme / Intent 调用本工具处理数据，并接收回调结果。", "exp.input": "要回调的数据（默认取外部传入内容）", "exp.genBtn": "生成回调数据", "exp.result": "回调数据（JSON）", "exp.schemeTitle": "回调地址（URL Scheme）", "exp.intentTitle": "Android Intent 示例", "exp.copy": "复制", "exp.noteTitle": "可行性说明", "exp.note": "当前为纯网页 PWA，浏览器无法直接把数据写回其它 App。支持两种方式：①调用方通过 URL Scheme / Intent 携带回调地址，本应用把结果编码进该地址后跳回；②直接复制结果手动粘贴回原应用。若以后打包为原生壳（WebView + JS Bridge，如 Capacitor），可实现真正自动回调。", "exp.usageIntro": "外部 App 调用本工具处理数据并接收回调结果的使用方法：调用方通过 URL Scheme 或 Intent 启动本工具，处理完成后本工具把结果（含执行状态、时间戳、处理后数据）回传给调用方指定的回调地址。", "exp.step1Title": "调用方发起调用", "exp.step1Body": "外部 App 通过 URL Scheme 启动本工具，传入要处理的文本和目标功能，并携带回调地址（callback 参数）。本工具处理完成后，会把结果拼接到回调地址后跳回。", "exp.step2Title": "回调数据格式", "exp.step2Body": "本工具处理完成后，回调地址会带上 result 参数（URL 编码的 JSON），包含 ok（是否成功）、ts（时间戳）、data（处理后的数据）、app（应用标识）。调用方解析后即可拿到处理结果。", "exp.step3Title": "Android Intent 调用示例", "exp.step3Body": "安卓 App 也可用 Intent 调起本工具（需打包为 App 后注册 intent-filter）。处理完成同样以回调地址返回结果。", "exp.cb": "数据回调", "exp.import": "导入方式", "exp.importTitle": "导入方式", "exp.importHint": "外部数据可通过以下方式传入本应用：", "exp.importUrl": "URL Scheme：crypto-pwa://?text=要处理的内容（也支持 url / title 参数，可传 JSON、图片 data URL）", "exp.importIntent": "Android Intent：其它应用「分享」到本应用（打包为 App 后注册 intent-filter）", "exp.importShare": "系统分享：在任意应用选「分享」→ 选择本应用（PWA 安装后出现在分享列表）", "exp.importClip": "剪贴板：复制文本 / JSON 后直接粘贴到对应工具的输入框",
+    "ext.title": "外部调用与分享", "exp.title": "实验性", "exp.callbackTitle": "外部回调（插件用法）", "exp.hint": "开启后允许外部 App 通过 URL Scheme / Intent 调用本工具处理数据，并接收回调结果。", "exp.input": "要回调的数据（默认取外部传入内容）", "exp.genBtn": "生成回调数据", "exp.result": "回调数据（JSON）", "exp.schemeTitle": "回调地址（URL Scheme）", "exp.intentTitle": "Android Intent 示例", "exp.copy": "复制", "exp.noteTitle": "可行性说明", "exp.note": "当前为纯网页 PWA，网页层无法直接把数据写回其它 App。支持两种方式：①调用方通过 URL Scheme / Intent 携带回调地址，本应用把结果编码进该地址后跳回；②直接复制结果手动粘贴回原应用。若以后打包为原生壳（WebView + JS Bridge，如 Capacitor），可实现真正自动回调。", "exp.usageIntro": "外部 App 调用本工具处理数据并接收回调结果的使用方法：调用方通过 URL Scheme 或 Intent 启动本工具，处理完成后本工具把结果（含执行状态、时间戳、处理后数据）回传给调用方指定的回调地址。", "exp.step1Title": "调用方发起调用", "exp.step1Body": "外部 App 通过 URL Scheme 启动本工具，传入要处理的文本和目标功能，并携带回调地址（callback 参数）。本工具处理完成后，会把结果拼接到回调地址后跳回。", "exp.step2Title": "回调数据格式", "exp.step2Body": "本工具处理完成后，回调地址会带上 result 参数（URL 编码的 JSON），包含 ok（是否成功）、ts（时间戳）、data（处理后的数据）、app（应用标识）。调用方解析后即可拿到处理结果。", "exp.step3Title": "Android Intent 调用示例", "exp.step3Body": "安卓 App 也可用 Intent 调起本工具（需打包为 App 后注册 intent-filter）。处理完成同样以回调地址返回结果。", "exp.cb": "数据回调", "exp.import": "导入方式", "exp.importTitle": "导入方式", "exp.importHint": "外部数据可通过以下方式传入本应用：", "exp.importUrl": "URL Scheme：crypto-pwa://?text=要处理的内容（也支持 url / title 参数，可传 JSON、图片 data URL）", "exp.importIntent": "Android Intent：其它应用「分享」到本应用（打包为 App 后注册 intent-filter）", "exp.importShare": "系统分享：在任意应用选「分享」→ 选择本应用（PWA 安装后出现在分享列表）", "exp.importClip": "剪贴板：复制文本 / JSON 后直接粘贴到对应工具的输入框",
     "ext.text":
       '<h3>1. 系统分享（分享面板）</h3>' +
-      '<p>在浏览器、文件管理器等里“分享”文字或网址，选择本工具（需已安装为 PWA），会自动进入「外部内容」选择器，让你挑选编码 / 加密 / 二维码等处理方式。</p>' +
+      '<p>在文件管理器、其他 App 等里“分享”文字或网址，选择本工具（需已安装为 PWA），会自动进入「外部内容」选择器，让你挑选编码 / 加密 / 二维码等处理方式。</p>' +
       '<h3>2. URL Scheme 深链</h3>' +
       '<p>在地址栏或别的 App 打开以下链接即可直接带入内容：</p>' +
       '<p><code>crypto-pwa://?text=要处理的内容</code></p>' +
@@ -199,7 +199,7 @@ window.I18N = {
 
     /* 显示设置 */
     "display.title": "显示设置", "disp.lang": "语言", "disp.font": "字体大小", "disp.immersive": "沉浸式状态栏",
-    "lang.system": "跟随系统", "lang.zh": "简体中文", "lang.en": "English (US)",
+    "lang.system": "跟随系统", "lang.zh": "中文", "lang.en": "English",
     "font.small": "小", "font.normal": "标准", "font.large": "大", "font.xlarge": "特大",
 
     /* 密码本 */
@@ -211,7 +211,7 @@ window.I18N = {
     "about.title": "关于",
     "about.update": "检测更新", "about.checking": "检查中…", "about.latest": "已是最新版本", "about.found": "发现新版本", "about.open": "前往 GitHub 查看", "about.fail": "检查更新失败：", "about.ver": "版本",
     "about.text":
-      '<p>这是一个<strong>完全在您手机/电脑浏览器本地运行</strong>的加解密工具箱（PWA），用于学习与实践加解密、编码、二维码等常见操作。</p>' +
+      '<p>这是一个<strong>完全在您的手机/电脑上本地运行</strong>的加解密工具箱（PWA），用于学习与实践加解密、编码、二维码等常见操作。</p>' +
       '<h3>它能做什么</h3><ul>' +
       '<li>哈希：MD5 / SHA-1/224/256/384/512 / SHA-3 / RIPEMD-160 / HMAC</li>' +
       '<li>编码：Base64 / Hex / URL，以及图片转 Base64</li>' +
@@ -219,14 +219,14 @@ window.I18N = {
       '<li>非对称加/解密：RSA / SM2（生成密钥、加密解密、签名验签）</li>' +
       '<li>二维码 / 条形码生成、最近使用记录、密码本、深色模式、多语言</li></ul>' +
       '<h3>项目源码</h3><p>本项目代码已同步至 GitHub，仓库名 <a href="' + GITHUB_REPO + '" target="_blank" rel="noopener">CryptPwa</a>。欢迎 Star / Fork / 提交 Issue。</p>' +
-      '<h3>技术说明</h3><p>算法核心使用成熟的 <a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a> 库与浏览器原生 <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto</a>；二维码使用 <a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a>。所有计算均在本地完成，不依赖任何服务器。</p>' +
+      '<h3>技术说明</h3><p>算法核心使用成熟的 <a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a> 库与系统原生 <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto</a>；二维码使用 <a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a>。所有计算均在本地完成，不依赖任何服务器。</p>' +
       '<h3>开源组件与引用位置</h3><ul>' +
       '<li><b><a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a></b>（MIT 许可）— 哈希与对称加密算法。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/crypto-js.js" target="_blank" rel="noopener">js/vendor/crypto-js.js</a>；用于「哈希」「编码（图片转 Base64 走其编解码）」「加/解密」面板。</li>' +
-      '<li><b><a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a></b>（MIT 许可）— 二维码生成。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/qrcode-generator.js" target="_blank" rel="noopener">js/vendor/qrcode-generator.js</a>；用于「二维码 / 条形码」面板（<code>qr-btn</code> 调用其 <code>qrcode()</code>）。</li>' +
+      '<li><b><a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a></b>（MIT 许可）— 二维码生成。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/qrcode-generator.js" target="_blank" rel="noopener">js/vendor/qrcode-generator.js</a>；用于「二维码 / 条形码」面板（<b class="ref">qr-btn</b> 调用其 <b class="ref">qrcode()</b>）。</li>' +
       '<li><b><a href="https://github.com/cozmo/jsQR" target="_blank" rel="noopener">jsQR</a></b>（Apache-2.0）— 摄像头扫码解码。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsqr.js" target="_blank" rel="noopener">js/vendor/jsqr.js</a>；用于「扫描二维码」。</li>' +
       '<li><b><a href="https://github.com/lindell/JsBarcode" target="_blank" rel="noopener">JsBarcode</a></b>（MIT 许可）— 条形码生成。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbarcode.all.min.js" target="_blank" rel="noopener">js/vendor/jsbarcode.all.min.js</a>；用于「条形码」。</li>' +
       '<li><b><a href="https://github.com/JuneAndGreen/sm-crypto" target="_blank" rel="noopener">sm-crypto</a></b>（MIT 许可）— SM2 国密算法。<br>引用文件：<a href="' + GITHUB_REPO + '/blob/main/js/vendor/sm-crypto.esm.js" target="_blank" rel="noopener">js/vendor/sm-crypto.esm.js</a>（依赖已改引本地 <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbn.esm.js" target="_blank" rel="noopener">jsbn</a>）；用于「非对称加/解密 → SM2」。</li>' +
-      '<li><b><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a></b>（浏览器原生，无单独依赖）— RSA 密钥生成、加解密、签名验签。<br>引用位置：浏览器原生 <code>crypto.subtle</code>；用于「非对称加/解密 → RSA」，仅 https / localhost 可用。</li>' +
+      '<li><b><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a></b>（系统原生，无单独依赖）— RSA 密钥生成、加解密、签名验签。<br>引用位置：系统原生 <b class="ref">crypto.subtle</b>；用于「非对称加/解密 → RSA」，仅 https / localhost 可用。</li>' +
       '<li><b>本项目代码</b>（手写）— 界面、交互、历史记录、密码本、设置、主题与多语言均自行实现，未封装第三方 UI 框架。</li></ul>' +
       '<p>所有计算均在本地完成、可离线使用，不向任何服务器上传数据。</p>',
 
@@ -234,10 +234,10 @@ window.I18N = {
     "privacy.title": "隐私政策",
     "privacy.text":
       '<p>本应用高度重视您的隐私。以下是我们的承诺：</p>' +
-      '<h3>1. 本地运行，不上传</h3><p>本应用完全在您设备的浏览器中运行，<strong>不连接任何服务器，不上传任何数据</strong>。您的输入、密钥、明文、密文与结果均不会被发送出去。</p>' +
+      '<h3>1. 本地运行，不上传</h3><p>本应用完全在您的设备上本地运行，<strong>不连接任何服务器，不上传任何数据</strong>。您的输入、密钥、明文、密文与结果均不会被发送出去。</p>' +
       '<h3>2. 我们不收集您的信息</h3><p>开发者无法、也<strong>不会收集</strong>您的任何输入内容、密钥或操作结果。</p>' +
       '<h3>3. 本地存储的数据</h3><ul>' +
-      '<li>「最近使用」记录仅保存在本机浏览器的 localStorage，不上传；</li>' +
+      '<li>「最近使用」记录仅保存在本机本地存储，不上传；</li>' +
       '<li>「密码本」仅保存在本机，不上传；</li>' +
       '<li>主题、语言、字体等偏好同样仅存于本机。</li></ul>' +
       '<h3>4. 无追踪</h3><p>本应用没有广告、没有行为埋点、不接入任何第三方统计或追踪。</p>' +
@@ -259,7 +259,7 @@ window.I18N = {
       '<li>MD5、SHA-1、DES、3DES、RC4、ECB 等已被证明不安全，仅用于<strong>学习与非机密校验</strong>，请勿用于保护真实机密。</li>' +
       '<li>对称加密请优先使用 <strong>AES</strong> + CBC/CTR 等模式，并妥善保管密钥与 IV。</li>' +
       '<li>RSA 建议 2048 位及以上，用于加密小段数据或交换密钥。</li></ul>' +
-      '<h3>2. 运行环境</h3><p>RSA 依赖浏览器原生 Web Crypto，仅在 <strong>https 或 localhost</strong> 环境可用；通过局域网 http 访问时该页面不可用。</p>' +
+      '<h3>2. 运行环境</h3><p>RSA 依赖系统原生 Web Crypto，仅在 <strong>https 或 localhost</strong> 环境可用；通过局域网 http 访问时该页面不可用。</p>' +
       '<h3>3. 使用建议</h3><ul>' +
       '<li>不要在公用、被监控或不可信的设备上输入真实密钥/明文；</li>' +
       '<li>本工具默认不存储您的对称密钥，除非您主动存入「密码本」；</li>' +
@@ -273,7 +273,7 @@ window.I18N = {
       '<li><strong>文件/存储读取</strong>：仅用于「图片转 Base64」时读取您<strong>主动选择</strong>的图片，读取后用于本地转换，不会上传。</li>' +
       '<li><strong>剪贴板</strong>：仅用于您点击「复制结果」时，把结果复制到剪贴板。</li>' +
       '<li><strong>网络</strong>：本应用默认<strong>离线</strong>运行；仅在您主动访问在线地址、或系统「分享」调起时才会联网。</li></ul>' +
-      '<h3>三、数据存储位置</h3><p>所有数据（使用记录、密码本、偏好设置）都只保存在您<strong>本机浏览器</strong>（localStorage / 内存），<strong>不会上传到任何服务器</strong>。</p>' +
+      '<h3>三、数据存储位置</h3><p>所有数据（使用记录、密码本、偏好设置）都只保存在您<strong>本机本地存储</strong>（localStorage / 内存），<strong>不会上传到任何服务器</strong>。</p>' +
       '<h3>四、您的权利</h3><p>您可随时清除历史、删除密码本、或卸载/清除站点数据来彻底移除本地信息。</p>',
 
     /* 关于（旧 about2，已合并进 about，保留以防引用） */
@@ -284,7 +284,7 @@ window.I18N = {
       '<h3>使用的开源组件</h3><ul>' +
       '<li>crypto-js（哈希 / 对称加密，成熟可信）</li>' +
       '<li>qrcode-generator（二维码生成）</li>' +
-      '<li>浏览器原生 Web Crypto（RSA）</li></ul>' +
+      '<li>系统原生 Web Crypto（RSA）</li></ul>' +
       '<p>算法核心均来自成熟库，界面与交互逻辑为手写实现。</p>',
 
     /* 加密后保存提示（密码本） */
@@ -302,7 +302,7 @@ window.I18N = {
     "vp.del": "删除",
     "vp.skip": "暂不保存", "vp.saveCur": "保存当前密码",
     "vp.none": "还没有已保存的条目。",
-    "paste": "粘贴", "vp.pasteOk": "已粘贴并应用 ✅", "vp.pasteBad": "剪贴板内容不符合该密钥格式", "vp.pasteDenied": "无法读取剪贴板（请检查浏览器权限）",
+    "paste": "粘贴", "vp.pasteOk": "已粘贴并应用 ✅", "vp.pasteBad": "剪贴板内容不符合该密钥格式", "vp.pasteDenied": "无法读取剪贴板（请检查系统权限）",
     "vp.book": " 密码本",
     "vp.generic": "通用",
     "vp.rsaPriv": "RSA 私钥",
@@ -403,7 +403,7 @@ window.I18N = {
     "rsa.pairSuffix": " RSA Key", "rsa.importDefault": "Imported RSA key",
     "rsa.badgeExt": "Ext", "rsa.rename": "Rename", "rsa.sidePub": "Public", "rsa.sidePriv": "Private",
 
-    "qr.in": "Content (text / URL / any string)", "qr.ec": "Error correction",
+    "qr.in": "Content (text / URL / any string)", "qr.ec": "Error correction", "qr.ecL": "L (low, 7%)", "qr.ecM": "M (medium, 15%)", "qr.ecQ": "Q (high, 25%)", "qr.ecH": "H (highest, 30%)",
     "qr.gen": "Generate QR", "qr.out": "QR code", "qr.dl": "Download SVG",
     "qr.tabQr": "QR code",
     "bc.tab": "Barcode", "bc.in": "Content (data to encode)", "bc.fmt": "Format",
@@ -422,7 +422,7 @@ window.I18N = {
     "set.about": "About", "set.privacy": "Privacy Policy", "set.terms": "Terms of Use",
     "set.security": "Security Notes", "set.personal": "Personal Info", "set.common": "Saved Passwords", "set.sync": "Backup & Sync",
     "set.theme": "Theme", "set.display": "Display", "set.about2": "About", "set.extcall": "External & Sharing", "set.storage": "Set path", "set.exp": "Experimental",
-    "set.grpGeneral": "General", "set.grpData": "Data & Privacy", "set.grpPrivacy": "Privacy & Terms", "set.dataEnc": "Data encryption", "enc.on": "Encryption ON — passwords stored as ciphertext", "enc.off": "Encryption OFF — passwords stored as plain text",
+    "set.grpGeneral": "General", "set.grpData": "Data & Privacy", "set.grpPrivacy": "Privacy & Terms", "set.dataEnc": "Data encryption", "set.cache": "Clear cache", "enc.on": "Encryption ON — passwords stored as ciphertext", "enc.off": "Encryption OFF — passwords stored as plain text", "cache.title": "Clear cache", "cache.hint": "Clears logs and temporary data. Your vault, settings and saved files are not affected.", "cache.lastClear": "Last cleared", "cache.never": "Never", "cache.clearBtn": "Clear now", "cache.done": "Cleared ✅",
 
     "theme.title": "Theme", "theme.system": "Follow device", "theme.light": "Light", "theme.dark": "Dark",
     "accent.title": "Accent · Monet color", "accent.pick": "Custom color", "accent.reset": "Reset",
@@ -459,7 +459,7 @@ window.I18N = {
     "inc.md5": "MD5", "inc.sha256": "SHA-256", "inc.imgb64": "Image → Base64", "inc.qr": "Make QR",
 
     /* External & sharing (URL Scheme / Intent / system share) */
-    "ext.title": "External & Sharing", "exp.title": "Experimental", "exp.callbackTitle": "External callback (plugin usage)", "exp.hint": "When enabled, external apps can invoke this tool via URL Scheme / Intent to process data and receive callback results.", "exp.input": "Data to return (defaults to external input)", "exp.genBtn": "Generate callback data", "exp.result": "Callback payload (JSON)", "exp.schemeTitle": "Callback URL (URL Scheme)", "exp.intentTitle": "Android Intent example", "exp.copy": "Copy", "exp.noteTitle": "Feasibility note", "exp.note": "This is a pure-web PWA: the browser cannot write data back into another app directly. Two supported ways: ① the caller passes a callback URL via Scheme/Intent, and this app encodes the result into that URL and jumps back; ② copy the result and paste it manually. A native wrapper (WebView + JS Bridge, e.g. Capacitor) enables true auto-callback.", "exp.usageIntro": "How an external app calls this tool, processes data, and receives the callback result: the caller launches this tool via URL Scheme or Intent with the data and a callback URL; after processing, this tool returns the result (status, timestamp, processed data) to the callback URL.", "exp.step1Title": "Caller initiates the call", "exp.step1Body": "An external app launches this tool via URL Scheme with the text to process, the target feature, and a callback URL (the callback parameter). After processing, this tool appends the result to the callback URL and jumps back.", "exp.step2Title": "Callback data format", "exp.step2Body": "After processing, the callback URL carries a result parameter (URL-encoded JSON) containing ok (success), ts (timestamp), data (processed data), and app (app id). The caller parses it to get the result.", "exp.step3Title": "Android Intent example", "exp.step3Body": "Android apps can also launch this tool via Intent (requires registering an intent-filter after packaging). The result is returned via the callback URL the same way.", "exp.cb": "Data callback", "exp.import": "Import methods", "exp.importTitle": "Import methods", "exp.importHint": "External data can be passed into this app via:", "exp.importUrl": "URL Scheme: crypto-pwa://?text=content (also url / title params; JSON and image data URLs work too)", "exp.importIntent": "Android Intent: share to this app from other apps (requires an intent-filter once packaged)", "exp.importShare": "System share: pick “Share” in any app → choose this app (appears after PWA install)", "exp.importClip": "Clipboard: copy text / JSON and paste it into the tool input box",
+    "ext.title": "External & Sharing", "exp.title": "Experimental", "exp.callbackTitle": "External callback (plugin usage)", "exp.hint": "When enabled, external apps can invoke this tool via URL Scheme / Intent to process data and receive callback results.", "exp.input": "Data to return (defaults to external input)", "exp.genBtn": "Generate callback data", "exp.result": "Callback payload (JSON)", "exp.schemeTitle": "Callback URL (URL Scheme)", "exp.intentTitle": "Android Intent example", "exp.copy": "Copy", "exp.noteTitle": "Feasibility note", "exp.note": "This is a pure-web PWA: the the web layer cannot write data back into another app directly. Two supported ways: ① the caller passes a callback URL via Scheme/Intent, and this app encodes the result into that URL and jumps back; ② copy the result and paste it manually. A native wrapper (WebView + JS Bridge, e.g. Capacitor) enables true auto-callback.", "exp.usageIntro": "How an external app calls this tool, processes data, and receives the callback result: the caller launches this tool via URL Scheme or Intent with the data and a callback URL; after processing, this tool returns the result (status, timestamp, processed data) to the callback URL.", "exp.step1Title": "Caller initiates the call", "exp.step1Body": "An external app launches this tool via URL Scheme with the text to process, the target feature, and a callback URL (the callback parameter). After processing, this tool appends the result to the callback URL and jumps back.", "exp.step2Title": "Callback data format", "exp.step2Body": "After processing, the callback URL carries a result parameter (URL-encoded JSON) containing ok (success), ts (timestamp), data (processed data), and app (app id). The caller parses it to get the result.", "exp.step3Title": "Android Intent example", "exp.step3Body": "Android apps can also launch this tool via Intent (requires registering an intent-filter after packaging). The result is returned via the callback URL the same way.", "exp.cb": "Data callback", "exp.import": "Import methods", "exp.importTitle": "Import methods", "exp.importHint": "External data can be passed into this app via:", "exp.importUrl": "URL Scheme: crypto-pwa://?text=content (also url / title params; JSON and image data URLs work too)", "exp.importIntent": "Android Intent: share to this app from other apps (requires an intent-filter once packaged)", "exp.importShare": "System share: pick “Share” in any app → choose this app (appears after PWA install)", "exp.importClip": "Clipboard: copy text / JSON and paste it into the tool input box",
     "ext.text":
       '<h3>1. System share (share sheet)</h3>' +
       '<p>Share text or a URL from a browser / file manager and pick this tool (must be installed as a PWA). It opens the “Incoming” chooser so you can pick encode / encrypt / QR, etc.</p>' +
@@ -476,7 +476,7 @@ window.I18N = {
     "ext.copyExample": "Copy example link",
 
     "display.title": "Display", "disp.lang": "Language", "disp.font": "Font size", "disp.immersive": "Immersive status bar",
-    "lang.system": "Follow system", "lang.zh": "简体中文", "lang.en": "English (US)",
+    "lang.system": "Follow system", "lang.zh": "中文", "lang.en": "English",
     "font.small": "Small", "font.normal": "Normal", "font.large": "Large", "font.xlarge": "Extra large",
 
     "common.title": "Saved Passwords", "common.add": "＋ Add", "common.empty": "No saved passwords yet. After saving, tap “Saved passwords” next to the key field in Encrypt/Decrypt or Asymmetric to fill instantly.",
@@ -486,7 +486,7 @@ window.I18N = {
     "about.title": "About",
     "about.update": "Check for updates", "about.checking": "Checking…", "about.latest": "You are up to date", "about.found": "New version found", "about.open": "Open GitHub releases", "about.fail": "Update check failed: ", "about.ver": "Version",
     "about.text":
-      '<p>A <strong>fully local</strong> crypto toolbox (PWA) that runs entirely in your browser — for learning and practicing hashing, encoding, QR and more.</p>' +
+      '<p>A <strong>fully local</strong> crypto toolbox (PWA) that runs entirely on your device — for learning and practicing hashing, encoding, QR and more.</p>' +
       '<h3>What it does</h3><ul>' +
       '<li>Hash: MD5 / SHA-1/224/256/384/512 / SHA-3 / RIPEMD-160 / HMAC</li>' +
       '<li>Encode: Base64 / Hex / URL, plus image-to-Base64</li>' +
@@ -497,21 +497,21 @@ window.I18N = {
       '<h3>Tech notes</h3><p>Core algorithms use the mature <a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a> library and native <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto</a>; QR uses <a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a>. Everything runs locally, no server involved.</p>' +
       '<h3>Open-source & where used</h3><ul>' +
       '<li><b><a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a></b> (MIT) — hashing & symmetric. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/crypto-js.js" target="_blank" rel="noopener">js/vendor/crypto-js.js</a>; used by Hash, Encode (image-to-Base64), and Encrypt/Decrypt panels.</li>' +
-      '<li><b><a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a></b> (MIT) — QR generation. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/qrcode-generator.js" target="_blank" rel="noopener">js/vendor/qrcode-generator.js</a>; used by the QR / Barcode panel (<code>qr-btn</code> calls its <code>qrcode()</code>).</li>' +
+      '<li><b><a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a></b> (MIT) — QR generation. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/qrcode-generator.js" target="_blank" rel="noopener">js/vendor/qrcode-generator.js</a>; used by the QR / Barcode panel (<b class="ref">qr-btn</b> calls its <b class="ref">qrcode()</b>).</li>' +
       '<li><b><a href="https://github.com/cozmo/jsQR" target="_blank" rel="noopener">jsQR</a></b> (Apache-2.0) — camera QR scanning. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsqr.js" target="_blank" rel="noopener">js/vendor/jsqr.js</a>; used by “Scan QR”.</li>' +
       '<li><b><a href="https://github.com/lindell/JsBarcode" target="_blank" rel="noopener">JsBarcode</a></b> (MIT) — barcode generation. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbarcode.all.min.js" target="_blank" rel="noopener">js/vendor/jsbarcode.all.min.js</a>; used by the Barcode panel.</li>' +
       '<li><b><a href="https://github.com/JuneAndGreen/sm-crypto" target="_blank" rel="noopener">sm-crypto</a></b> (MIT) — SM2 national crypto. File: <a href="' + GITHUB_REPO + '/blob/main/js/vendor/sm-crypto.esm.js" target="_blank" rel="noopener">js/vendor/sm-crypto.esm.js</a> (dependency rewired to local <a href="' + GITHUB_REPO + '/blob/main/js/vendor/jsbn.esm.js" target="_blank" rel="noopener">jsbn</a>); used by Asymmetric → SM2.</li>' +
-      '<li><b><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a></b> (native, no dependency) — RSA key gen, encrypt/decrypt, sign/verify. Location: native <code>crypto.subtle</code>; used by the Asymmetric → RSA pane, only on https / localhost.</li>' +
+      '<li><b><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API" target="_blank" rel="noopener">Web Crypto API</a></b> (native, no dependency) — RSA key gen, encrypt/decrypt, sign/verify. Location: native <b class="ref">crypto.subtle</b>; used by the Asymmetric → RSA pane, only on https / localhost.</li>' +
       '<li><b>This project’s code</b> (hand-written) — UI, interaction, history, password book, settings, theme and i18n are all custom; no third-party UI framework.</li></ul>' +
       '<p>Everything runs locally and offline; nothing is uploaded to any server.</p>',
 
     "privacy.title": "Privacy Policy",
     "privacy.text":
       '<p>We take your privacy seriously. Our commitments:</p>' +
-      '<h3>1. Local-only, no upload</h3><p>This app runs entirely in your browser. It <strong>connects to no server and uploads no data</strong>. Your input, keys, plaintext, ciphertext and results are never sent anywhere.</p>' +
+      '<h3>1. Local-only, no upload</h3><p>This app runs entirely on your device. It <strong>connects to no server and uploads no data</strong>. Your input, keys, plaintext, ciphertext and results are never sent anywhere.</p>' +
       '<h3>2. We collect nothing about you</h3><p>The developer cannot and <strong>will not collect</strong> any of your input, keys or results.</p>' +
       '<h3>3. Locally stored data</h3><ul>' +
-      '<li>“Recent” history is stored only in this browser’s localStorage, never uploaded;</li>' +
+      '<li>“Recent” history is stored only in local storage, never uploaded;</li>' +
       '<li>“Saved passwords” are stored only locally, never uploaded;</li>' +
       '<li>Theme, language and font preferences are also local only.</li></ul>' +
       '<h3>4. No tracking</h3><p>No ads, no analytics, no third-party tracking of any kind.</p>' +
@@ -544,7 +544,7 @@ window.I18N = {
       '<li><strong>File/Storage</strong>: only used by “Image to Base64” to read an image <strong>you pick</strong>; converted locally, never uploaded.</li>' +
       '<li><strong>Clipboard</strong>: only when you tap “Copy result”.</li>' +
       '<li><strong>Network</strong>: the app is <strong>offline by default</strong>; it goes online only when you open an online URL or use system “Share”.</li></ul>' +
-      '<h3>3. Where data lives</h3><p>All data (history, saved passwords, preferences) stays in <strong>your browser</strong> (localStorage / memory), <strong>never uploaded</strong>.</p>' +
+      '<h3>3. Where data lives</h3><p>All data (history, saved passwords, preferences) stays in <strong>your device</strong> (local storage / memory), <strong>never uploaded</strong>.</p>' +
       '<h3>4. Your rights</h3><p>You may clear history, delete saved passwords, or clear site data at any time.</p>',
 
     "about2.title": "About",
@@ -572,7 +572,7 @@ window.I18N = {
     "vp.del": "Delete",
     "vp.skip": "Not now", "vp.saveCur": "Save current",
     "vp.none": "No saved entries yet.",
-    "paste": "Paste", "vp.pasteOk": "Pasted & applied ✅", "vp.pasteBad": "Clipboard content does not match this key format", "vp.pasteDenied": "Cannot read clipboard (check browser permission)",
+    "paste": "Paste", "vp.pasteOk": "Pasted & applied ✅", "vp.pasteBad": "Clipboard content does not match this key format", "vp.pasteDenied": "Cannot read clipboard (check system permission)",
     "vp.book": " Password Book",
     "vp.generic": "General",
     "vp.rsaPriv": "RSA Private Key",

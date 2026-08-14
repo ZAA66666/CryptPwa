@@ -301,7 +301,7 @@
     titleEl.textContent = t("set.title");
     const groups = [
       { title: t("set.grpGeneral"), items: ["display", "theme", "extcall", "exp", "storage"] },
-      { title: t("set.grpData"), items: ["common", "sync"] },
+      { title: t("set.grpData"), items: ["common", "sync", "cache"] },
       { title: t("set.grpPrivacy"), items: ["about", "privacy", "terms", "security", "personal"] },
     ];
     let html = "";
@@ -325,6 +325,20 @@
     encToggle.onchange = () => {
       const on = encToggle.checked;
       if (on) {
+        if (window.dialog) {
+          window.dialog.prompt(t("common.setMaster") + "：" + t("common.masterPlaceholder")).then((master) => {
+            if (!master) { encToggle.checked = false; return; }
+            const plain = localStorage.getItem(PLAIN_KEY);
+            const arr = plain ? JSON.parse(plain) : [];
+            localStorage.removeItem(PLAIN_KEY);
+            setDataEnc(true);
+            setupVault(master);
+            writePasswords(arr);
+            alert(t("enc.on"));
+            render();
+          });
+          return;
+        }
         const master = window.prompt(t("common.setMaster") + "：" + t("common.masterPlaceholder"));
         if (!master) { encToggle.checked = false; return; }
         const plain = localStorage.getItem(PLAIN_KEY);
@@ -362,6 +376,16 @@
           `</div>` +
           `<div class="legal-text">${t(name + ".text")}</div>`;
       }
+    } else if (name === "cache") {
+      /* 清理缓存：清日志等临时数据，显示上次清理时间 */
+      titleEl.textContent = t("cache.title");
+      const last = localStorage.getItem("set_cache_clear_time") || "";
+      html =
+        `<div class="cp-note">${t("cache.hint")}</div>` +
+        `<div class="cp-form">` +
+        `<div class="settings-row" style="margin:0 0 4px"><span class="sr-label">${t("cache.lastClear")}</span><span class="sr-value" id="cache-last">${escapeHtml(last || t("cache.never"))}</span></div>` +
+        `<div class="btn-row"><button class="btn primary" id="cache-clear">🧹 ${t("cache.clearBtn")}</button></div>` +
+        `</div>`;
     } else if (name === "common") {
       renderCommon();
       return;
@@ -497,7 +521,25 @@
   }
 
   function attachSubview(name) {
-    if (name === "storage") {
+    if (name === "cache") {
+      const btn = document.getElementById("cache-clear");
+      if (btn) btn.onclick = () => {
+        /* 清日志等临时缓存 */
+        if (window.__clearLog) window.__clearLog();
+        try {
+          Object.keys(localStorage).forEach((k) => {
+            if (k.indexOf("crypto_log") === 0) localStorage.removeItem(k);
+          });
+        } catch (e) {}
+        const now = new Date();
+        const stamp = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0") + " " + String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+        localStorage.setItem("set_cache_clear_time", stamp);
+        const el = bodyEl.querySelector("#cache-last");
+        if (el) el.textContent = stamp;
+        if (window.__log) window.__log("cache", "缓存已清理 @" + stamp);
+        if (window.toast) window.toast(t("cache.done") + " " + stamp);
+      };
+    } else if (name === "storage") {
       document.getElementById("sp-save").onclick = () => {
         const v = (bodyEl.querySelector("#sp-path").value || "").trim() || "sdcard/CrytoPwa";
         setSetting("savepath", v);
@@ -692,8 +734,11 @@
           const newer = cmp.some((n) => n > 0) && cmp.findIndex((n) => n !== 0) >= 0 && cmp[cmp.findIndex((n) => n !== 0)] > 0;
           if (newer) {
             const msg = t("about.found") + " v" + tag + "（" + t("about.ver") + " " + APP_VERSION + "）";
-            if (window.confirm(msg + "\n\n" + t("about.open") + "？")) {
-              window.open(rel.html_url || GITHUB_REPO + "/releases", "_blank");
+            const openRel = () => window.open(rel.html_url || GITHUB_REPO + "/releases", "_blank");
+            if (window.dialog) {
+              window.dialog.confirm(msg, { title: t("about.update") }).then((ok) => { if (ok) openRel(); });
+            } else if (window.confirm(msg + "\n\n" + t("about.open") + "？")) {
+              openRel();
             }
             if (hint) hint.textContent = t("about.found") + " v" + tag;
           } else {
@@ -832,9 +877,12 @@
           const a = readPasswords(); a.splice(i, 1); writePasswords(a); render();
         };
         row.querySelector(".cp-ren").onclick = () => {
-          const nv = window.prompt(t("rsa.rename") + "：", p.label || "");
-          if (nv === null) return;
-          const a = readPasswords(); a[i].label = nv.trim() || a[i].label; writePasswords(a); render();
+          const doRen = (nv) => {
+            if (nv === null) return;
+            const a = readPasswords(); a[i].label = nv.trim() || a[i].label; writePasswords(a); render();
+          };
+          if (window.dialog) window.dialog.prompt(t("rsa.rename") + "：", p.label || "").then(doRen);
+          else doRen(window.prompt(t("rsa.rename") + "：", p.label || ""));
         };
         list.appendChild(row);
       });
@@ -921,9 +969,14 @@
             const ud = JSON.parse(o.UserData);
             if (ud && typeof ud === "object" && ud.ct && ud.salt && ud.iv) {
               /* 加密文件：输入主密码解密后写入 */
-              const master = window.prompt(t("common.masterPlaceholder"));
-              if (!master) return;
-              writePasswords(decryptVault(o.UserData, master));
+              const doImp = (master) => {
+                if (!master) return;
+                writePasswords(decryptVault(o.UserData, master));
+                render(); alert(t("common.importDone"));
+              };
+              if (window.dialog) window.dialog.prompt(t("common.masterPlaceholder")).then(doImp);
+              else doImp(window.prompt(t("common.masterPlaceholder")));
+              return;
             } else if (Array.isArray(ud)) {
               writePasswords(ud); // 明文文件
             } else throw new Error("fmt");
@@ -934,16 +987,22 @@
       };
       /* 修改主密码 */
       bodyEl.querySelector("#mp-change").onclick = () => {
-        const cur = window.prompt(t("common.masterPlaceholder"));
-        if (!cur) return;
-        let arr;
-        try { arr = decryptVault(localStorage.getItem(VAULT_KEY), cur); }
-        catch (e) { alert(t("common.importFail")); return; }
-        const nw = window.prompt(t("common.confirmMaster"));
-        if (!nw) return;
-        sessionMaster = nw;
-        localStorage.setItem(VAULT_KEY, encryptVault(arr, nw));
-        alert(t("common.changeMaster") + " ✅"); render();
+        const doChange = (cur) => {
+          if (!cur) return;
+          let arr;
+          try { arr = decryptVault(localStorage.getItem(VAULT_KEY), cur); }
+          catch (e) { alert(t("common.importFail")); return; }
+          const doSet = (nw) => {
+            if (!nw) return;
+            sessionMaster = nw;
+            localStorage.setItem(VAULT_KEY, encryptVault(arr, nw));
+            alert(t("common.changeMaster") + " ✅"); render();
+          };
+          if (window.dialog) window.dialog.prompt(t("common.confirmMaster")).then(doSet);
+          else doSet(window.prompt(t("common.confirmMaster")));
+        };
+        if (window.dialog) window.dialog.prompt(t("common.masterPlaceholder")).then(doChange);
+        else doChange(window.prompt(t("common.masterPlaceholder")));
       };
       /* 锁定（清空内存中的主密码）：加反馈提示 */
       bodyEl.querySelector("#mp-lock").onclick = () => {
@@ -1070,7 +1129,7 @@
     const text = await res.text();
     if (isBackupBundle(text)) { applyBackup(text, scope); }
     else {
-      const master = window.prompt(t("common.masterPlaceholder"));
+      const master = await window.dialog.prompt(t("common.masterPlaceholder"));
       if (!master) throw new Error("cancel");
       importVault(text, master); // 旧版纯密码本：校验主密码并写入
     }
@@ -1214,10 +1273,13 @@
           });
           return;
         }
-        const master = window.prompt(t("common.masterPlaceholder"));
-        if (!master) return;
-        try { importVault(txt, master); render(); alert(t("sync.importDone")); }
-        catch (e) { alert(t("sync.importFail")); }
+        const doImp = (master) => {
+          if (!master) return;
+          try { importVault(txt, master); render(); alert(t("sync.importDone")); }
+          catch (e) { alert(t("sync.importFail")); }
+        };
+        if (window.dialog) window.dialog.prompt(t("common.masterPlaceholder")).then(doImp);
+        else doImp(window.prompt(t("common.masterPlaceholder")));
       };
       reader.readAsText(f);
     };

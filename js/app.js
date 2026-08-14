@@ -41,10 +41,19 @@ function copyText(text, btn) {
   if (!text) return;
   /* 大内容：自动判别是否超过剪贴板限制 → 提示另存为文件（保存到设置的保存路径） */
   if (utf8ByteLength(text) > COPY_FILE_LIMIT) {
-    const ok = window.confirm(_t("copy.bigFileAsk", "内容较大（超过约 5000 字节，剪贴板可能放不下）\n是否保存为文件？"));
-    if (!ok) return;
-    const name = "result_" + new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19).replace("T", "_") + ".txt";
-    saveTextFile(name, text);
+    if (window.dialog) {
+      window.dialog.confirm(_t("copy.bigFileAsk", "内容较大（超过约 5000 字节，剪贴板可能放不下）\n是否保存为文件？"), { title: _t("dlg.confirm", "确认") })
+        .then((ok) => {
+          if (!ok) return;
+          const name = "result_" + new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19).replace("T", "_") + ".txt";
+          saveTextFile(name, text);
+        });
+    } else {
+      const ok = window.confirm(_t("copy.bigFileAsk", "内容较大（超过约 5000 字节，剪贴板可能放不下）\n是否保存为文件？"));
+      if (!ok) return;
+      const name = "result_" + new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19).replace("T", "_") + ".txt";
+      saveTextFile(name, text);
+    }
     return;
   }
   const done = () => { const o = btn.textContent; btn.textContent = "✅ 已复制"; setTimeout(() => (btn.textContent = o), 1200); };
@@ -195,6 +204,111 @@ function toast(msg, ms = 1800) {
   clearTimeout(__toastTimer);
   __toastTimer = setTimeout(() => el.classList.remove("show"), ms);
 }
+
+/* ---------- 统一弹窗系统（替代默认 alert/confirm/prompt，中心扩散动画） ---------- */
+(function () {
+  let maskEl = null, boxEl = null;
+  const _esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  function ensure() {
+    if (!maskEl) {
+      maskEl = document.createElement("div");
+      maskEl.id = "dlg-mask"; maskEl.className = "dlg-mask";
+      document.body.appendChild(maskEl);
+      boxEl = document.createElement("div");
+      boxEl.id = "dlg-box"; boxEl.className = "dlg-box";
+      document.body.appendChild(boxEl);
+    }
+    return boxEl;
+  }
+  function close() {
+    if (maskEl) { maskEl.classList.remove("show"); boxEl.classList.remove("show"); }
+  }
+  function open(html, cls) {
+    const box = ensure();
+    box.className = "dlg-box" + (cls ? " " + cls : "");
+    box.innerHTML = html;
+    maskEl.classList.add("show");
+    box.classList.add("show");
+    return box;
+  }
+  const T = (k, f) => (typeof t === "function" ? (t(k) === k ? f : t(k)) : f);
+  window.dialog = {
+    /* 提示 */
+    alert: function (msg, title) {
+      return new Promise((res) => {
+        const box = open(
+          `<div class="dlg-title">${_esc(title || T("dlg.tip", "提示"))}</div>` +
+          `<div class="dlg-body">${String(msg == null ? "" : msg).replace(/\n/g, "<br>")}</div>` +
+          `<div class="dlg-actions"><button class="btn primary" id="dlg-ok">${_esc(T("dlg.ok", "确定"))}</button></div>`
+        );
+        const ok = box.querySelector("#dlg-ok");
+        if (ok) ok.focus();
+        const done = () => { close(); ok.removeEventListener("click", done); maskEl.removeEventListener("click", done); res(); };
+        if (ok) ok.addEventListener("click", done);
+        maskEl.addEventListener("click", done);
+      });
+    },
+    /* 确认：返回 Promise<boolean> */
+    confirm: function (msg, opts) {
+      opts = opts || {};
+      return new Promise((res) => {
+        const box = open(
+          `<div class="dlg-title">${_esc(opts.title || T("dlg.confirm", "确认"))}</div>` +
+          `<div class="dlg-body">${String(msg == null ? "" : msg).replace(/\n/g, "<br>")}</div>` +
+          `<div class="dlg-actions">` +
+          `<button class="btn ghost" id="dlg-no">${_esc(opts.noLabel || T("dlg.cancel", "取消"))}</button>` +
+          `<button class="btn primary" id="dlg-yes">${_esc(opts.yesLabel || T("dlg.ok", "确定"))}</button>` +
+          `</div>`
+        );
+        const done = (v) => { close(); res(v); };
+        box.querySelector("#dlg-no").addEventListener("click", () => done(false));
+        box.querySelector("#dlg-yes").addEventListener("click", () => done(true));
+        maskEl.addEventListener("click", () => done(false));
+      });
+    },
+    /* 输入：返回 Promise<string|null> */
+    prompt: function (msg, placeholder) {
+      return new Promise((res) => {
+        const box = open(
+          `<div class="dlg-title">${_esc(T("dlg.input", "输入"))}</div>` +
+          `<div class="dlg-body">${String(msg == null ? "" : msg).replace(/\n/g, "<br>")}</div>` +
+          `<input id="dlg-input" type="text" placeholder="${_esc(placeholder || "")}" />` +
+          `<div class="dlg-actions">` +
+          `<button class="btn ghost" id="dlg-no">${_esc(T("dlg.cancel", "取消"))}</button>` +
+          `<button class="btn primary" id="dlg-yes">${_esc(T("dlg.ok", "确定"))}</button>` +
+          `</div>`
+        );
+        const inp = box.querySelector("#dlg-input");
+        const done = (v) => { close(); res(v); };
+        box.querySelector("#dlg-no").addEventListener("click", () => done(null));
+        box.querySelector("#dlg-yes").addEventListener("click", () => done(inp.value));
+        maskEl.addEventListener("click", () => done(null));
+        setTimeout(() => inp.focus(), 60);
+      });
+    },
+    /* 底部动作表（bottom sheet） */
+    sheet: function (items, title) {
+      return new Promise((res) => {
+        const list = items.map((it, i) =>
+          `<button class="sheet-item" data-i="${i}">${_esc(it.label)}${it.desc ? `<span class="sheet-desc">${_esc(it.desc)}</span>` : ""}</button>`
+        ).join("");
+        const box = open(
+          `<div class="sheet-title">${_esc(title || "")}</div><div class="sheet-list">${list}</div>`,
+          "dlg-sheet"
+        );
+        const done = (i) => { close(); res(items[i] || null); };
+        box.querySelectorAll(".sheet-item").forEach((b) =>
+          b.addEventListener("click", () => done(parseInt(b.dataset.i, 10)))
+        );
+        maskEl.addEventListener("click", () => done(-1));
+      });
+    },
+    close: close,
+  };
+  /* 覆盖系统 alert（无返回值，安全）；confirm/prompt 保持系统原样（同步 API 不破坏既有逻辑），
+     新代码请用 dialog.confirm / dialog.prompt（异步 Promise） */
+  window.alert = function (m) { window.dialog.alert(m); };
+})();
 // 分类 → 主页工具图标（与工具网格一致），历史记录用图标而非文字徽章
 const CAT_ICONS = {
   hash: '<path d="M9 4 7 20"/><path d="M17 4 15 20"/><path d="M4 9h16"/><path d="M3.5 15h17"/>',
@@ -1541,6 +1655,14 @@ function ensureExpEl(id, cls) {
 function openEditor(ta, editable) {
   const mask = ensureExpEl("exp-mask", "exp-mask");
   const panel = ensureExpEl("exp-panel", "exp-panel");
+  /* 延伸方向：输入框在上半屏 → 从顶部滑入；下半屏 → 从底部滑入 */
+  try {
+    const r = ta.getBoundingClientRect ? ta.getBoundingClientRect() : null;
+    const vh = window.innerHeight || 800;
+    panel.classList.remove("from-top", "from-bottom");
+    if (r && r.top > vh / 2) panel.classList.add("from-bottom");
+    else if (r) panel.classList.add("from-top");
+  } catch (e) {}
   const title = (typeof t === "function") ? t("ui.full") : "全屏编辑";
   if (editable) {
     const doneLbl = (typeof t === "function") ? t("ui.done") : "完成";

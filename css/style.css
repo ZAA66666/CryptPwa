@@ -1341,3 +1341,74 @@ input[type="file"] { font-size: calc(13px * var(--fs)); }
   border: 1px solid var(--border); border-radius: 12px; background: var(--settings-bg);
   color: var(--text); padding: 10px; resize: vertical; word-break: break-all;
 }
+
+/* ===== 统一弹窗系统（中心扩散动画） ===== */
+.dlg-mask {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(0,0,0,0.45);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+.dlg-mask.show { opacity: 1; pointer-events: auto; }
+.dlg-box {
+  position: fixed; left: 50%; top: 50%;
+  width: min(86vw, 400px);
+  transform: translate(-50%, -50%) scale(0.85);
+  background: var(--card); color: var(--text);
+  border-radius: 20px; padding: 20px 20px 16px;
+  z-index: 91;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.32);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+.dlg-box.show { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+.dlg-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.dlg-body { font-size: 14px; line-height: 1.7; color: var(--text); margin-bottom: 4px; word-break: break-all; }
+.dlg-box input {
+  width: 100%; margin-top: 10px; padding: 11px 12px; box-sizing: border-box;
+  font-size: 15px; border: 1px solid var(--border); border-radius: 12px;
+  background: var(--settings-bg); color: var(--text); outline: none;
+}
+.dlg-box input:focus { border-color: var(--accent); }
+.dlg-actions { display: flex; gap: 10px; margin-top: 16px; }
+.dlg-actions .btn { flex: 1 1 auto; }
+
+/* 底部动作表（bottom sheet） */
+.dlg-box.dlg-sheet {
+  left: 0; top: auto; bottom: 0;
+  width: 100%; max-width: 100%;
+  border-radius: 22px 22px 0 0;
+  padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  transition: opacity 0.2s ease, transform 0.26s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.dlg-box.dlg-sheet.show { transform: translateY(0); }
+.sheet-title { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 6px; }
+.sheet-list { display: flex; flex-direction: column; gap: 4px; }
+.sheet-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  width: 100%; border: none; background: transparent; color: var(--text);
+  font-size: 15px; padding: 13px 12px; border-radius: 12px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.sheet-item:active { background: var(--settings-bg); }
+.sheet-desc { font-size: 12px; color: var(--muted); }
+
+/* 统一现有居中弹窗（vp/exp/scan）为中心扩散动画，避免右下角弹入感 */
+.vp-panel, .exp-panel, .scan-panel, .rsan-panel {
+  transform: translate(-50%, -50%) scale(0.86) !important;
+  transition: opacity 0.2s ease, transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.15) !important;
+}
+.vp-panel.show, .exp-panel.show, .scan-panel.show, .rsan-panel.show {
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+/* 全屏编辑延伸：上方触发 → 从顶部下滑；下方触发 → 从底部上滑 */
+.exp-panel.from-top { transform: translate(-50%, -108%) scale(0.92) !important; }
+.exp-panel.from-top.show { transform: translate(-50%, -50%) scale(1) !important; }
+.exp-panel.from-bottom { transform: translate(-50%, 8%) scale(0.92) !important; }
+.exp-panel.from-bottom.show { transform: translate(-50%, -50%) scale(1) !important; }
+
+/* About 页调用方法引用：加粗 + 底部横线（替代 code 样式） */
+.legal-text b.ref { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; color: var(--accent); }
+/* 清理缓存页：上次清理时间值 */
+.settings-row .sr-value { font-size: 14px; color: var(--text); font-weight: 600; }
