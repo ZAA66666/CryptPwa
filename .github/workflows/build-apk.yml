@@ -46,6 +46,11 @@ jobs:
         run: |
           npm run sync
 
+      - name: Run static & algorithm tests
+        run: |
+          node scripts/tests/consistency.cjs
+          node scripts/tests/smoke.cjs
+
       - name: Determine build type (push 默认 release)
         id: bt
         run: |

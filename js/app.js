@@ -317,6 +317,7 @@ const CAT_ICONS = {
   rsa: '<circle cx="8.5" cy="8.5" r="3.6"/><path d="M11 11 20 20"/><path d="M16.5 16.5 19 14"/><path d="M14.5 14.5 17 12"/>',
   qr: '<rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="5" y="5" width="3" height="3" rx="0.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="16" y="5" width="3" height="3" rx="0.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="5" y="16" width="3" height="3" rx="0.6"/><rect x="14" y="14" width="3" height="3" rx="1"/><rect x="18" y="18" width="3" height="3" rx="1"/>',
   json: '<path d="M8 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h2"/><path d="M16 3h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2"/><path d="M9 9l3 3-3 3"/><path d="M15 9l-3 3 3 3"/>',
+  txt: '<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>',
   sm2: '<path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/><path d="M9 12l2 2 4-4"/>',
   cron: '<circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/>',
   rand: '<rect x="4" y="4" width="7" height="7" rx="1.4"/><circle cx="7.5" cy="7.5" r="1"/><rect x="13" y="13" width="7" height="7" rx="1.4"/><circle cx="16.5" cy="16.5" r="1"/>',
@@ -370,9 +371,13 @@ function renderHistory() {
   if (!list) return;
   const arr = loadHistory();
   list.innerHTML = "";
-  if (arr.length === 0) { empty.style.display = ""; return; }
-  empty.style.display = "none";
-  arr.forEach((it) => {
+  if (arr.length === 0) { if (empty) empty.style.display = ""; return; }
+  if (empty) empty.style.display = "none";
+  const f = (typeof window.__histFilter === "string" && window.__histFilter) || "all";
+  const filtered = f === "all" ? arr : arr.filter((it) => it.cat === f);
+  if (filtered.length === 0) { if (empty) { empty.textContent = (typeof t === "function" ? t("hist.none") : "该分类暂无记录"); empty.style.display = ""; } return; }
+  if (empty) empty.style.display = "none";
+  filtered.forEach((it) => {
     const sub = (it.preview || "") + (it.extra ? " · " + it.extra : "");
     // 分类本地化名称（仅作 title 提示，主视觉用图标）
     let catName = it.cat;
@@ -396,9 +401,32 @@ function renderHistory() {
     list.appendChild(li);
   });
 }
+/* 历史记录：类型筛选 */
+(function () {
+  const wrap = document.getElementById("hist-filters");
+  if (!wrap) return;
+  wrap.querySelectorAll(".chip").forEach((b) => {
+    b.addEventListener("click", () => {
+      wrap.querySelectorAll(".chip").forEach((x) => x.classList.remove("active"));
+      b.classList.add("active");
+      window.__histFilter = b.dataset.f;
+      renderHistory();
+    });
+  });
+})();
+/* 历史记录：导出 JSON */
+document.getElementById("history-export").addEventListener("click", () => {
+  const arr = loadHistory();
+  if (!arr.length) { toast(t("hist.emptyTip")); return; }
+  const name = "history_" + new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19).replace("T", "_") + ".json";
+  window.downloadJson(name, JSON.stringify(arr, null, 2));
+  if (window.toast) toast(t("hist.exported"));
+});
 document.getElementById("history-clear").addEventListener("click", () => {
   if (loadHistory().length === 0) { toast(t("hist.emptyTip")); return; }
-  if (confirm(t("hist.clearConfirm"))) { saveHistory([]); renderHistory(); }
+  if (window.dialog) {
+    window.dialog.confirm(t("hist.clearConfirm"), { title: t("hist.clear") }).then((ok) => { if (ok) { saveHistory([]); renderHistory(); } });
+  } else if (confirm(t("hist.clearConfirm"))) { saveHistory([]); renderHistory(); }
 });
 
 /* ---------- 2. 哈希面板 ---------- */
@@ -566,6 +594,72 @@ function jwtEncode(inp) {
   return b64urlEncode(JSON.stringify(header)) + "." + b64urlEncode(JSON.stringify(payload)) + ".";
 }
 
+/* ===== 编码扩展 2：Octal / ASCII / HTML entity / UTF-16 / Roman（纯 JS，离线可用） ===== */
+function toOctal(str) {
+  return Array.from(str).map((ch) => {
+    const cp = ch.codePointAt(0);
+    return cp.toString(8).padStart(4, "0");
+  }).join(" ");
+}
+function fromOctal(str) {
+  return str.trim().split(/\s+/).map((o) => {
+    if (!/^[0-7]+$/.test(o)) throw new Error("非法八进制：" + o);
+    return String.fromCodePoint(parseInt(o, 8));
+  }).join("");
+}
+function toAsciiDec(str) {
+  return Array.from(str).map((ch) => ch.codePointAt(0)).join(" ");
+}
+function fromAsciiDec(str) {
+  return str.trim().split(/[\s,]+/).map((n) => {
+    if (!/^\d+$/.test(n)) throw new Error("非法十进制：" + n);
+    const v = parseInt(n, 10);
+    if (v > 0x10ffff) throw new Error("超出 Unicode 范围：" + n);
+    return String.fromCodePoint(v);
+  }).join("");
+}
+function htmlEntityEncode(str) {
+  return str
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function htmlEntityDecode(str) {
+  const ta = document.createElement("textarea");
+  ta.innerHTML = str;
+  return ta.value;
+}
+function utf16Encode(str) {
+  let out = "";
+  for (let i = 0; i < str.length; i++) out += "\\u" + str.charCodeAt(i).toString(16).padStart(4, "0");
+  return out;
+}
+function utf16Decode(str) {
+  return str.replace(/\\u([0-9a-fA-F]{4})/g, (_, h) => String.fromCharCode(parseInt(h, 16)));
+}
+const ROMAN_NUM = [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"], [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]];
+function toRoman(str) {
+  return str.trim().split(/[\s,]+/).map((tok) => {
+    if (!/^\d+$/.test(tok)) throw new Error("罗马数字仅支持整数：" + tok);
+    let n = parseInt(tok, 10);
+    if (n < 1 || n > 3999) throw new Error("范围 1~3999：" + tok);
+    let out = "";
+    for (const [v, sym] of ROMAN_NUM) { while (n >= v) { out += sym; n -= v; } }
+    return out;
+  }).join(" ");
+}
+function fromRoman(str) {
+  return str.trim().split(/[\s,]+/).map((tok) => {
+    const up = tok.toUpperCase();
+    let n = 0, i = 0;
+    for (const [v, sym] of ROMAN_NUM) {
+      while (up.startsWith(sym, i)) { n += v; i += sym.length; }
+    }
+    if (i !== up.length) throw new Error("非法罗马数字：" + tok);
+    if (toRoman(String(n)) !== up) throw new Error("非法罗马数字：" + tok);
+    return String(n);
+  }).join(" ");
+}
+
 // action: "enc" 编码 / "dec" 解码
 function encDo(action) {
   encLastOp = action;
@@ -584,6 +678,11 @@ function encDo(action) {
         case "b58": result = base58Encode(new TextEncoder().encode(inp)); break;
         case "unicode": result = toUnicodeEscapes(inp); break;
         case "jwt": result = jwtEncode(inp); break;
+        case "oct": result = toOctal(inp); break;
+        case "ascii": result = toAsciiDec(inp); break;
+        case "htmlent": result = htmlEntityEncode(inp); break;
+        case "utf16": result = utf16Encode(inp); break;
+        case "roman": result = toRoman(inp); break;
       }
     } else {
       switch (method) {
@@ -594,11 +693,16 @@ function encDo(action) {
         case "b58": result = new TextDecoder().decode(base58Decode(inp.trim())); break;
         case "unicode": result = fromUnicodeEscapes(inp); break;
         case "jwt": result = jwtDecode(inp.trim()); break;
+        case "oct": result = fromOctal(inp); break;
+        case "ascii": result = fromAsciiDec(inp); break;
+        case "htmlent": result = htmlEntityDecode(inp); break;
+        case "utf16": result = utf16Decode(inp); break;
+        case "roman": result = fromRoman(inp); break;
       }
     }
     out.value = result;
     if (!out.value.startsWith("❌")) {
-      const methodName = { b64: "Base64", hex: "Hex", url: "URL", b32: "Base32", b58: "Base58", unicode: "Unicode", jwt: "JWT" }[method];
+      const methodName = { b64: "Base64", hex: "Hex", url: "URL", b32: "Base32", b58: "Base58", unicode: "Unicode", jwt: "JWT", oct: "Octal", ascii: "ASCII", htmlent: "HTML 实体", utf16: "UTF-16", roman: "罗马数字" }[method];
       addHistory({ cat: "enc", go: "enc", op: action, method: methodName, preview: inp.slice(0, 24) });
       // 编码没有密码概念，不提示保存到密码本（仅加解密相关功能才会提示）
       if (window.toast) toast(t(action === "enc" ? "enc.okEnc" : "enc.okDec"));
@@ -1319,12 +1423,44 @@ document.getElementById("qr-btn").addEventListener("click", () => {
     const qr = qrcode(0, document.getElementById("qr-ec").value); // 0=自动选版本
     qr.addData(text);
     qr.make();
-    box.innerHTML = qr.createSvgTag({ cellSize: 6, margin: 8, scalable: true });
+    let svg = qr.createSvgTag({ cellSize: 6, margin: 8, scalable: true });
+    /* 美化：前景色 / 背景色 */
+    const fg = document.getElementById("qr-fg") ? document.getElementById("qr-fg").value || "#000000" : "#000000";
+    const bg = document.getElementById("qr-bg") ? document.getElementById("qr-bg").value || "#ffffff" : "#ffffff";
+    svg = svg.replace(/fill="black"/g, 'fill="' + fg + '"').replace(/fill="white"/g, 'fill="' + bg + '"');
+    /* 美化：中心 Logo（图片 dataURL 叠加） */
+    if (window.__qrLogo) {
+      const m = svg.match(/viewBox="0 0 (\d+) (\d+)"/);
+      if (m) {
+        const size = parseInt(m[1], 10);
+        const l = Math.max(20, Math.round(size * 0.24));
+        const pos = Math.round((size - l) / 2);
+        svg = svg.replace("</svg>",
+          `<rect x="${pos - 2}" y="${pos - 2}" width="${l + 4}" height="${l + 4}" rx="${l / 2 + 2}" fill="${bg}" />` +
+          `<image href="${window.__qrLogo}" x="${pos}" y="${pos}" width="${l}" height="${l}" preserveAspectRatio="xMidYMid meet" />` +
+          `</svg>`);
+      }
+    }
+    box.innerHTML = svg;
     addHistory({ cat: "qr", go: "qr", op: "gen", preview: text.slice(0, 24) });
   } catch (e) {
     box.innerHTML = '<p class="hint error">内容过长，无法生成二维码</p>';
   }
 });
+/* 二维码美化：Logo 选择/清除 */
+(function () {
+  const logoBtn = document.getElementById("qr-logo-btn");
+  const logoFile = document.getElementById("qr-logo-file");
+  const logoClear = document.getElementById("qr-logo-clear");
+  if (logoBtn && logoFile) logoBtn.onclick = () => logoFile.click();
+  if (logoFile) logoFile.onchange = () => {
+    const f = logoFile.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { window.__qrLogo = r.result; if (window.toast) toast(typeof t === "function" ? t("qr.logoOk") : "已设置 Logo，重新生成即可看到"); };
+    r.readAsDataURL(f);
+  };
+  if (logoClear) logoClear.onclick = () => { window.__qrLogo = ""; if (window.toast) toast(typeof t === "function" ? t("qr.logoCleared") : "已清除 Logo"); };
+})();
 document.getElementById("qr-download").addEventListener("click", () => {
   const svg = document.querySelector("#qr-output svg");
   if (!svg) return;
@@ -1577,6 +1713,10 @@ function applyLaunchParams() {
   const raw = p.get("text") || p.get("url") || p.get("title") || "";
   const text = (raw || "").trim();
 
+  /* 外部回调地址：调用方带 callback=... 时，处理完后可跳回 */
+  const cb = (p.get("callback") || "").trim();
+  window.__callback = cb || "";
+
   // 若用户在「设置→外部调用与分享」中关闭了自动弹出，则忽略外部内容
   const extOn = (localStorage.getItem("set_ext_incoming") || "1") === "1";
   if (text && !extOn) return;
@@ -1591,6 +1731,7 @@ function applyLaunchParams() {
       window.__incomingText = text;
     }
     wireIncomingChips();
+    wireCallback();
     showPanel("incoming");
     renderIncoming();
     return;
@@ -1647,6 +1788,40 @@ window.__dragDrop = function (text) {
   showPanel("incoming");
   renderIncoming();
 };
+/* 系统分享接收：其他 App「分享」文本/图片 → 这里（原生 ACTION_SEND intent） */
+window.__sharedText = function (text) {
+  try {
+    if (window.__log) window.__log("share", String(text).slice(0, 200));
+  } catch (e) {}
+  const s = String(text || "").trim();
+  if (!s) return;
+  if (s.startsWith("content://") || s.startsWith("file://") || /\.(png|jpe?g|gif|webp)$/i.test(s)) {
+    window.__incomingImage = s;
+    window.__incomingText = "";
+  } else {
+    window.__incomingImage = "";
+    window.__incomingText = s;
+  }
+  try { if (window.toast) toast(typeof t === "function" ? t("inc.dragOk") : "已接收分享的内容"); } catch (e) {}
+  wireIncomingChips();
+  showPanel("incoming");
+  renderIncoming();
+};
+/* 外部回调：把处理结果跳回调用方（callback 参数） */
+function wireCallback() {
+  const card = document.getElementById("inc-callback-card");
+  if (!card) return;
+  if (!window.__callback) { card.hidden = true; return; }
+  card.hidden = false;
+  const btn = document.getElementById("inc-callback-go");
+  if (btn) btn.onclick = () => {
+    const result = (document.getElementById("inc-callback-input") || {}).value || window.__incomingText || "";
+    let url = window.__callback;
+    url += (url.indexOf("?") >= 0 ? "&" : "?") + "result=" + encodeURIComponent(result);
+    try { if (window.__log) window.__log("callback", url.slice(0, 200)); } catch (e) {}
+    window.location.href = url;
+  };
+}
 
 /* ---------- 7.5 编辑框增强：清空按钮 + 全屏编辑 ---------- */
 // 给所有 textarea 包一层 .expand-wrap：
@@ -2255,6 +2430,77 @@ function setupExpanders() {
     const v = $("rand-output").value;
     if (v) copyText(v, e.currentTarget);
   });
+})();
+
+/* ---------- 7.9 文本工具（字数统计 / 去重 / 文本对比） ---------- */
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const tabs = $("txt-tabs");
+  const panes = { count: $("txt-pane-count"), dedupe: $("txt-pane-dedupe"), diff: $("txt-pane-diff") };
+  if (tabs) {
+    tabs.querySelectorAll("button").forEach((b) => {
+      b.addEventListener("click", () => {
+        tabs.querySelectorAll("button").forEach((x) => x.classList.remove("active"));
+        b.classList.add("active");
+        Object.keys(panes).forEach((k) => { if (panes[k]) panes[k].hidden = (k !== b.dataset.v); });
+      });
+    });
+  }
+  /* 字数统计：实时 */
+  const cntInput = $("txt-count-input");
+  if (cntInput) {
+    const upd = () => {
+      const v = cntInput.value;
+      if ($("st-chars")) $("st-chars").textContent = v.length;
+      if ($("st-lines")) $("st-lines").textContent = v ? v.split(/\n/).length : 0;
+      if ($("st-words")) $("st-words").textContent = v ? (v.match(/[\u4e00-\u9fff]|[A-Za-z0-9]+/g) || []).length : 0;
+      if ($("st-bytes")) $("st-bytes").textContent = new TextEncoder().encode(v).length;
+    };
+    cntInput.addEventListener("input", upd);
+    upd();
+  }
+  /* 去重：每行一条，Set 去重（可选保留空行） */
+  if ($("txt-dupe-btn")) $("txt-dupe-btn").addEventListener("click", () => {
+    const lines = $("txt-dupe-input").value.split("\n");
+    const seen = new Set();
+    const out = lines.filter((l) => {
+      const k = l.trim();
+      if (!k) return true; // 保留空行
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+    $("txt-dupe-output").value = out.join("\n");
+    addHistory({ cat: "txt", go: "txt", op: "dedupe", preview: lines.length + " 行 → " + out.length + " 行" });
+    if (window.toast) toast(t("txt.done") + " " + out.length + "/" + lines.length);
+  });
+  if ($("txt-dupe-copy")) $("txt-dupe-copy").addEventListener("click", (e) => copyText($("txt-dupe-output").value, e.currentTarget));
+  /* 文本对比：行级 LCS diff */
+  function lcsDiff(a, b) {
+    const A = a.split("\n"), B = b.split("\n");
+    const m = A.length, n = B.length;
+    const dp = Array.from({ length: m + 1 }, () => new Uint32Array(n + 1));
+    for (let i = m - 1; i >= 0; i--)
+      for (let j = n - 1; j >= 0; j--)
+        dp[i][j] = A[i] === B[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    const out = [];
+    let i = 0, j = 0;
+    while (i < m && j < n) {
+      if (A[i] === B[j]) { out.push("  " + A[i]); i++; j++; }
+      else if (dp[i + 1][j] >= dp[i][j + 1]) { out.push("- " + A[i]); i++; }
+      else { out.push("+ " + B[j]); j++; }
+    }
+    while (i < m) out.push("- " + A[i++]);
+    while (j < n) out.push("+ " + B[j++]);
+    return out.join("\n");
+  }
+  if ($("txt-diff-btn")) $("txt-diff-btn").addEventListener("click", () => {
+    const a = $("txt-diff-a").value, b = $("txt-diff-b").value;
+    $("txt-diff-output").value = lcsDiff(a, b);
+    addHistory({ cat: "txt", go: "txt", op: "diff", preview: "对比 " + a.split("\n").length + " 行 vs " + b.split("\n").length + " 行" });
+    if (window.toast) toast(t("txt.done"));
+  });
+  if ($("txt-diff-copy")) $("txt-diff-copy").addEventListener("click", (e) => copyText($("txt-diff-output").value, e.currentTarget));
 })();
 
 /* ---------- 8. 初始化 ---------- */

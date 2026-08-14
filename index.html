@@ -54,6 +54,10 @@
             <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.4"/><circle cx="7.5" cy="7.5" r="1.1"/><rect x="13" y="13" width="7" height="7" rx="1.4"/><circle cx="16.5" cy="16.5" r="1.1"/><path d="M14.5 4.5 19.5 9.5M19.5 4.5 14.5 9.5"/></svg></span>
             <span class="tc-name" data-i18n="tool.rand">随机文本</span>
           </button>
+          <button class="tool-card" data-go="txt">
+            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></span>
+            <span class="tc-name" data-i18n="tool.txt">文本工具</span>
+          </button>
           <button class="tool-card" data-go="guide">
             <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-2-2-5-2-7-1v14c2-1 5-1 7 1 2-2 5-2 7-1V5c-2-1-5-1-7 1Z"/><path d="M12 6v14"/></svg></span>
             <span class="tc-name" data-i18n="tool.guide">教程</span>
@@ -62,7 +66,21 @@
 
         <div class="history-head">
           <span data-i18n="home.recent">最近使用</span>
-          <button class="link-btn" id="history-clear" data-i18n="home.clear">清空</button>
+          <span class="hist-actions">
+            <button class="link-btn" id="history-export" data-i18n="hist.export">导出</button>
+            <button class="link-btn" id="history-clear" data-i18n="home.clear">清空</button>
+          </span>
+        </div>
+        <div class="hist-filters" id="hist-filters">
+          <button class="chip active" data-f="all" data-i18n="hist.all">全部</button>
+          <button class="chip" data-f="hash" data-i18n="cat.hash">哈希</button>
+          <button class="chip" data-f="enc" data-i18n="cat.enc">编码</button>
+          <button class="chip" data-f="sym" data-i18n="cat.sym">加解密</button>
+          <button class="chip" data-f="rsa" data-i18n="cat.rsa">RSA</button>
+          <button class="chip" data-f="sm2" data-i18n="cat.sm2">SM2</button>
+          <button class="chip" data-f="qr" data-i18n="cat.qr">二维码</button>
+          <button class="chip" data-f="json" data-i18n="cat.json">JSON</button>
+          <button class="chip" data-f="rand" data-i18n="cat.rand">随机</button>
         </div>
         <ul class="history-list" id="history-list"></ul>
         <p class="history-empty" id="history-empty" data-i18n="home.empty">还没有记录，去用用上面的工具吧～</p>
@@ -125,6 +143,11 @@
             <button type="button" data-v="b58" data-i18n="enc.b58">Base58</button>
             <button type="button" data-v="unicode" data-i18n="enc.unicode">Unicode</button>
             <button type="button" data-v="jwt" data-i18n="enc.jwt">JWT</button>
+            <button type="button" data-v="oct" data-i18n="enc.oct">Octal</button>
+            <button type="button" data-v="ascii" data-i18n="enc.ascii">ASCII</button>
+            <button type="button" data-v="htmlent" data-i18n="enc.htmlent">HTML 实体</button>
+            <button type="button" data-v="utf16" data-i18n="enc.utf16">UTF-16</button>
+            <button type="button" data-v="roman" data-i18n="enc.roman">罗马数字</button>
           </div>
           <div class="enc-actions">
             <button class="btn primary" id="enc-encode" data-i18n="enc.encode">编码</button>
@@ -344,6 +367,16 @@
             <option value="Q" data-i18n="qr.ecQ">Q（较高，25%）</option>
             <option value="H" data-i18n="qr.ecH">H（高，30%）</option>
           </select>
+
+          <div class="qr-styles">
+            <label class="qr-style-item"><span data-i18n="qr.fg">前景色</span><input type="color" id="qr-fg" value="#000000" /></label>
+            <label class="qr-style-item"><span data-i18n="qr.bg">背景色</span><input type="color" id="qr-bg" value="#ffffff" /></label>
+            <label class="qr-style-item qr-logo"><span data-i18n="qr.logo">Logo</span>
+              <button type="button" class="mini-btn" id="qr-logo-btn" data-i18n="qr.pickLogo">选择图片</button>
+              <button type="button" class="mini-btn" id="qr-logo-clear" data-i18n="qr.clearLogo">清除</button>
+              <input type="file" id="qr-logo-file" accept="image/*" style="display:none" />
+            </label>
+          </div>
 
           <button class="btn primary" id="qr-btn" data-i18n="qr.gen">生成二维码</button>
           <button class="btn ghost" id="qr-scan-btn" data-i18n="qr.scan">扫描二维码</button>
@@ -584,6 +617,53 @@
         <button class="btn ghost" id="rand-copy" data-i18n="rand.copy">复制结果</button>
       </section>
 
+      <!-- ========== 面板：文本工具（去重 / 对比 / 字数统计） ========== -->
+      <section class="panel" id="panel-txt">
+        <div class="panel-head">
+          <button class="ph-back" aria-label="返回">‹</button>
+          <span class="ph-title" data-i18n="txt.title">文本工具</span>
+        </div>
+        <div class="seg-inline" id="txt-tabs">
+          <button type="button" data-v="count" class="active" data-i18n="txt.count">字数统计</button>
+          <button type="button" data-v="dedupe" data-i18n="txt.dedupe">去重</button>
+          <button type="button" data-v="diff" data-i18n="txt.diff">文本对比</button>
+        </div>
+
+        <div class="txt-pane" id="txt-pane-count">
+          <label class="field-label" data-i18n="txt.input">输入文本</label>
+          <textarea id="txt-count-input" data-i18n-attr="placeholder:ph.txtIn" placeholder="输入要统计的文本…"></textarea>
+          <div class="txt-stats" id="txt-stats">
+            <span class="stat-chip" data-i18n="txt.chars">字符</span><b id="st-chars">0</b>
+            <span class="stat-chip" data-i18n="txt.words">字数</span><b id="st-words">0</b>
+            <span class="stat-chip" data-i18n="txt.lines">行数</span><b id="st-lines">0</b>
+            <span class="stat-chip" data-i18n="txt.bytes">字节</span><b id="st-bytes">0</b>
+          </div>
+        </div>
+
+        <div class="txt-pane" id="txt-pane-dedupe" hidden>
+          <label class="field-label" data-i18n="txt.inLines">输入文本（每行一条）</label>
+          <textarea id="txt-dupe-input" data-i18n-attr="placeholder:ph.txtLines" placeholder="每行一条，粘贴要去重的内容…"></textarea>
+          <div class="btn-row">
+            <button class="btn primary" id="txt-dupe-btn" data-i18n="txt.runDedupe">去重</button>
+            <button class="btn ghost" id="txt-dupe-copy" data-i18n="txt.copyResult">复制结果</button>
+          </div>
+          <label class="field-label" data-i18n="txt.out"></label>
+          <textarea id="txt-dupe-output" readonly data-i18n-attr="placeholder:ph.result" placeholder="去重结果将显示在这里"></textarea>
+        </div>
+
+        <div class="txt-pane" id="txt-pane-diff" hidden>
+          <label class="field-label" data-i18n="txt.orig">原文</label>
+          <textarea id="txt-diff-a" data-i18n-attr="placeholder:ph.txtIn" placeholder="原文…"></textarea>
+          <label class="field-label" data-i18n="txt.modified">修改后</label>
+          <textarea id="txt-diff-b" data-i18n-attr="placeholder:ph.txtIn" placeholder="修改后…"></textarea>
+          <div class="btn-row">
+            <button class="btn primary" id="txt-diff-btn" data-i18n="txt.runDiff">对比</button>
+            <button class="btn ghost" id="txt-diff-copy" data-i18n="txt.copyResult">复制结果</button>
+          </div>
+          <textarea id="txt-diff-output" readonly data-i18n-attr="placeholder:ph.result" placeholder="差异结果将显示在这里"></textarea>
+        </div>
+      </section>
+
       <!-- ========== 面板 6：使用教程 ========== -->
       <section class="panel" id="panel-guide">
         <div class="panel-head">
@@ -731,6 +811,12 @@
           <div class="inc-preview" id="inc-preview"></div>
           <button class="mini-btn" id="inc-pick-img" data-i18n="inc.pickImg">选择图片文件</button>
           <input type="file" id="inc-file" accept="image/*" style="display:none" />
+        </div>
+
+        <div class="inc-card" id="inc-callback-card" hidden>
+          <div class="inc-label" data-i18n="inc.cbLabel">处理结果（粘贴结果后返回调用方）</div>
+          <textarea id="inc-callback-input" rows="2" data-i18n-attr="placeholder:ph.result" placeholder="把处理结果粘贴到这里"></textarea>
+          <button class="btn primary" id="inc-callback-go" data-i18n="inc.cbGo">↩ 返回调用方</button>
         </div>
 
         <div class="inc-group">

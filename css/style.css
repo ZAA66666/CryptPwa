@@ -1417,3 +1417,16 @@ input[type="file"] { font-size: calc(13px * var(--fs)); }
 .legal-text b.ref { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; color: var(--accent); }
 /* 清理缓存页：上次清理时间值 */
 .settings-row .sr-value { font-size: 14px; color: var(--text); font-weight: 600; }
+
+/* 二维码美化：前景/背景色 + Logo */
+.qr-styles { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0 4px; }
+.qr-style-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.qr-style-item input[type="color"] { width: 40px; height: 28px; border: 1px solid var(--border); border-radius: 8px; padding: 2px; background: var(--card); cursor: pointer; }
+.qr-style-item.qr-logo { flex-wrap: wrap; }
+.qr-style-item .mini-btn { padding: 5px 10px; font-size: 12.5px; }
+
+/* 历史记录：筛选 chips + 导出按钮 */
+.hist-actions { display: flex; align-items: center; gap: 6px; }
+.hist-filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 10px; }
+.hist-filters .chip { padding: 4px 10px; font-size: 12px; border: 1px solid var(--border); background: var(--card); color: var(--muted); }
+.hist-filters .chip.active { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }

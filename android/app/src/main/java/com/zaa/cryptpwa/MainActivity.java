@@ -1,6 +1,8 @@
 package com.zaa.cryptpwa;
 
 import android.content.ClipData;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.DragEvent;
 import android.view.View;
 import android.webkit.WebView;
@@ -11,10 +13,50 @@ import org.json.JSONObject;
 
 /**
  * MainActivity：Capacitor 桥。
- * 小窗/分屏拖放接收：其他应用把文字或图片拖入本应用挂起小窗时，
- * 通过 OnDragListener 捕获 ClipData，转成文本/URI 用 JS Bridge 推给网页层。
+ * 1) 小窗/分屏拖放接收：文字或图片拖入小窗时，OnDragListener 捕获 ClipData → JS。
+ * 2) 系统分享接收：其他 App 分享文本/图片（ACTION_SEND）→ JS __sharedText。
  */
 public class MainActivity extends BridgeActivity {
+
+    @Override
+    public void onCreate(android.os.Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        handleSharedIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleSharedIntent(intent);
+    }
+
+    private void handleSharedIntent(Intent intent) {
+        if (intent == null) return;
+        String type = intent.getType();
+        if (type == null) return;
+        String payload = null;
+        if (type.startsWith("text/")) {
+            payload = intent.getStringExtra(Intent.EXTRA_TEXT);
+        } else if (type.startsWith("image/") || type.startsWith("application/")) {
+            Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            if (uri == null && intent.getClipData() != null && intent.getClipData().getItemCount() > 0) {
+                uri = intent.getClipData().getItemAt(0).getUri();
+            }
+            if (uri != null) payload = uri.toString();
+        }
+        if (payload == null) return;
+        final String data = payload;
+        getBridge().getWebView().post(new Runnable() {
+            @Override
+            public void run() {
+                getBridge().getWebView().evaluateJavascript(
+                        "window.__sharedText && window.__sharedText(" + JSONObject.quote(data) + ");",
+                        null
+                );
+            }
+        });
+    }
 
     @Override
     public void onStart() {
@@ -26,7 +68,6 @@ public class MainActivity extends BridgeActivity {
             public boolean onDrag(View v, DragEvent event) {
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DRAG_STARTED:
-                        // 只接收文本或 URI（图片）拖放
                         return event.getClipDescription() != null
                                 && (event.getClipDescription().hasMimeType("text/*")
                                 || event.getClipDescription().hasMimeType("image/*"));
@@ -44,7 +85,6 @@ public class MainActivity extends BridgeActivity {
                                 buf.append(item.getText());
                             } else if (item.getUri() != null) {
                                 if (buf.length() > 0) buf.append("\n");
-                                // 图片/文件：传 content:// URI，网页层可尝试读取
                                 buf.append(item.getUri().toString());
                             }
                         }

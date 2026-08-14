@@ -7,7 +7,7 @@
 /* 本项目 GitHub 仓库（CryptPwa，作者 ZAA66666）。 */
 const GITHUB_REPO = "https://github.com/ZAA66666/CryptPwa";
 /* 当前版本号（用于“检测更新”对比 GitHub Releases） */
-const APP_VERSION = "1.3.0";
+const APP_VERSION = "1.4.0";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
@@ -35,13 +35,14 @@ window.I18N = {
     "enc.in": "输入", "enc.mode": "方式", "enc.imgLabel": "图片转 Base64（可选）",
     "enc.imgBtn": "图片 → Base64", "enc.run": "执行", "enc.out": "结果",
     "enc.b64": "Base64", "enc.hex": "Hex", "enc.url": "URL", "enc.encode": "编码", "enc.decode": "解码",
-    "enc.b32": "Base32", "enc.b58": "Base58", "enc.unicode": "Unicode", "enc.jwt": "JWT",
+    "enc.b32": "Base32", "enc.b58": "Base58", "enc.unicode": "Unicode", "enc.jwt": "JWT", "enc.oct": "Octal", "enc.ascii": "ASCII", "enc.htmlent": "HTML 实体", "enc.utf16": "UTF-16", "enc.roman": "罗马数字",
+    "enc.help": "编码：把文本转成另一种表示；解码：还原。",
     "enc.okEnc": "✅ 编码完成", "enc.okDec": "✅ 解码完成", "enc.fail": "❌ 处理失败：", "enc.empty": "请输入要编码/解码的内容",
     "ph.hashIn": "要计算哈希的文本，如 hello", "ph.encIn": "要编码或解码的内容（支持中文）",
     "ph.symIn": "加密时填明文；解密时填 Base64 密文", "ph.rsaIn": "加密填明文；解密填 Base64 密文；签名填待签名文本",
     "ph.hashKey": "HMAC 密钥", "ph.symKey": "如：1234567890123456", "ph.symIv": "CBC/CTR/CFB/OFB 模式必填",
     "ph.rsaMsg": "验签时填写原始消息", "ph.rsaPub": "粘贴对方公钥", "ph.rsaPriv": "粘贴自己私钥",
-    "ph.qrIn": "如：https://example.com", "ph.result": "结果将显示在这里", "ph.scanResult": "识别结果",
+    "ph.qrIn": "如：https://example.com", "ph.result": "结果将显示在这里", "ph.scanResult": "识别结果", "ph.txtIn": "输入要处理的文本…", "ph.txtLines": "每行一条，粘贴要处理的内容…",
     "ph.bcIn": "如：123456789012 / ABC-123",
     "ph.jsonIn": "粘贴或输入 JSON，如 {\"name\":\"Tom\"}", "ph.jsonPath": "键路径，如 user.name 或 list.0", "ph.jsonCode": "生成的代码将显示在这里",
     "hist.hash": "哈希", "hist.sym": "加/解密", "hist.qr": "二维码", "hist.json": "JSON", "hist.bc": "条形码",
@@ -61,7 +62,7 @@ window.I18N = {
     "json.kvTpl": "＋ 模板", "json.tplTitle": "选择模板", "json.tplRandom": "🎲 随机示例", "json.tplTemplate": "📋 JSON 模板",
     "json.ok": "合法 JSON", "json.invalid": "JSON 语法错误", "json.notFound": "未找到该路径",
     "json.emptyKey": "存在空键，已跳过", "json.imported": "已导入 N 行", "json.copied": "已复制",
-    "hist.emptyTip": "没有使用记录", "hist.clearConfirm": "确定清空所有使用记录？",
+    "hist.emptyTip": "没有使用记录", "hist.clearConfirm": "确定清空所有使用记录？", "hist.export": "导出", "hist.exported": "已导出历史记录", "hist.all": "全部", "hist.none": "该分类暂无记录", "hist.clear": "清空历史",
 
     /* Crontab 定时表达式 */
     "cron.expr": "表达式（5 段：分 时 日 月 周）", "cron.parse": "解析 / 校验", "cron.next": "接下来 5 次执行",
@@ -110,7 +111,7 @@ window.I18N = {
     "rsa.badgeExt": "外", "rsa.rename": "改名", "rsa.sidePub": "公钥", "rsa.sidePriv": "私钥",
 
     /* 二维码 */
-    "qr.in": "内容（文本 / 网址 / 任意字符串）", "qr.ec": "纠错等级", "qr.ecL": "L（低，7%）", "qr.ecM": "M（中，15%）", "qr.ecQ": "Q（较高，25%）", "qr.ecH": "H（高，30%）",
+    "qr.in": "内容（文本 / 网址 / 任意字符串）", "qr.ec": "纠错等级", "qr.ecL": "L（低，7%）", "qr.ecM": "M（中，15%）", "qr.ecQ": "Q（较高，25%）", "qr.ecH": "H（高，30%）", "qr.fg": "前景色", "qr.bg": "背景色", "qr.logo": "Logo", "qr.pickLogo": "选择图片", "qr.clearLogo": "清除", "qr.logoOk": "已设置 Logo，重新生成即可看到", "qr.logoCleared": "已清除 Logo",
     "qr.gen": "生成二维码", "qr.out": "二维码", "qr.dl": "下载 SVG",
     "qr.tabQr": "二维码",
     "bc.tab": "条形码", "bc.in": "内容（条形码编码的数据）", "bc.fmt": "编码格式",
@@ -124,7 +125,7 @@ window.I18N = {
     "footer": "本工具用于学习与实践。MD5、DES、RC4、ECB 等已不安全，请勿用于保护真实机密。",
 
     /* 历史分类徽章 & 操作名 */
-    "cat.hash": "哈希", "cat.enc": "编/解码", "cat.sym": "加/解密", "cat.rsa": "非对称加/解密", "cat.qr": "二维码", "cat.json": "JSON", "cat.generic": "通用", "cat.cron": "Crontab", "cat.rand": "随机文本",
+    "cat.hash": "哈希", "cat.enc": "编/解码", "cat.sym": "加/解密", "cat.rsa": "非对称加/解密", "cat.sm2": "SM2", "cat.qr": "二维码", "cat.json": "JSON", "cat.generic": "通用", "cat.cron": "Crontab", "cat.rand": "随机文本", "cat.txt": "文本工具", "tool.txt": "文本工具", "txt.title": "文本工具", "txt.count": "字数统计", "txt.dedupe": "去重", "txt.diff": "文本对比", "txt.input": "输入文本", "txt.inLines": "输入文本（每行一条）", "txt.out": "结果", "txt.chars": "字符", "txt.words": "字数", "txt.lines": "行数", "txt.bytes": "字节", "txt.runDedupe": "去重", "txt.runDiff": "对比", "txt.copyResult": "复制结果", "txt.orig": "原文", "txt.modified": "修改后", "txt.done": "完成",
     "op.encrypt": "加密", "op.decrypt": "解密", "op.sign": "签名", "op.verify": "验签",
 
     /* 设置框架 */
@@ -163,7 +164,7 @@ window.I18N = {
     "save.savedDoc": "已保存到系统文档目录：", "save.fail": "保存失败：", "storage.androidHint": "安卓版：请在下方直接手动填写保存路径（系统不支持文件夹选择）。", "storage.saved": "已保存默认保存路径",
 
     /* 外部内容选择器（URL Scheme / Intent / 系统分享） */
-    "inc.title": "外部内容", "inc.from": "收到内容", "inc.none": "（无内容）", "inc.dragOk": "已接收拖入的内容",
+    "inc.title": "外部内容", "inc.from": "收到内容", "inc.none": "（无内容）", "inc.dragOk": "已接收拖入的内容", "inc.cbLabel": "处理结果（粘贴后返回调用方）", "inc.cbGo": "↩ 返回调用方",
     "inc.pickImg": "选择图片文件", "inc.quick": "快捷编码", "inc.encrypt": "快捷加密",
     "inc.hash": "哈希", "inc.other": "其他",
     "inc.b64enc": "Base64 编码", "inc.b64dec": "Base64 解码", "inc.hexenc": "Hex 编码", "inc.urlenc": "URL 编码",
@@ -350,18 +351,19 @@ window.I18N = {
     "enc.in": "Input", "enc.mode": "Mode", "enc.imgLabel": "Image to Base64 (optional)",
     "enc.imgBtn": "Image → Base64", "enc.run": "Run", "enc.out": "Result",
     "enc.b64": "Base64", "enc.hex": "Hex", "enc.url": "URL", "enc.encode": "Encode", "enc.decode": "Decode",
-    "enc.b32": "Base32", "enc.b58": "Base58", "enc.unicode": "Unicode", "enc.jwt": "JWT",
+    "enc.b32": "Base32", "enc.b58": "Base58", "enc.unicode": "Unicode", "enc.jwt": "JWT", "enc.oct": "Octal", "enc.ascii": "ASCII", "enc.htmlent": "HTML entities", "enc.utf16": "UTF-16", "enc.roman": "Roman numerals",
+    "enc.help": "Encode: transform text into another representation; decode reverses it.",
     "enc.okEnc": "✅ Encode done", "enc.okDec": "✅ Decode done", "enc.fail": "❌ Failed: ", "enc.empty": "Enter text to encode/decode",
     "ph.hashIn": "Text to hash, e.g. hello", "ph.encIn": "Content to encode/decode (Chinese supported)",
     "ph.symIn": "Plaintext to encrypt; Base64 ciphertext to decrypt", "ph.rsaIn": "Plaintext to encrypt; Base64 ciphertext to decrypt; message to sign",
     "ph.hashKey": "HMAC key", "ph.symKey": "e.g. 1234567890123456", "ph.symIv": "Required for CBC/CTR/CFB/OFB",
     "ph.rsaMsg": "Original message for verification", "ph.rsaPub": "Paste peer's public key", "ph.rsaPriv": "Paste your private key",
-    "ph.qrIn": "e.g. https://example.com", "ph.result": "Result will show here", "ph.scanResult": "Recognized result",
+    "ph.qrIn": "e.g. https://example.com", "ph.result": "Result will show here", "ph.scanResult": "Recognized result", "ph.txtIn": "Type text to process…", "ph.txtLines": "One per line — paste content to process…",
     "ph.bcIn": "e.g. 123456789012 / ABC-123",
     "ph.jsonIn": "Paste or type JSON, e.g. {\"name\":\"Tom\"}", "ph.jsonPath": "Key path, e.g. user.name or list.0", "ph.jsonCode": "Generated code will show here",
     "hist.hash": "Hash", "hist.sym": "Encrypt/Decrypt", "hist.qr": "QR", "hist.json": "JSON", "hist.bc": "Barcode",
     "hist.gen": "Generate", "hist.scan": "Scan", "hist.imgB64": "Image→Base64",
-    "hist.emptyTip": "No history yet", "hist.clearConfirm": "Clear all history?",
+    "hist.emptyTip": "No history yet", "hist.clearConfirm": "Clear all history?", "hist.export": "Export", "hist.exported": "History exported", "hist.all": "All", "hist.none": "No records in this category", "hist.clear": "Clear history",
     /* JSON tool */
     "ph.json": "JSON Tools",
     "json.tabFmt": "Format", "json.tabExtract": "Extract code", "json.tabKv": "Key-Value",
@@ -403,7 +405,7 @@ window.I18N = {
     "rsa.pairSuffix": " RSA Key", "rsa.importDefault": "Imported RSA key",
     "rsa.badgeExt": "Ext", "rsa.rename": "Rename", "rsa.sidePub": "Public", "rsa.sidePriv": "Private",
 
-    "qr.in": "Content (text / URL / any string)", "qr.ec": "Error correction", "qr.ecL": "L (low, 7%)", "qr.ecM": "M (medium, 15%)", "qr.ecQ": "Q (high, 25%)", "qr.ecH": "H (highest, 30%)",
+    "qr.in": "Content (text / URL / any string)", "qr.ec": "Error correction", "qr.ecL": "L (low, 7%)", "qr.ecM": "M (medium, 15%)", "qr.ecQ": "Q (high, 25%)", "qr.ecH": "H (highest, 30%)", "qr.fg": "Foreground", "qr.bg": "Background", "qr.logo": "Logo", "qr.pickLogo": "Pick image", "qr.clearLogo": "Clear", "qr.logoOk": "Logo set — regenerate to see it", "qr.logoCleared": "Logo cleared",
     "qr.gen": "Generate QR", "qr.out": "QR code", "qr.dl": "Download SVG",
     "qr.tabQr": "QR code",
     "bc.tab": "Barcode", "bc.in": "Content (data to encode)", "bc.fmt": "Format",
@@ -415,7 +417,7 @@ window.I18N = {
 
     "footer": "For learning & practice. MD5, DES, RC4, ECB, etc. are insecure — do not use them to protect real secrets.",
 
-    "cat.hash": "Hash", "cat.enc": "Encode/Decode", "cat.sym": "Encrypt/Decrypt", "cat.rsa": "Asymmetric", "cat.qr": "QR", "cat.json": "JSON", "cat.generic": "General", "cat.cron": "Crontab", "cat.rand": "Random",
+    "cat.hash": "Hash", "cat.enc": "Encode/Decode", "cat.sym": "Encrypt/Decrypt", "cat.rsa": "Asymmetric", "cat.sm2": "SM2", "cat.qr": "QR", "cat.json": "JSON", "cat.generic": "General", "cat.cron": "Crontab", "cat.rand": "Random", "cat.txt": "Text tools", "tool.txt": "Text tools", "txt.title": "Text tools", "txt.count": "Word count", "txt.dedupe": "Deduplicate", "txt.diff": "Compare", "txt.input": "Input text", "txt.inLines": "Input text (one per line)", "txt.out": "Result", "txt.chars": "Chars", "txt.words": "Words", "txt.lines": "Lines", "txt.bytes": "Bytes", "txt.runDedupe": "Deduplicate", "txt.runDiff": "Compare", "txt.copyResult": "Copy result", "txt.orig": "Original", "txt.modified": "Modified", "txt.done": "Done",
     "op.encrypt": "Encrypt", "op.decrypt": "Decrypt", "op.sign": "Sign", "op.verify": "Verify",
 
     "set.title": "Settings", "set.back": "Back",
@@ -451,7 +453,7 @@ window.I18N = {
     "save.savedDoc": "Saved to system Documents: ", "save.fail": "Save failed: ", "storage.androidHint": "Android: type the path manually below (folder picker is not available).", "storage.saved": "Default save path saved",
 
     /* Incoming content chooser (URL Scheme / Intent / system share) */
-    "inc.title": "Incoming", "inc.from": "Received", "inc.none": "(no content)", "inc.dragOk": "Dropped content received",
+    "inc.title": "Incoming", "inc.from": "Received", "inc.none": "(no content)", "inc.dragOk": "Dropped content received", "inc.cbLabel": "Result (paste, then return to caller)", "inc.cbGo": "↩ Return to caller",
     "inc.pickImg": "Pick image file", "inc.quick": "Quick encode", "inc.encrypt": "Quick encrypt",
     "inc.hash": "Hash", "inc.other": "Other",
     "inc.b64enc": "Base64 encode", "inc.b64dec": "Base64 decode", "inc.hexenc": "Hex encode", "inc.urlenc": "URL encode",

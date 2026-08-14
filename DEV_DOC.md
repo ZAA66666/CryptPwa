@@ -41,7 +41,7 @@
 | **随机** | 随机文本/密钥 | 数字/小写/大写/特殊字符胶囊按钮组合、自定义字符集、正则约束、长度与生成数量（带 −/+ 步进） |
 | **教程** | 使用指南 | 各功能入门教程（详情/折叠卡片） |
 
-**设置页**（8 组）：
+**设置页**（8 组，分组白底卡片样式）：每组 `settings-group` 圆角卡片（`box-shadow` 浅），组标题小色块+文字（13px muted），组内 `settings-item` 行（图标+文字+箭头›）；13 项均有 SVG 图标（`SETTINGS_ICONS` 字典）。
 - **通用**：密码本（主密码设置/修改/锁定[有反馈]/条目增删改查、**长按条目查看完整内容**、**默认显示第一个库**、连按标题 10 次弹库管理、**数据加密开关已移入本页顶部**）、显示设置（语言/字体大小）、主题（浅/深/跟随 + 7 色板 + 自定义取色，选中圈用色板自身颜色）、**内容保存路径**（加/解密结果大内容超 5000 字节自动提示另存为文件；安卓可选目录）
 - **数据隐私**：数据备份与同步（WebDAV 备份/恢复，自动连通性检测；导出本地注明保存到系统文档/下载目录）、**清理缓存**（清日志等临时数据，显示上次清理时间）
 - **外部调用与分享**：URL Scheme 说明、外部数据接收页（inc-*）、**小窗/分屏拖放接收**（原生 OnDragListener → JS __dragDrop）
@@ -50,7 +50,7 @@
 
 **统一弹窗系统**：`window.dialog.{alert,confirm,prompt,sheet}`（自定义 UI，中心 scale 扩散动画；sheet 底部上滑）；**禁用原生 window.alert/confirm/prompt**（confirm/prompt 为异步 Promise，调用点 .then 处理）；vp/exp/scan 面板动画统一中心扩散；全屏编辑 openEditor 按触发位置 from-top/from-bottom 延伸。
 
-**安卓原生能力**：沉浸式状态栏（默认开）、全局返回键（弹窗→设置→面板→**双击退出**）、Toolbar 三点菜单（设置/关于）、状态栏安全区留白、**小窗拖放接收文字/图片**、按钮圆角点击高亮、overscroll 禁止整页滑动、**固定签名 p12（Actions Secret 注入）**。文案约定：不出现"浏览器/localStorage"字眼（用"本机/系统/本地存储"）。
+**安卓原生能力**：沉浸式状态栏（默认开）、全局返回键（弹窗→设置→面板→**双击退出**）、Toolbar 三点菜单（设置/关于）、状态栏安全区留白、**小窗拖放接收文字/图片**、按钮圆角点击高亮、overscroll 禁止整页滑动、**固定签名 p12（Actions Secret 注入）**、**Android 系统预测性返回手势**（`enableOnBackInvokedCallback="true"`，开始预览/完成返回/取消停留行为正确）。文案约定：不出现"浏览器/localStorage"字眼（用"本机/系统/本地存储"）。
 
 ---
 
@@ -85,24 +85,24 @@
 ## 四、可增加功能建议（按优先级）
 
 **P0（核心补差，最值得做）**
-1. ⚠️ **修复 SHA3 兼容性 Bug**：当前"SHA-3"实际输出 **Keccak-512**（crypto-js 库历史原因），与标准 SHA3（OpenSSL/在线工具）不一致。改法二选一：a) vendor 换标准 SHA3 实现（如 js-sha3）并保留 Keccak 选项标注；b) 不改算法但把选项改名"Keccak-512"，另加标准 SHA3。
+1. ✅ **SHA3 兼容性 Bug（已修复 bf4e9f5）**：引入 js-sha3 标准实现；hash 页选项拆为「标准 SHA3-512」（js-sha3，FIPS 202，输出 `b751850b...`）与「Keccak-512」（crypto-js 原始算法，输出 `18587dc2...`），两选项均加 i18n。
 2. **哈希类型识别（Hash Detector）**：输入 hash 自动猜算法（长度+字符集判断），HashCalc/CryptX 都有，用户高频需求。
 3. **文件哈希**：从文件选择器取文件算 MD5/SHA（App 内可用 input[type=file] 读取，安卓 WebView 可用）。
 4. **文件加/解密**：大文件分块 AES 加解密并保存（CryptX 有，实用性高）。
 
 **P1（增强体验）**
 5. **古典密码**：摩斯（可自定义点划字符）、凯撒、维吉尼亚、Atbash、ROT13（两款竞品都有）。
-6. **更多编码**：Octal / ASCII 十进制 / HTML entity / UTF-16 转义 / 罗马数字。
+6. ✅ **更多编码（已实现 v1.4）**：Octal / ASCII 十进制 / HTML entity / UTF-16 转义 / 罗马数字，共 12 种编码。
 7. **密码强度检测**：给"随机文本"生成结果加强度评分条。
-8. **历史记录增强**：导出历史、按类型筛选（HashCalc 有 50 条导出）。
-9. **二维码美化**：自定义前景色/背景色/加 Logo 中心图。
-10. **文本工具**：去重、对比差异、字数统计（实用工具箱常见）。
+8. ✅ **历史记录增强（已实现 v1.4）**：类型筛选 chips（全部/哈希/编码/加解密/RSA/SM2/二维码/JSON/随机）+ 导出 JSON。
+9. ✅ **二维码美化（已实现 v1.4）**：前景色/背景色选择器 + 中心 Logo 图片叠加。
+10. ✅ **文本工具（已实现 v1.4）**：新面板 txt——字数统计（字符/字数/行/字节实时）、去重（每行）、文本对比（行级 LCS diff，+/- 标记）。
 
 **P2（工程/生态）**
 11. WebDAV 定时自动备份（现有手动）。
-12. 实验性外部回调**真正实现**：WebView JS Bridge 让第三方 App 拿到结果（当前仅为示例说明）。
-13. 单元测试接入 CI（现有测试脚本见"六、测试报告"）。
-14. Android 端接入系统分享 intent-filter（接收任意 App 分享文本）。
+12. ✅ **外部回调真正实现（v1.4）**：URL 带 callback 参数 → incoming 面板显示「结果回调」卡片，处理结果粘贴后一键跳回 callback URL（带 result 参数）。
+13. ✅ **测试接入 CI（v1.4）**：脚本入库 scripts/tests/（consistency.cjs + smoke.cjs），workflow 构建前自动运行（静态一致性 + 算法冒烟）。
+14. ✅ **系统分享接入（v1.4）**：AndroidManifest 注册 ACTION_SEND（text/plain + image/*）+ SEND_MULTIPLE；MainActivity onNewIntent 处理 EXTRA_TEXT/EXTRA_STREAM → JS __sharedText → incoming 面板。
 
 ---
 
