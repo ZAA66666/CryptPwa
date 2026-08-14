@@ -3,6 +3,7 @@ package com.zaa.cryptpwa;
 import android.content.Intent;
 import android.net.Uri;
 
+import com.getcapacitor.ActivityResult;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -30,7 +31,7 @@ public class FolderPickerPlugin extends Plugin {
     }
 
     @ActivityCallback
-    private void pickResult(PluginCall call, com.getcapacitor.annotation.ActivityResult result) {
+    private void pickResult(PluginCall call, ActivityResult result) {
         if (result.getResultCode() == android.app.Activity.RESULT_OK && result.getData() != null) {
             Uri uri = result.getData().getData();
             if (uri == null) { call.reject("no uri"); return; }
