@@ -26,9 +26,10 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(android.os.Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /* 状态栏：透明背景 + 文字色跟随系统暗色模式（启动时一次性设置） */
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
+        /* 状态栏：预留空间（WebView 不再压到状态栏底下，主页内容不被遮挡）；
+           默认绿底（与主页一致），JS 按页面切换底色；文字色跟随系统暗色模式 */
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+        getWindow().setStatusBarColor(android.graphics.Color.parseColor("#00a862"));
         int night = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK);
         boolean lightBars = (night != Configuration.UI_MODE_NIGHT_YES);
         WindowInsetsControllerCompat ctrl = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());

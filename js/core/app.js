@@ -112,8 +112,9 @@ function setAsymAlgo(v) {
   else if (typeof ensureRsaKeys === "function") ensureRsaKeys();
 }
 /* ---------- 状态栏：预留空间 + 文字色可见 ---------- */
-/* 关键：webview 不覆盖系统状态栏（setOverlaysWebView false），顶部为状态栏预留空间，
-   避免内容被时钟/电池遮挡；同时用 DARK 深色图标 + 背景色，保证图标永远看得清。 */
+/* 预留空间由原生层保证：capacitor.config.json 的 StatusBar.overlaysWebView=false +
+   MainActivity.setDecorFitsSystemWindows(true)，WebView 不再压到状态栏底下，主页内容永不遮挡。
+   JS 只负责按页面切换状态栏底色 + 用 DARK 深色图标，保证时钟/电池等永远看得清。 */
 function setStatusBar(name) {
   try {
     const sb = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar;
@@ -124,10 +125,6 @@ function setStatusBar(name) {
   } catch (e) {}
 }
 (function () {
-  try {
-    const sb = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar;
-    if (sb && sb.setOverlaysWebView) sb.setOverlaysWebView({ overlay: false }); // 内容不被状态栏遮挡
-  } catch (e) {}
   // 设置页打开/关闭时同步状态栏（底层是主页则绿底，否则浅底）
   const ov = document.getElementById("settings-overlay");
   if (ov) {
