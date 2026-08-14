@@ -1490,3 +1490,30 @@ input[type="file"] { font-size: calc(13px * var(--fs)); }
   -webkit-tap-highlight-color: transparent;
 }
 .swatch.active { border-color: var(--accent); transform: scale(1.12); }
+
+/* 操作/选项 picker 按钮（替代原生 select：点击弹统一 dialog.sheet 弹层） */
+.picker-btn {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  margin: 4px 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--settings-bg);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.picker-btn:active { background: var(--accent-soft); border-color: var(--accent); }
+.picker-btn .picker-icon {
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted);
+  margin-left: auto;
+  width: 22px; height: 22px;
+}
+.picker-btn .picker-icon svg { width: 18px; height: 18px; }
+.picker-btn .picker-label { flex: 1 1 auto; }

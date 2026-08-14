@@ -275,22 +275,21 @@
 
             <!-- 操作区 -->
             <label class="field-label" data-i18n="asym.op">操作</label>
-            <select id="rsa-op">
-              <option value="encrypt">加密（用公钥）</option>
-              <option value="decrypt">解密（用私钥）</option>
-              <option value="sign">签名（用私钥）</option>
-              <option value="verify">验签（用公钥）</option>
-            </select>
+            <button type="button" class="picker-btn" id="rsa-op-btn">
+              <span class="picker-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              <span class="picker-label" id="rsa-op-label" data-i18n="asym.opEnc">加密（用公钥）</span>
+            </button>
+            <input type="hidden" id="rsa-op" value="encrypt" />
 
             <label class="field-label" id="rsa-input-label" data-i18n="asym.in">输入</label>
             <textarea id="rsa-input" data-i18n-attr="placeholder:ph.rsaIn" placeholder="加密填明文；解密填 Base64 密文；签名填待签名文本"></textarea>
 
             <div id="rsa-msg-wrap" style="display:none">
               <label class="field-label" data-i18n="asym.msg">验签原文</label>
-              <textarea id="rsa-msg" data-i18n-attr="placeholder:ph.rsaMsg" placeholder="验签时填写原始消息"></textarea>
+              <textarea id="rsa-msg" data-i18n-attr="placeholder:ph.rsaMsg" placeholder="验签时填原始消息"></textarea>
             </div>
 
-            <button class="btn primary" id="rsa-run" data-i18n="asym.run">执行</button>
+            <button class="btn primary" id="rsa-run" data-i18n="asym.btnEnc">加密</button>
 
             <label class="field-label" data-i18n="asym.out">结果（密文 / 签名）</label>
             <textarea id="rsa-output" readonly data-i18n-attr="placeholder:ph.result" placeholder="结果将显示在这里"></textarea>
@@ -321,22 +320,21 @@
 
             <!-- 操作区 -->
             <label class="field-label" data-i18n="asym.op">操作</label>
-            <select id="sm2-op">
-              <option value="encrypt">加密（用公钥）</option>
-              <option value="decrypt">解密（用私钥）</option>
-              <option value="sign">签名（用私钥）</option>
-              <option value="verify">验签（用公钥）</option>
-            </select>
+            <button type="button" class="picker-btn" id="sm2-op-btn">
+              <span class="picker-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              <span class="picker-label" id="sm2-op-label" data-i18n="asym.opEnc">加密（用公钥）</span>
+            </button>
+            <input type="hidden" id="sm2-op" value="encrypt" />
 
             <label class="field-label" id="sm2-input-label" data-i18n="asym.in">输入</label>
             <textarea id="sm2-input" data-i18n-attr="placeholder:ph.sm2In" placeholder="加密填明文；解密填十六进制密文；签名填待签名文本"></textarea>
 
             <div id="sm2-msg-wrap" style="display:none">
               <label class="field-label" data-i18n="asym.msg">验签原文</label>
-              <textarea id="sm2-msg" data-i18n-attr="placeholder:ph.rsaMsg" placeholder="验签时填写原始消息"></textarea>
+              <textarea id="sm2-msg" data-i18n-attr="placeholder:ph.rsaMsg" placeholder="验签时填原始消息"></textarea>
             </div>
 
-            <button class="btn primary" id="sm2-run" data-i18n="asym.run">执行</button>
+            <button class="btn primary" id="sm2-run" data-i18n="asym.btnEnc">加密</button>
 
             <label class="field-label" data-i18n="asym.out">结果（密文 / 签名）</label>
             <textarea id="sm2-output" readonly data-i18n-attr="placeholder:ph.result" placeholder="结果将显示在这里"></textarea>

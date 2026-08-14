@@ -1724,4 +1724,35 @@
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
+
+  /* 暴露密码本 API（供 app.js 全局 data-fill 委托使用） */
+  window.__vaultApi = {
+    enabled: dataEncEnabled,
+    isLocked: function () {
+      return dataEncEnabled() ? !sessionMaster : !localStorage.getItem(PLAIN_KEY);
+    },
+    read: readPasswords,
+    /* 列出密码本中指定分类的条目；先用 sessionMaster 解，失败则 prompt 主密码 */
+    list: async function (cat) {
+      if (!dataEncEnabled()) return readPasswords().filter((p) => !cat || p.cat === cat);
+      if (!sessionMaster) {
+        const m = await window.dialog.prompt(t("common.masterPlaceholder"));
+        if (!m) return null;
+        try { decryptVault(localStorage.getItem(VAULT_KEY), m); } catch (e) { window.dialog.alert(t("common.importFail")); return null; }
+        sessionMaster = m;
+      }
+      return readPasswords().filter((p) => !cat || p.cat === cat);
+    },
+    /* 列出全部条目（含 rsa 密钥对）供「密码本」按钮填充 */
+    listAll: async function (cat) {
+      if (!dataEncEnabled()) return readPasswords().filter((p) => !cat || p.cat === cat);
+      if (!sessionMaster) {
+        const m = await window.dialog.prompt(t("common.masterPlaceholder"));
+        if (!m) return null;
+        try { decryptVault(localStorage.getItem(VAULT_KEY), m); } catch (e) { window.dialog.alert(t("common.importFail")); return null; }
+        sessionMaster = m;
+      }
+      return readPasswords().filter((p) => !cat || p.cat === cat);
+    },
+  };
 })();

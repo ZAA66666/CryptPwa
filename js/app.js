@@ -981,19 +981,36 @@ if (symRandIvBtn) symRandIvBtn.addEventListener("click", genRandSymIv);
 const rsaPub = document.getElementById("rsa-pub");
 const rsaPriv = document.getElementById("rsa-priv");
 const rsaOp = document.getElementById("rsa-op");
+const rsaOpBtn = document.getElementById("rsa-op-btn");
+const rsaOpLabel = document.getElementById("rsa-op-label");
+const rsaRun = document.getElementById("rsa-run");
 const rsaInput = document.getElementById("rsa-input");
 const rsaInputLabel = document.getElementById("rsa-input-label");
 const rsaMsgWrap = document.getElementById("rsa-msg-wrap");
 const rsaMsg = document.getElementById("rsa-msg");
 const rsaOutput = document.getElementById("rsa-output");
 
-// 根据操作切换输入框标签，并显示/隐藏“验签原文”
+// 根据操作切换输入框标签 / 显示/隐藏"验签原文" / 改执行按钮文案
+const RSA_OP_LABELS = { encrypt: "asym.opEnc", decrypt: "asym.opDec", sign: "asym.opSign", verify: "asym.opVerify" };
+const RSA_BTN_LABELS = { encrypt: "asym.btnEnc", decrypt: "asym.btnDec", sign: "asym.btnSign", verify: "asym.btnVerify" };
+const RSA_INPUT_LABELS = { encrypt: "明文", decrypt: "Base64 密文", sign: "待签名文本", verify: "签名 (Base64)" };
 function refreshRsaLabels() {
-  const map = { encrypt: "明文", decrypt: "Base64 密文", sign: "待签名文本", verify: "签名 (Base64)" };
-  rsaInputLabel.textContent = map[rsaOp.value];
-  rsaMsgWrap.style.display = rsaOp.value === "verify" ? "block" : "none";
+  rsaInputLabel.textContent = RSA_INPUT_LABELS[rsaOp.value];
+  rsaMsgWrap.style.display = rsaOp.value === "verify" ? "" : "none";
+  rsaOpLabel.textContent = t(RSA_OP_LABELS[rsaOp.value]);
+  rsaRun.textContent = t(RSA_BTN_LABELS[rsaOp.value]);
+  rsaRun.setAttribute("data-i18n", RSA_BTN_LABELS[rsaOp.value]);
 }
-rsaOp.addEventListener("change", refreshRsaLabels);
+rsaOpBtn.addEventListener("click", async () => {
+  if (!window.dialog) return;
+  const ops = ["encrypt", "decrypt", "sign", "verify"];
+  const items = ops.map((v) => ({ label: t(RSA_OP_LABELS[v]), desc: "" }));
+  const res = await window.dialog.sheet(items, t("asym.opLabel"));
+  if (res == null || res < 0) return;
+  rsaOp.value = ops[res];
+  refreshRsaLabels();
+});
+refreshRsaLabels();
 
 // 二进制 <-> Base64 / PEM 互转
 function abToB64(buf) { return btoa(String.fromCharCode(...new Uint8Array(buf))); }
@@ -1165,12 +1182,28 @@ const sm2Output = document.getElementById("sm2-output");
 const sm2Pub = document.getElementById("sm2-pub");
 const sm2Priv = document.getElementById("sm2-priv");
 
+const SM2_OP_LABELS = { encrypt: "asym.opEnc", decrypt: "asym.opDec", sign: "asym.opSign", verify: "asym.opVerify" };
+const SM2_BTN_LABELS = { encrypt: "asym.btnEnc", decrypt: "asym.btnDec", sign: "asym.btnSign", verify: "asym.btnVerify" };
+const SM2_INPUT_LABELS = { encrypt: "明文", decrypt: "十六进制密文", sign: "待签名文本", verify: "签名 (十六进制)" };
 function refreshSm2Labels() {
-  const map = { encrypt: "明文", decrypt: "十六进制密文", sign: "待签名文本", verify: "签名 (十六进制)" };
-  sm2InputLabel.textContent = map[sm2Op.value];
-  sm2MsgWrap.style.display = sm2Op.value === "verify" ? "block" : "none";
+  sm2InputLabel.textContent = SM2_INPUT_LABELS[sm2Op.value];
+  sm2MsgWrap.style.display = sm2Op.value === "verify" ? "" : "none";
+  if (sm2OpLabel) sm2OpLabel.textContent = t(SM2_OP_LABELS[sm2Op.value]);
+  if (sm2Run) { sm2Run.textContent = t(SM2_BTN_LABELS[sm2Op.value]); sm2Run.setAttribute("data-i18n", SM2_BTN_LABELS[sm2Op.value]); }
 }
-if (sm2Op) sm2Op.addEventListener("change", refreshSm2Labels);
+const sm2OpBtn = document.getElementById("sm2-op-btn");
+const sm2OpLabel = document.getElementById("sm2-op-label");
+const sm2Run = document.getElementById("sm2-run");
+if (sm2OpBtn) sm2OpBtn.addEventListener("click", async () => {
+  if (!window.dialog) return;
+  const ops = ["encrypt", "decrypt", "sign", "verify"];
+  const items = ops.map((v) => ({ label: t(SM2_OP_LABELS[v]), desc: "" }));
+  const res = await window.dialog.sheet(items, t("asym.opLabel"));
+  if (res == null || res < 0) return;
+  sm2Op.value = ops[res];
+  refreshSm2Labels();
+});
+refreshSm2Labels();
 
 function sm2LoadKeys() {
   try { sm2Pub.value = localStorage.getItem("set_sm2_pub") || ""; sm2Priv.value = localStorage.getItem("set_sm2_priv") || ""; } catch (e) {}
@@ -1812,6 +1845,47 @@ function applyLaunchParams() {
     }
   }
 }
+
+/* 全局 data-fill 委托：所有页面的"密码本"快速按钮（sym/asym 等）都生效
+ * 点击 → __vaultApi.listAll(cat) 列出条目 → dialog.sheet 选 → 填到目标 input */
+(function () {
+  document.addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-fill]");
+    if (!b) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const targetId = b.dataset.fill;
+    const cat = b.dataset.cat || "generic";
+    const api = window.__vaultApi;
+    if (!api) return;
+    const arr = await api.listAll(cat);
+    if (arr === null) return;
+    if (!arr.length) {
+      if (window.dialog) await window.dialog.alert(t("vault.empty", "密码本为空，先保存一个"), { title: t("vp.title") });
+      return;
+    }
+    const items = arr.map((p, i) => ({
+      label: p.label || (p.method || p.kind || "条目"),
+      desc: p.method || p.kind || "",
+    }));
+    const res = await window.dialog.sheet(items, t("vp.pickFill", "从密码本选取"));
+    if (res == null || res < 0) return;
+    const ent = arr[res];
+    let val = "";
+    if (ent.kind === "rsa-pair") {
+      const isPriv = /priv/.test(targetId || "");
+      val = isPriv ? (ent.priv || "") : (ent.pub || "");
+    } else {
+      val = ent.value || ent.pub || ent.priv || "";
+    }
+    const inp = document.getElementById(targetId);
+    if (inp) {
+      inp.value = val;
+      inp.dispatchEvent(new Event("input"));
+      inp.focus();
+    }
+  });
+})();
 
 /* 小窗/分屏拖放接收：安卓原生把拖入的文字/图片 URI 推到这里 */
 window.__dragDrop = function (text) {

@@ -7,7 +7,7 @@
 /* 本项目 GitHub 仓库（CryptPwa，作者 ZAA66666）。 */
 const GITHUB_REPO = "https://github.com/ZAA66666/CryptPwa";
 /* 当前版本号（用于“检测更新”对比 GitHub Releases） */
-const APP_VERSION = "2.0.2";
+const APP_VERSION = "2.0.3";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
@@ -94,6 +94,8 @@ window.I18N = {
     /* 非对称 */
     "asym.gen": "生成 RSA 密钥对 (2048)", "asym.pub": "公钥 (PUBLIC KEY)",
     "asym.priv": "私钥 (PRIVATE KEY)", "asym.op": "操作", "asym.in": "输入",
+    "asym.opLabel": "请选择操作", "asym.opEnc": "加密（用公钥）", "asym.opDec": "解密（用私钥）", "asym.opSign": "签名（用私钥）", "asym.opVerify": "验签（用公钥）",
+    "asym.btnEnc": "加密", "asym.btnDec": "解密", "asym.btnSign": "签名", "asym.btnVerify": "验签",
     "asym.msg": "验签原文", "asym.run": "执行", "asym.out": "结果",
     "asym.keys": "密钥", "asym.genTitle": "RSA 密钥对 (2048)",
     "asym.genHint": "已生成，可复制或保存。私钥请妥善保管，切勿泄露。",
@@ -417,7 +419,7 @@ window.I18N = {
       '<p>算法核心均来自成熟库，界面与交互逻辑为手写实现。</p>',
 
     /* 加密后保存提示（密码本） */
-    "vp.title": "保存到密码本？",
+    "vp.title": "保存到密码本？", "vault.empty": "密码本为空，先保存一个", "vault.pickFill": "从密码本选取",
     "vp.ask": "是否把这次用的密钥存进密码本？",
     "vp.method": "加密方式",
     "vp.pw": "密码 / 密钥",
@@ -517,6 +519,8 @@ window.I18N = {
 
     "asym.gen": "Generate RSA Key Pair (2048)", "asym.pub": "Public Key (PUBLIC KEY)",
     "asym.priv": "Private Key (PRIVATE KEY)", "asym.op": "Operation", "asym.in": "Input",
+    "asym.opLabel": "Choose operation", "asym.opEnc": "Encrypt (with public key)", "asym.opDec": "Decrypt (with private key)", "asym.opSign": "Sign (with private key)", "asym.opVerify": "Verify (with public key)",
+    "asym.btnEnc": "Encrypt", "asym.btnDec": "Decrypt", "asym.btnSign": "Sign", "asym.btnVerify": "Verify",
     "asym.keys": "Keys", "asym.genTitle": "RSA Key Pair (2048)",
     "asym.genHint": "Generated — copy or save. Keep the private key safe, never leak it.",
     "asym.msg": "Original message (verify)", "asym.run": "Run", "asym.out": "Result",
@@ -817,7 +821,7 @@ window.I18N = {
       '<p>Core algorithms come from mature libraries; the UI is hand-written.</p>',
 
     /* Save-to-vault prompt (password book) */
-    "vp.title": "Save to password book?",
+    "vp.title": "Save to password book?", "vault.empty": "Password book is empty — save one first", "vault.pickFill": "Pick from password book",
     "vp.ask": "Save the key you just used?",
     "vp.method": "Method",
     "vp.pw": "Password / Key",
