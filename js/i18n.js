@@ -29,7 +29,7 @@ window.I18N = {
 
     /* 哈希 */
     "hash.in": "输入文本", "hash.algo": "算法", "hash.key": "密钥（HMAC 需要）",
-    "hash.btn": "计算哈希", "hash.out": "结果（十六进制）", "copy": "复制结果", "copy.bigFileAsk": "内容较大（超过约 5000 字节，剪贴板可能放不下）\n是否保存为文件？",
+    "hash.btn": "计算哈希", "hash.out": "结果（十六进制）", "copy": "复制结果", "copy.bigFileAsk": "内容较大（超过约 5000 字节，剪贴板可能放不下）\n是否保存为文件？", "hash.sha3_512": "标准 SHA3-512", "hash.keccak512": "Keccak-512（原始算法）",
 
     /* 编码 */
     "enc.in": "输入", "enc.mode": "方式", "enc.imgLabel": "图片转 Base64（可选）",
@@ -345,7 +345,7 @@ window.I18N = {
     "ui.expand": "Expand", "ui.full": "Fullscreen edit", "ui.clear": "Clear", "ui.done": "Done", "back.pressAgain": "Press back again to exit",
 
     "hash.in": "Input text", "hash.algo": "Algorithm", "hash.key": "Key (for HMAC)",
-    "hash.btn": "Compute hash", "hash.out": "Result (hex)", "copy": "Copy result", "copy.bigFileAsk": "Content is large (over ~5000 bytes, clipboard may not fit)\nSave it as a file instead?",
+    "hash.btn": "Compute hash", "hash.out": "Result (hex)", "copy": "Copy result", "copy.bigFileAsk": "Content is large (over ~5000 bytes, clipboard may not fit)\nSave it as a file instead?", "hash.sha3_512": "Standard SHA3-512", "hash.keccak512": "Keccak-512 (original)",
 
     "enc.in": "Input", "enc.mode": "Mode", "enc.imgLabel": "Image to Base64 (optional)",
     "enc.imgBtn": "Image → Base64", "enc.run": "Run", "enc.out": "Result",

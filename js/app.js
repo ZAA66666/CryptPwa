@@ -418,7 +418,13 @@ document.getElementById("hash-btn").addEventListener("click", () => {
   if (!text) { out.value = ""; return; }
   const algo = hashAlgo.value;
   let res;
-  if (algo.startsWith("HMAC")) {
+  if (algo === "SHA3-512") {
+    /* 标准 SHA3-512（FIPS 202）：js-sha3 */
+    res = sha3_512(text);
+  } else if (algo === "KECCAK-512") {
+    /* Keccak-512（NIST 原始 Keccak，非标准 SHA3）：crypto-js 兼容模式 */
+    res = CryptoJS.SHA3(text, { outputLength: 512 }).toString();
+  } else if (algo.startsWith("HMAC")) {
     if (!hashKey.value) { out.value = "❌ HMAC 需要密钥"; return; }
     res = CryptoJS[algo](text, hashKey.value).toString();
   } else {
