@@ -7,7 +7,7 @@
 /* 本项目 GitHub 仓库（CryptPwa，作者 ZAA66666）。 */
 const GITHUB_REPO = "https://github.com/ZAA66666/CryptPwa";
 /* 当前版本号（用于“检测更新”对比 GitHub Releases） */
-const APP_VERSION = "v260814_c4c";
+const APP_VERSION = "v260814_c81";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
@@ -25,7 +25,7 @@ window.I18N = {
     "home.recent": "最近使用", "home.clear": "清空",
     "home.empty": "还没有记录，去用用上面的工具吧～",
     "home.tapBack": "点击回到该功能",
-    "ui.expand": "展开查看全文", "ui.full": "全屏编辑", "ui.clear": "清空", "ui.done": "完成", "ui.collapse": "收起", "back.pressAgain": "再按一次返回退出",
+    "ui.expand": "展开查看全文", "ui.full": "全屏编辑", "ui.clear": "清空", "ui.done": "完成", "ui.collapse": "收起", "ui.saveFile": "保存到文件", "back.pressAgain": "再按一次返回退出",
 
     /* 哈希 */
     "hash.in": "输入文本", "hash.algo": "算法", "hash.key": "密钥（HMAC 需要）",
@@ -473,7 +473,7 @@ window.I18N = {
     "home.recent": "Recent", "home.clear": "Clear",
     "home.empty": "No records yet — go try the tools above～",
     "home.tapBack": "Tap to open this feature",
-    "ui.expand": "Expand", "ui.full": "Fullscreen edit", "ui.clear": "Clear", "ui.done": "Done", "ui.collapse": "Collapse", "back.pressAgain": "Press back again to exit",
+    "ui.expand": "Expand", "ui.full": "Fullscreen edit", "ui.clear": "Clear", "ui.done": "Done", "ui.collapse": "Collapse", "ui.saveFile": "Save to file", "back.pressAgain": "Press back again to exit",
 
     "hash.in": "Input text", "hash.algo": "Algorithm", "hash.key": "Key (for HMAC)",
     "hash.btn": "Compute hash", "hash.out": "Result (hex)", "copy": "Copy result", "copy.bigFileAsk": "Content is large (over ~5000 bytes, clipboard may not fit)\nSave it as a file instead?", "hash.sha3_512": "Standard SHA3-512", "hash.keccak512": "Keccak-512 (original)",

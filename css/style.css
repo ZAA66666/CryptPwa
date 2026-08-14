@@ -1118,8 +1118,10 @@ input[type="color"] { width: 46px; height: 30px; border: 1px solid var(--border)
 .exp-mask.show { opacity: 1; pointer-events: auto; }
 .exp-panel {
   position: fixed; left: 50%; top: 50%; transform: translate(-50%, -48%) scale(0.98);
-  width: min(94vw, 460px); max-height: 86vh; overflow: hidden;
-  background: var(--card); border-radius: 20px; padding: 0; z-index: 81;
+  width: 92vw; height: 80vh;
+  max-width: 720px;
+  overflow: hidden;
+  background: var(--card); border-radius: 18px; padding: 0; z-index: 81;
   box-shadow: 0 12px 40px rgba(0,0,0,0.35);
   opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease;
   display: flex; flex-direction: column;
@@ -1127,29 +1129,47 @@ input[type="color"] { width: 46px; height: 30px; border: 1px solid var(--border)
 .exp-panel.show { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
 .exp-panel .vp-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 8px; margin: 0; }
 .exp-panel .vp-title { font-size: 16px; font-weight: 700; color: var(--text); }
+.exp-panel .exp-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px 6px; margin: 0;
+}
 .exp-panel .exp-collapse {
   border: none; background: var(--settings-bg); color: var(--muted);
-  width: 36px; height: 36px; border-radius: 50%;
+  width: 30px; height: 30px; border-radius: 50%;
   line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
   -webkit-tap-highlight-color: transparent;
 }
-.exp-panel .exp-collapse svg { width: 20px; height: 20px; }
-.exp-panel .exp-done { min-width: 80px; padding: 10px 18px; border-radius: 22px; }
+.exp-panel .exp-collapse svg { width: 18px; height: 18px; }
+.exp-panel .exp-done { min-width: 64px; padding: 7px 14px; border-radius: 18px; font-size: 13px; }
 .exp-panel .exp-text {
   flex: 1 1 auto; min-height: 0; overflow-y: auto;
-  width: auto; margin: 4px 18px 12px;
-  padding: 14px;
+  width: auto; margin: 2px 12px 8px;
+  padding: 12px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 13.5px; line-height: 1.65;
-  border: 1px solid var(--border); border-radius: 14px;
+  font-size: 13px; line-height: 1.6;
+  border: 1px solid var(--border); border-radius: 12px;
   background: var(--settings-bg);
   color: var(--text); resize: none; box-sizing: border-box;
   word-break: break-all; white-space: pre-wrap;
 }
-.exp-panel .exp-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 18px 10px; margin: 0;
+/* 编辑框外部（弹窗内）操作行：复制 / 保存到文件（紧凑） */
+.exp-panel .exp-ops {
+  display: flex; gap: 8px;
+  padding: 0 12px 10px;
 }
+.exp-panel .exp-op {
+  flex: 1 1 auto;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--settings-bg);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.exp-panel .exp-op:active { background: var(--accent-soft); border-color: var(--accent); }
 .exp-panel .btn-row .btn { flex: 1 1 auto; }
 
 /* 扫描二维码浮层（摄像头取景框 + 相册识别） */

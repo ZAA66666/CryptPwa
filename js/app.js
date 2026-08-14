@@ -1873,7 +1873,7 @@ function applyLaunchParams() {
     const arr = await api.listAll(cat);
     if (arr === null) return;
     if (!arr.length) {
-      if (window.dialog) await window.dialog.alert(t("vault.empty", "密码本为空，先保存一个"), { title: t("vp.title") });
+      if (window.dialog) await window.dialog.alert(t("vault.empty", "密码本为空，先保存一个"), t("vp.title"));
       return;
     }
     const items = arr.map((p, i) => ({
@@ -1980,6 +1980,9 @@ function openEditor(ta, editable) {
   } catch (e) {}
   const doneLbl = (typeof t === "function") ? t("ui.done") : "完成";
   const closeLbl = (typeof t === "function") ? t("ui.collapse", "收起") : "收起";
+  const copyLbl = (typeof t === "function") ? t("copy") : "复制";
+  const saveLbl = (typeof t === "function") ? t("ui.saveFile", "保存到文件") : "保存到文件";
+  /* 弹窗内部操作行（编辑框外）：复制 + 保存到文件（保留右上角完成） */
   panel.innerHTML =
     `<div class="exp-head">` +
       `<button class="exp-collapse" id="exp-close" aria-label="${closeLbl}" title="${closeLbl}">` +
@@ -1987,7 +1990,11 @@ function openEditor(ta, editable) {
       `</button>` +
       `<button class="btn primary exp-done" id="exp-ok">${escapeHtml(doneLbl)}</button>` +
     `</div>` +
-    `<textarea class="exp-text" id="exp-edit" ${editable ? "" : "readonly"}>${escapeHtml(ta.value)}</textarea>`;
+    `<textarea class="exp-text" id="exp-edit" ${editable ? "" : "readonly"}>${escapeHtml(ta.value)}</textarea>` +
+    `<div class="exp-ops">` +
+      `<button type="button" class="exp-op" id="exp-copy">📋 ${escapeHtml(copyLbl)}</button>` +
+      `<button type="button" class="exp-op" id="exp-save">💾 ${escapeHtml(saveLbl)}</button>` +
+    `</div>`;
   panel.classList.add("show"); mask.classList.add("show");
   const close = () => { panel.classList.remove("show"); mask.classList.remove("show"); };
   const editArea = panel.querySelector("#exp-edit");
@@ -2001,6 +2008,14 @@ function openEditor(ta, editable) {
     }
     close();
     if (editable) ta.focus();
+  };
+  const copyBtn = panel.querySelector("#exp-copy");
+  if (copyBtn) copyBtn.onclick = (e) => copyText(editArea.value, e.currentTarget);
+  const saveBtn = panel.querySelector("#exp-save");
+  if (saveBtn) saveBtn.onclick = () => {
+    const name = "output_" + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-") + ".txt";
+    if (window.downloadJson) window.downloadJson(name, editArea.value);
+    else saveTextFile(name, editArea.value);
   };
 }
 function setupExpanders() {
