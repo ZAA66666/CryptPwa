@@ -42,6 +42,7 @@ sandbox.document = {
   addEventListener() {}, removeEventListener() {},
   createElement() { return makeEl(); },
   body: makeEl(),
+  documentElement: makeEl(),
 };
 sandbox.navigator = { userAgent: "node", clipboard: { writeText() { return Promise.resolve(); } }, mediaDevices: {}, share: undefined };
 sandbox.localStorage = { getItem(k) { return store[k] ?? null; }, setItem(k, v) { store[k] = String(v); }, removeItem(k) { delete store[k]; } };
@@ -55,6 +56,7 @@ sandbox.setTimeout = () => 0;
 sandbox.clearTimeout = () => {};
 sandbox.requestAnimationFrame = () => 0;
 sandbox.cancelAnimationFrame = () => {};
+sandbox.getComputedStyle = () => ({ getPropertyValue: () => "" });
 sandbox.crypto = { subtle: { generateKey: () => Promise.reject(new Error("mock")), exportKey: () => Promise.reject(new Error("mock")) }, getRandomValues: (a) => a };
 sandbox.TextEncoder = TextEncoder; sandbox.TextDecoder = TextDecoder;
 sandbox.btoa = (s) => Buffer.from(s, "binary").toString("base64");
@@ -70,11 +72,12 @@ sandbox.window.Capacitor = undefined; // 原生插件不存在时，状态栏/�
 vm.createContext(sandbox);
 
 const files = [
-  "js/i18n.js", "js/tools.js",
+  "js/utils/i18n.js", "js/utils/tools.js",
   "js/pages/hash.js", "js/pages/enc.js", "js/pages/sym.js", "js/pages/asym.js",
   "js/pages/qr.js", "js/pages/guide.js", "js/pages/incoming.js",
   "js/pages/json.js", "js/pages/cron.js", "js/pages/rand.js", "js/pages/txt.js",
-  "js/app.js",
+  "js/core/app.js",
+  "js/core/settings.js",
 ];
 let ok = true;
 for (const f of files) {

@@ -7,8 +7,8 @@ android {
         applicationId "com.zaa.cryptpwa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 23
-        versionName "v260815_0022"
+        versionCode 24
+        versionName "v260815_0023"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

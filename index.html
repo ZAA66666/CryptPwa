@@ -2,13 +2,17 @@
 <!--
   加解密工具箱 · 单页应用外壳（SPA shell）
   文件地图（看不懂项目先读 css/style.css 顶部的“布局系统总览”注释）：
-    index.html       本文件：所有页面的 DOM 骨架（主页 + 各功能 panel + 设置 overlay + 弹窗），脚本在 </body> 前加载
-    css/style.css    全部样式（含布局系统总览 + 各区作用注释）
-    js/i18n.js       多语言词条 + 全局 APP_VERSION（版本号唯一真相源）
-    js/tools.js      通用工具（驼峰命名、toast、统一 dialog 弹窗等）
-    js/app.js        主逻辑：面板切换、各工具算法、状态栏、弹窗、返回键、SW 注册
-    js/settings.js   设置模块：主题/语言/字体/沉浸式/密码本/关于·隐私·协议
-    sw.js            Service Worker：离线缓存（CACHE_NAME 改动必 +1）
+    index.html              本文件(主入口/主activity)：所有页面的 DOM 骨架（主页 + 各功能 panel + 设置 overlay + 弹窗），脚本在 </body> 前加载
+    css/style.css           全部样式（含布局系统总览 + 各区作用注释）
+    js/core/app.js          调用类(主逻辑)：面板切换、各工具算法、状态栏、弹窗、返回键、SW 注册
+    js/core/settings.js     调用类(设置模块)：主题/语言/字体/沉浸式/密码本/关于·隐私·协议
+    js/utils/i18n.js        工具类：多语言词条 + 全局 APP_VERSION（版本号唯一真相源）
+    js/utils/tools.js       工具类：通用工具（驼峰命名、toast、统一 dialog 弹窗等）
+    js/pages/*.js           页面类：12 个功能面板各自独立成文件（RSA/SM2 共用 asym）
+    js/vendor/*.js          工具类(第三方)：crypto-js / sha3 / qrcode / jsqr / jsbarcode / sm-crypto
+    assets/icons/*.png      图片资源：应用图标（manifest 引用）
+    data/*.json             数据类：语言包模板、示例备份
+    sw.js                   Service Worker：离线缓存（CACHE_NAME 改动必 +1）
   原生层（Capacitor）：android/ 下 MainActivity 壳 + 原生插件（FolderPicker 等）；
                      构建时 npx cap sync 把本目录 web 资源灌进 android 打包件。
 -->
@@ -846,8 +850,8 @@
     import * as smCrypto from "./js/vendor/sm-crypto.esm.js";
     window.smCrypto = smCrypto;
   </script>
-  <script src="js/i18n.js"></script>
-  <script src="js/tools.js"></script>
+  <script src="js/utils/i18n.js"></script>
+  <script src="js/utils/tools.js"></script>
   <!-- 各页面/面板逻辑：独立成文件，便于维护；在 app.js 之前加载，函数/变量按全局作用域共享 -->
   <script src="js/pages/hash.js"></script>
   <script src="js/pages/enc.js"></script>
@@ -860,7 +864,7 @@
   <script src="js/pages/cron.js"></script>
   <script src="js/pages/rand.js"></script>
   <script src="js/pages/txt.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/settings.js"></script>
+  <script src="js/core/app.js"></script>
+  <script src="js/core/settings.js"></script>
 </body>
 </html>
