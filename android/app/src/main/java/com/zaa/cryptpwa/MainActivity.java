@@ -37,6 +37,7 @@ public class MainActivity extends BridgeActivity {
             ctrl.setAppearanceLightNavigationBars(lightBars);
         }
         handleSharedIntent(getIntent());
+        handleDeepLink(getIntent());
     }
 
     @Override
@@ -44,6 +45,27 @@ public class MainActivity extends BridgeActivity {
         super.onNewIntent(intent);
         setIntent(intent);
         handleSharedIntent(intent);
+        handleDeepLink(intent);
+    }
+
+    /* 桌面快捷方式 / URL Scheme 深链：crypto-pwa://?tab=hash → 转成 ?tab=hash 交给 JS */
+    private void handleDeepLink(Intent intent) {
+        if (intent == null) return;
+        Uri data = intent.getData();
+        if (data == null) return;
+        String s = data.toString();               // crypto-pwa://?tab=hash
+        if (s.startsWith("crypto-pwa:")) s = s.substring("crypto-pwa:".length());
+        if (s.startsWith("//")) s = s.substring(1);
+        final String query = s;
+        getBridge().getWebView().post(new Runnable() {
+            @Override
+            public void run() {
+                getBridge().getWebView().evaluateJavascript(
+                        "window.__handleDeepLink && window.__handleDeepLink(" + JSONObject.quote(query) + ");",
+                        null
+                );
+            }
+        });
     }
 
     private void handleSharedIntent(Intent intent) {

@@ -874,12 +874,14 @@ function refreshSymHints() {
             : rule.exact ? rule.exact.includes(cur)
             : (cur >= rule.min && cur <= rule.max);
   const mark = !symKey.value ? "" : (ok ? " ✓" : " ✗");
-  symKeyHint.innerHTML = `密钥需 ${need}；<span class="hl-fill">当前已填 ${cur} 字节${mark}</span>。`;
+  const hintTpl = (t && typeof t === "function") ? t("sym.hintKey") : "密钥需 {need}；当前已填 {cur} 字节";
+  symKeyHint.innerHTML = hintTpl.replace("{need}", need).replace("{cur}", cur + " " + mark);
   symKeyHint.classList.toggle("error", !!symKey.value && !ok);
   updateKeySizeLabel();
   symIvWrap.style.display = mode === "ECB" ? "none" : "block";
   if (mode !== "ECB") {
-    symIvHint.textContent = `IV 需正好 ${rule.block} 字节（当前 ${utf8ByteLength(symIv.value)} 字节）。`;
+    const ivTpl = (t && typeof t === "function") ? t("sym.hintIv") : "IV 需正好 {block} 字节（当前 {cur} 字节）";
+    symIvHint.textContent = ivTpl.replace("{block}", rule.block).replace("{cur}", utf8ByteLength(symIv.value));
   }
 }
 [symAlgo, symKey, symIv].forEach((el) => el.addEventListener("input", refreshSymHints));
@@ -894,15 +896,21 @@ function validateSym(op) {
   if (rule.sizes) {
     const need = getSymKeySize();
     if (kl !== need) {
-      showError(symKeyHint, `❌ 密钥长度不对：AES 需要 ${need} 字节（${need * 8} 位），当前 ${kl} 字节。`);
+      const e = (t("sym.errKeyLen") || "❌ 密钥长度不对：AES 需要 {need} 字节（{bits} 位），当前 {cur} 字节")
+        .replace("{need}", need).replace("{bits}", need * 8).replace("{cur}", kl);
+      showError(symKeyHint, e);
       return null;
     }
   } else if (rule.exact && !rule.exact.includes(kl)) {
-    showError(symKeyHint, `❌ 密钥长度不对：需要 ${rule.exact.join(" / ")} 字节，当前 ${kl} 字节。`);
+    const e = (t("sym.errKeyExact") || "❌ 密钥长度不对：需要 {need} 字节，当前 {cur} 字节")
+      .replace("{need}", rule.exact.join(" / ")).replace("{cur}", kl);
+    showError(symKeyHint, e);
     return null;
   }
   if (rule.min !== undefined && (kl < rule.min || kl > rule.max)) {
-    showError(symKeyHint, `❌ Blowfish 密钥需 ${rule.min}~${rule.max} 字节，当前 ${kl} 字节。`);
+    const e = (t("sym.errBlowfish") || "❌ Blowfish 密钥需 {min}~{max} 字节，当前 {cur} 字节")
+      .replace("{min}", rule.min).replace("{max}", rule.max).replace("{cur}", kl);
+    showError(symKeyHint, e);
     return null;
   }
   symKeyHint.classList.remove("error");
@@ -918,7 +926,9 @@ function validateSym(op) {
     }
   }
   if (mode !== "ECB" && !skipIvCheck && utf8ByteLength(effIv) !== rule.block) {
-    showError(symIvHint, `❌ IV 需正好 ${rule.block} 字节，当前 ${utf8ByteLength(effIv)} 字节。`);
+    const e = (t("sym.errIvLen") || "❌ IV 需正好 {block} 字节，当前 {cur} 字节")
+      .replace("{block}", rule.block).replace("{cur}", utf8ByteLength(effIv));
+    showError(symIvHint, e);
     return null;
   }
   return { algo, mode, key, iv: effIv };
@@ -1066,7 +1076,8 @@ const rsavPanel = document.getElementById("rsav-panel");
 function truncKey(k) {
   k = (k || "").trim();
   if (k.length <= 70) return k;
-  return k.slice(0, 48) + "\n        ……（已省略中间 " + (k.length - 72) + " 个字符）……\n" + k.slice(-24);
+  const om = (t("rsa.trunc") || "（已省略中间 {n} 个字符）").replace("{n}", k.length - 72);
+  return k.slice(0, 48) + "\n        " + om + "\n" + k.slice(-24);
 }
 function fillRsaView() {
   document.getElementById("rsav-pub").textContent = truncKey(rsaPub.value);
@@ -1941,6 +1952,22 @@ window.__sharedText = function (text) {
   showPanel("incoming");
   renderIncoming();
 };
+/* 桌面快捷方式 / 深链：crypto-pwa://?tab=hash → 直达对应工具（原生 intent data 转来） */
+window.__handleDeepLink = function (q) {
+  try {
+    if (window.__log) window.__log("deeplink", String(q || "").slice(0, 200));
+  } catch (e) {}
+  let query = String(q || "").trim();
+  if (!query) return;
+  if (query.indexOf("?") !== 0) query = query.indexOf("?") === -1 ? "?" + query : query.slice(query.indexOf("?"));
+  const p = new URLSearchParams(query);
+  const tab = p.get("tab");
+  if (tab && ["hash", "enc", "sym", "qr", "json", "cron", "rand", "txt", "guide"].includes(tab)) {
+    showPanel(tab);
+    return;
+  }
+  if (p.get("text") || p.get("url")) applyLaunchParams();
+};
 /* 外部回调：把处理结果跳回调用方（callback 参数） */
 function wireCallback() {
   const card = document.getElementById("inc-callback-card");
@@ -2168,7 +2195,12 @@ function setupExpanders() {
     row.innerHTML =
       '<input class="kv-key" type="text" placeholder="key" value="' + escapeHtml(key) + '" />' +
       '<input class="kv-val" type="text" placeholder="value" value="' + escapeHtml(val) + '" />' +
-      '<select class="kv-type">' + opt("string", "字符串") + opt("number", "数字") + opt("boolean", "布尔") + opt("null", "空") + "</select>" +
+      '<select class="kv-type">' +
+      opt("string", t("kv.string") || "字符串") +
+      opt("number", t("kv.number") || "数字") +
+      opt("boolean", t("kv.boolean") || "布尔") +
+      opt("null", t("kv.null") || "空") +
+      "</select>" +
       '<button class="kv-del" type="button" aria-label="删除">✕</button>';
     row.querySelector(".kv-del").addEventListener("click", () => row.remove());
     return row;
@@ -2207,7 +2239,7 @@ function setupExpanders() {
       panel.querySelector("#kv-tpl-json").onclick = () => {
         kvList.innerHTML = "";
         addKvRow("id", "1", "number");
-        addKvRow("name", "张三", "string");
+        addKvRow("name", "zhangsan", "string");
         addKvRow("email", "zhangsan@example.com", "string");
         addKvRow("role", "admin", "string");
         addKvRow("enabled", "true", "boolean");

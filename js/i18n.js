@@ -7,7 +7,7 @@
 /* 本项目 GitHub 仓库（CryptPwa，作者 ZAA66666）。 */
 const GITHUB_REPO = "https://github.com/ZAA66666/CryptPwa";
 /* 当前版本号（用于“检测更新”对比 GitHub Releases） */
-const APP_VERSION = "v260814_c81";
+const APP_VERSION = "v260814_ecc";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
@@ -35,7 +35,7 @@ window.I18N = {
     "enc.in": "输入", "enc.mode": "方式", "enc.imgLabel": "图片转 Base64（可选）",
     "enc.imgBtn": "图片 → Base64", "enc.run": "执行", "enc.out": "结果",
     "enc.b64": "Base64", "enc.hex": "Hex", "enc.url": "URL", "enc.encode": "编码", "enc.decode": "解码",
-    "enc.b32": "Base32", "enc.b58": "Base58", "enc.unicode": "Unicode", "enc.jwt": "JWT", "enc.oct": "Octal", "enc.ascii": "ASCII", "enc.htmlent": "HTML 实体", "enc.utf16": "UTF-16", "enc.roman": "罗马数字",
+    "enc.b32": "Base32", "enc.b58": "Base58", "enc.unicode": "Unicode", "enc.jwt": "JWT", "enc.oct": "Octal", "enc.ascii": "ASCII", "enc.htmlent": "HTML 实体", "enc.utf16": "UTF-16", "enc.roman": "罗马数字", "sym.hintKey": "密钥需 {need}；当前已填 {cur}", "sym.hintIv": "IV 需正好 {block} 字节（当前 {cur} 字节）", "sym.errKeyLen": "❌ 密钥长度不对：AES 需要 {need} 字节（{bits} 位），当前 {cur} 字节", "sym.errKeyExact": "❌ 密钥长度不对：需要 {need} 字节，当前 {cur} 字节", "sym.errBlowfish": "❌ Blowfish 密钥需 {min}~{max} 字节，当前 {cur} 字节", "sym.errIvLen": "❌ IV 需正好 {block} 字节，当前 {cur} 字节", "rsa.trunc": "（已省略中间 {n} 个字符）", "kv.string": "字符串", "kv.number": "数字", "kv.boolean": "布尔", "kv.null": "空",
     "enc.help": "编码：把文本转成另一种表示；解码：还原。",
     "enc.okEnc": "✅ 编码完成", "enc.okDec": "✅ 解码完成", "enc.fail": "❌ 处理失败：", "enc.empty": "请输入要编码/解码的内容",
     "ph.hashIn": "要计算哈希的文本，如 hello", "ph.encIn": "要编码或解码的内容（支持中文）",
@@ -289,7 +289,7 @@ window.I18N = {
     "storage.usage1": "加密/解密后的结果内容，超过约 5000 字节（剪贴板放不下）时，自动提示保存为文件到此目录",
     "storage.usage2": "RSA / SM2 密钥「导出到文件」时保存的 .pem / .txt 文件",
     "storage.usage3": "WebDAV 备份、本地导出等生成的 JSON 备份文件",
-    "storage.pick": "选择文件夹", "storage.reset": "恢复默认",
+    "storage.pick": "选择文件夹", "storage.reset": "恢复默认", "storage.saved": "已保存路径", "storage.alreadyDefault": "已是默认路径（sdcard/CrytoPwa）", "storage.alreadySaved": "已是当前保存路径", "storage.restoredDefault": "已恢复默认路径",
     "storage.pickFail": "选择失败：", "storage.pickUnsupported": "当前设备不支持直接选目录，请手动输入路径。",
     "save.savedDoc": "已保存到系统文档目录：", "save.fail": "保存失败：", "storage.androidHint": "安卓版：请在下方直接手动填写保存路径（系统不支持文件夹选择）。", "storage.saved": "已保存默认保存路径",
 
@@ -481,7 +481,7 @@ window.I18N = {
     "enc.in": "Input", "enc.mode": "Mode", "enc.imgLabel": "Image to Base64 (optional)",
     "enc.imgBtn": "Image → Base64", "enc.run": "Run", "enc.out": "Result",
     "enc.b64": "Base64", "enc.hex": "Hex", "enc.url": "URL", "enc.encode": "Encode", "enc.decode": "Decode",
-    "enc.b32": "Base32", "enc.b58": "Base58", "enc.unicode": "Unicode", "enc.jwt": "JWT", "enc.oct": "Octal", "enc.ascii": "ASCII", "enc.htmlent": "HTML entities", "enc.utf16": "UTF-16", "enc.roman": "Roman numerals",
+    "enc.b32": "Base32", "enc.b58": "Base58", "enc.unicode": "Unicode", "enc.jwt": "JWT", "enc.oct": "Octal", "enc.ascii": "ASCII", "enc.htmlent": "HTML entities", "enc.utf16": "UTF-16", "enc.roman": "Roman numerals", "sym.hintKey": "Key needs {need}; currently {cur}", "sym.hintIv": "IV must be exactly {block} bytes (currently {cur})", "sym.errKeyLen": "❌ Wrong key length: AES needs {need} bytes ({bits} bits), got {cur} bytes", "sym.errKeyExact": "❌ Wrong key length: needs {need} bytes, got {cur} bytes", "sym.errBlowfish": "❌ Blowfish key needs {min}-{max} bytes, got {cur} bytes", "sym.errIvLen": "❌ IV must be exactly {block} bytes, got {cur} bytes", "rsa.trunc": "(omitted {n} chars)", "kv.string": "string", "kv.number": "number", "kv.boolean": "boolean", "kv.null": "null",
     "enc.help": "Encode: transform text into another representation; decode reverses it.",
     "enc.okEnc": "✅ Encode done", "enc.okDec": "✅ Decode done", "enc.fail": "❌ Failed: ", "enc.empty": "Enter text to encode/decode",
     "ph.hashIn": "Text to hash, e.g. hello", "ph.encIn": "Content to encode/decode (Chinese supported)",
@@ -709,7 +709,7 @@ window.I18N = {
     "storage.usage1": "Encrypted/decrypted result content over ~5000 bytes (too large for clipboard) — auto-prompt to save as a file to this folder",
     "storage.usage2": ".pem / .txt files exported from RSA / SM2 keys",
     "storage.usage3": "JSON backup files from WebDAV backup and local export",
-    "storage.pick": "Pick folder", "storage.reset": "Reset to default",
+    "storage.pick": "Pick folder", "storage.reset": "Reset to default", "storage.saved": "Path saved", "storage.alreadyDefault": "Already default path (sdcard/CrytoPwa)", "storage.alreadySaved": "Already the current save path", "storage.restoredDefault": "Restored to default path",
     "storage.pickFail": "Pick failed: ", "storage.pickUnsupported": "This browser cannot pick a folder directly — please type the path manually.",
     "save.savedDoc": "Saved to system Documents: ", "save.fail": "Save failed: ", "storage.androidHint": "Android: type the path manually below (folder picker is not available).", "storage.saved": "Default save path saved",
 

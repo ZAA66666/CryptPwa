@@ -24,7 +24,6 @@
     <main>
       <!-- ========== 面板 0：主页（工具网格 + 历史记录，参考 ctool） ========== -->
       <section class="panel active" id="panel-home">
-        <p class="home-greet" data-i18n="home.greet">工具箱 · 点下面的功能直接用</p>
         <ul class="tool-list">
           <li><button class="tool-row" data-go="hash">
             <span class="tr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 7 20"/><path d="M17 4 15 20"/><path d="M4 9h16"/><path d="M3.5 15h17"/></svg></span>
@@ -200,7 +199,7 @@
         </select>
 
         <label class="field-label" data-i18n="sym.key">密钥</label>
-        <input id="sym-key" type="text" placeholder="如：1234567890123456" />
+        <input id="sym-key" type="text" data-i18n-attr="placeholder:ph.symKey" placeholder="如：1234567890123456" />
         <div class="sym-key-actions">
           <button class="mini-btn" data-fill="sym-key" data-cat="sym"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8.5" r="3.6"/><path d="M11 11 20 20"/><path d="M16.5 16.5 19 14"/><path d="M14.5 14.5 17 12"/></svg><span data-i18n="symFill">密码本</span></button>
           <button class="mini-btn" id="sym-rand-key"><svg class="kico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M21 3 13 11"/><path d="M8 21H3v-5"/><path d="M3 21l8-8"/><path d="M16 21h5v-5"/><path d="M21 21l-8-8"/></svg><span data-i18n="sym.randKey">随机密钥</span></button>

@@ -531,11 +531,6 @@ body.on-home { padding-bottom: calc(52px + env(safe-area-inset-bottom)); }
 }
 
 /* ===== 主页：工具网格（参考 ctool 仪表盘） ===== */
-.home-greet {
-  font-size: 14px;
-  color: var(--muted);
-  margin: 2px 0 14px;
-}
 /* 主页工具列表（参考酷安"主题风格"列表页：白底圆角卡片 + 圆角色块 + 右箭头） */
 .tool-list {
   list-style: none;
@@ -968,7 +963,7 @@ input[type="file"] {
 .scope-opt { display: flex; align-items: center; gap: 10px; padding: 12px 10px; border-radius: 10px; background: var(--settings-bg); cursor: pointer; font-size: 14px; color: var(--text); }
 .scope-opt input { width: 18px; height: 18px; accent-color: var(--accent); flex: 0 0 auto; }
 .seg-inline { display: flex; flex-wrap: wrap; background: #f0f2f4; border-radius: 10px; padding: 3px; }
-.seg-inline button { border: none; background: transparent; padding: 7px 12px; border-radius: 8px; font-size: 13px; color: #6b7178; cursor: pointer; }
+.seg-inline button { border: none; background: transparent; padding: 7px 12px; border-radius: 8px; font-size: 13px; color: #6b7178; cursor: pointer; white-space: nowrap; flex: 0 1 auto; min-width: 0; }
 .seg-inline button.active { background: #fff; color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,0.12); font-weight: 600; }
 
 /* 莫奈取色：预设色板 + 取色器 */

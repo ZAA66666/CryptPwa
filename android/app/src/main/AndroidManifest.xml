@@ -19,6 +19,11 @@
             android:resizeableActivity="true"
             android:exported="true">
 
+            <!-- 桌面快捷方式（长按图标直达各工具） -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

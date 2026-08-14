@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 桌面长按图标 → 快捷直达各工具（参考快捷方式类 App 的调用方式） -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="hash"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="哈希"
+        android:shortcutLongLabel="计算哈希">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="crypto-pwa://?tab=hash"
+            android:targetPackage="com.zaa.cryptpwa"
+            android:targetClass="com.zaa.cryptpwa.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="enc"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="编解码"
+        android:shortcutLongLabel="编/解码">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="crypto-pwa://?tab=enc"
+            android:targetPackage="com.zaa.cryptpwa"
+            android:targetClass="com.zaa.cryptpwa.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="sym"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="加解密"
+        android:shortcutLongLabel="加/解密">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="crypto-pwa://?tab=sym"
+            android:targetPackage="com.zaa.cryptpwa"
+            android:targetClass="com.zaa.cryptpwa.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="qr"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="二维码"
+        android:shortcutLongLabel="二维码/条形码">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="crypto-pwa://?tab=qr"
+            android:targetPackage="com.zaa.cryptpwa"
+            android:targetClass="com.zaa.cryptpwa.MainActivity" />
+    </shortcut>
+</shortcuts>

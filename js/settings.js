@@ -567,11 +567,18 @@
         if (window.toast) window.toast(t("cache.done") + " " + stamp);
       };
     } else if (name === "storage") {
+      const DEFAULT_PATH = "sdcard/CrytoPwa";
+      const curPath = () => (getSetting("savepath", DEFAULT_PATH) || "").trim() || DEFAULT_PATH;
       document.getElementById("sp-save").onclick = () => {
-        const v = (bodyEl.querySelector("#sp-path").value || "").trim() || "sdcard/CrytoPwa";
-        setSetting("savepath", v);
-        alert(t("storage.saved"));
-        render();
+        const v = (bodyEl.querySelector("#sp-path").value || "").trim() || DEFAULT_PATH;
+        if (v === curPath()) {
+          /* 已经是默认/当前路径：toast 提示，不弹窗 */
+          if (window.toast) window.toast(v === DEFAULT_PATH ? t("storage.alreadyDefault") : t("storage.alreadySaved"));
+        } else {
+          setSetting("savepath", v);
+          if (window.toast) window.toast(t("storage.saved"));
+          render();
+        }
       };
       /* 选择文件夹：优先用 File System Access API（Chrome/Edge 可用），否则提示手动输入 */
       const pickBtn = document.getElementById("sp-pick");
@@ -633,9 +640,14 @@
       };
       const resetBtn = document.getElementById("sp-reset");
       if (resetBtn) resetBtn.onclick = () => {
-        setSetting("savepath", "sdcard/CrytoPwa");
-        bodyEl.querySelector("#sp-path").value = "sdcard/CrytoPwa";
-        if (pickHint) pickHint.textContent = "";
+        if (curPath() === DEFAULT_PATH) {
+          if (window.toast) window.toast(t("storage.alreadyDefault"));
+        } else {
+          setSetting("savepath", DEFAULT_PATH);
+          bodyEl.querySelector("#sp-path").value = DEFAULT_PATH;
+          if (pickHint) pickHint.textContent = "";
+          if (window.toast) window.toast(t("storage.restoredDefault"));
+        }
       };
     } else if (name === "theme") {
       bodyEl.querySelectorAll("#theme-seg button").forEach((b) =>
