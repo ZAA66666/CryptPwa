@@ -7,8 +7,8 @@ android {
         applicationId "com.zaa.cryptpwa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 8
-        versionName "2.0.3"
+        versionCode 9
+        versionName "2.0.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -29,9 +29,10 @@ android {
     }
     buildTypes {
         release {
-            /* 体积精简：开启 R8 minify + 资源压缩，APK 体积减小 ~40-60% */
-            minifyEnabled true
-            shrinkResources true
+            /* 关掉 R8 minify / shrinkResources：之前开启导致 Capacitor 插件/资源被裁剪，功能打不开。
+               体积靠 abiFilters（仅 ARM）已经减小，优先保证功能完整 */
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             // 固定签名（仓库内 cryptpwa-release.p12，CI 与本机构建使用同一签名，可覆盖安装）
             signingConfig signingConfigs.release
