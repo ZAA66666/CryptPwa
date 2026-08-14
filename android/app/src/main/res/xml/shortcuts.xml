@@ -5,8 +5,8 @@
         android:shortcutId="hash"
         android:enabled="true"
         android:icon="@mipmap/ic_launcher"
-        android:shortcutShortLabel="哈希"
-        android:shortcutLongLabel="计算哈希">
+        android:shortcutShortLabel="@string/shortcut_hash_short"
+        android:shortcutLongLabel="@string/shortcut_hash_long">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="crypto-pwa://?tab=hash"
@@ -17,8 +17,8 @@
         android:shortcutId="enc"
         android:enabled="true"
         android:icon="@mipmap/ic_launcher"
-        android:shortcutShortLabel="编解码"
-        android:shortcutLongLabel="编/解码">
+        android:shortcutShortLabel="@string/shortcut_enc_short"
+        android:shortcutLongLabel="@string/shortcut_enc_long">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="crypto-pwa://?tab=enc"
@@ -29,8 +29,8 @@
         android:shortcutId="sym"
         android:enabled="true"
         android:icon="@mipmap/ic_launcher"
-        android:shortcutShortLabel="加解密"
-        android:shortcutLongLabel="加/解密">
+        android:shortcutShortLabel="@string/shortcut_sym_short"
+        android:shortcutLongLabel="@string/shortcut_sym_long">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="crypto-pwa://?tab=sym"
@@ -41,8 +41,8 @@
         android:shortcutId="qr"
         android:enabled="true"
         android:icon="@mipmap/ic_launcher"
-        android:shortcutShortLabel="二维码"
-        android:shortcutLongLabel="二维码/条形码">
+        android:shortcutShortLabel="@string/shortcut_qr_short"
+        android:shortcutLongLabel="@string/shortcut_qr_long">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="crypto-pwa://?tab=qr"

@@ -4,4 +4,14 @@
     <string name="title_activity_main">哈机码</string>
     <string name="package_name">com.zaa.cryptpwa</string>
     <string name="custom_url_scheme">com.zaa.cryptpwa</string>
+
+    <!-- 桌面快捷方式标签（shortcuts.xml 必须引用资源） -->
+    <string name="shortcut_hash_short">哈希</string>
+    <string name="shortcut_hash_long">计算哈希</string>
+    <string name="shortcut_enc_short">编解码</string>
+    <string name="shortcut_enc_long">编/解码</string>
+    <string name="shortcut_sym_short">加解密</string>
+    <string name="shortcut_sym_long">加/解密</string>
+    <string name="shortcut_qr_short">二维码</string>
+    <string name="shortcut_qr_long">二维码/条形码</string>
 </resources>
