@@ -7,7 +7,7 @@
 /* 本项目 GitHub 仓库（CryptPwa，作者 ZAA66666）。 */
 const GITHUB_REPO = "https://github.com/ZAA66666/CryptPwa";
 /* 当前版本号（用于“检测更新”对比 GitHub Releases） */
-const APP_VERSION = "v260815_0024";
+const APP_VERSION = "v260815_0025";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */

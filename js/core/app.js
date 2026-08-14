@@ -448,10 +448,11 @@ document.getElementById("history-export").addEventListener("click", () => {
   if (window.toast) toast(t("hist.exported"));
 });
 document.getElementById("history-clear").addEventListener("click", () => {
-  if (loadHistory().length === 0) { toast(t("hist.emptyTip")); return; }
+  const n = loadHistory().length;
+  if (n === 0) { toast(t("hist.emptyTip")); return; }
   if (window.dialog) {
-    window.dialog.confirm(t("hist.clearConfirm"), { title: t("hist.clear") }).then((ok) => { if (ok) { saveHistory([]); renderHistory(); } });
-  } else if (confirm(t("hist.clearConfirm"))) { saveHistory([]); renderHistory(); }
+    window.dialog.confirm(t("hist.clearConfirm"), { title: t("hist.clear") }).then((ok) => { if (ok) { saveHistory([]); renderHistory(); toast("已清除 " + n + " 条历史记录"); } });
+  } else if (confirm(t("hist.clearConfirm"))) { saveHistory([]); renderHistory(); toast("已清除 " + n + " 条历史记录"); }
 });
 
 /* ▶ hash 页面/面板逻辑已抽离到 js/pages/hash.js（该文件在 app.js 之前加载） */

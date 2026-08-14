@@ -40,7 +40,7 @@ html[dir="rtl"] input, html[dir="rtl"] textarea { direction: rtl; text-align: ri
 
 /* 首屏防白闪：WebView 首帧绘制前，html 底色设为与启动闪屏一致的强调绿，
    避免原生闪屏消失瞬间露出白色 WebView 造成“闪一下白屏”。 */
-html { background: #00a862; }
+html { height: 100%; background: #00a862; }
 
 * { box-sizing: border-box; }
 
@@ -75,7 +75,7 @@ button, .btn, .chip, .rcs-btn, .num-btn, .bottom-item, .settings-item, .vp-item,
 
 body {
   margin: 0;
-  min-height: 100vh;
+  height: 100%;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -217,7 +217,6 @@ body:not(.on-home) .panel.active { padding-top: calc(env(safe-area-inset-top) + 
   display: block;
   flex: 1 1 auto;
   min-height: 0;
-  height: 100%;
   animation: panelIn 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 @keyframes panelIn {
@@ -1214,9 +1213,8 @@ input[type="color"] { width: 46px; height: 30px; border: 1px solid var(--border)
 :root[data-theme="dark"] .mchip.qr      { color: #c2c8d2; background: rgba(120,130,145,.22); }
 :root[data-theme="dark"] .mchip.generic { color: #b4bccc; background: rgba(128,128,128,.22); }
 
-/* ===== 沉浸式状态栏 ===== */
-body.immersive .app-header { padding-top: calc(22px + env(safe-area-inset-top)); }
-body.immersive { padding-top: 0; }
+/* 状态栏由安卓原生层处理（MainActivity.setDecorFitsSystemWindows(true) + 绿底），
+   WebView 不覆盖状态栏，主页内容永不遮挡；不再使用 .immersive 叠加样式。 */
 
 /* ===== 字体大小缩放覆盖规则（置于文件末尾，确保覆盖基础 px 字号） =====
    所有字号都乘以 --fs，由「显示设置 → 字体大小」控制。 */

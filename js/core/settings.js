@@ -178,10 +178,10 @@
     document.documentElement.style.setProperty("--fs", map[f] || 1);
   }
   function applyImmersive() {
-    /* 沉浸式状态栏：默认开启（移除开关），安卓原生 overlay */
-    document.body.classList.add("immersive");
+    /* 状态栏不覆盖 WebView：原生层已 setDecorFitsSystemWindows(true) + overlaysWebView:false
+       预留空间，主页内容永不遮挡；这里只同步图标深浅色，保证时钟/电池在绿底上始终可见 */
     if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar) {
-      window.Capacitor.Plugins.StatusBar.setOverlaysWebView({ overlay: true }).catch(() => {});
+      window.Capacitor.Plugins.StatusBar.setOverlaysWebView({ overlay: false }).catch(() => {});
       const dark = document.documentElement.getAttribute("data-theme") === "dark";
       window.Capacitor.Plugins.StatusBar.setStyle({ style: dark ? "LIGHT" : "DARK" }).catch(() => {});
     }
@@ -335,7 +335,7 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
     titleEl.textContent = t("set.title");
     const groups = [
       { title: t("set.grpGeneral"), items: ["display", "theme", "extcall", "exp", "storage"] },
-      { title: t("set.grpData"), items: ["common", "sync", "cache"] },
+      { title: t("set.grpData"), items: ["common", "sync"] },
       { title: t("set.grpPrivacy"), items: ["about", "feedback", "privacy", "terms", "security", "personal"] },
     ];
     let html = "";
@@ -425,16 +425,6 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
           `</div>` +
           `<div class="legal-text">${t(name + ".text")}</div>`;
       }
-    } else if (name === "cache") {
-      /* 清理缓存：清日志等临时数据，显示上次清理时间 */
-      titleEl.textContent = t("cache.title");
-      const last = localStorage.getItem("set_cache_clear_time") || "";
-      html =
-        `<div class="cp-note">${t("cache.hint")}</div>` +
-        `<div class="cp-form">` +
-        `<div class="settings-row" style="margin:0 0 4px"><span class="sr-label">${t("cache.lastClear")}</span><span class="sr-value" id="cache-last">${escapeHtml(last || t("cache.never"))}</span></div>` +
-        `<div class="btn-row"><button class="btn primary" id="cache-clear">🧹 ${t("cache.clearBtn")}</button></div>` +
-        `</div>`;
     } else if (name === "common") {
       renderCommon();
       return;
@@ -486,10 +476,9 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
         `</div>` +
         `<div class="legal-text" style="margin-top:14px">${t("ext.text")}</div>`;
     } else if (name === "exp") {
-      /* 实验性：纯列表 2 项（数据回调 / 调试功能），点行才弹说明 */
+      /* 实验性：数据回调（其他 App 拉起本 App 并回传结果），点行才弹说明 */
       titleEl.textContent = t("exp.title");
       const cbOn = getSetting("exp_callback", "1") === "1";
-      const dbgOn = getSetting("exp_debug", "0") === "1";
       html =
         `<ul class="settings-list exp-list">` +
         `<li class="settings-item" id="exp-cb-row">` +
@@ -498,21 +487,7 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
         `<span class="si-arrow">›</span>` +
         `<label class="switch"><input type="checkbox" id="exp-cb-toggle" ${cbOn ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label>` +
         `</li>` +
-        `<li class="settings-item" id="exp-dbg-row">` +
-        `<span class="si-icon">${SETTINGS_ICONS.exp}</span>` +
-        `<span class="si-text">${t("exp.debug")}</span>` +
-        `<span class="si-arrow">›</span>` +
-        `<label class="switch"><input type="checkbox" id="exp-dbg-toggle" ${dbgOn ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label>` +
-        `</li>` +
-        `</ul>` +
-        `<ul class="settings-list exp-list" id="exp-log-list" ${dbgOn ? "" : "hidden"}>` +
-        `<li class="settings-item" id="exp-log-row">` +
-        `<span class="si-icon">${SETTINGS_ICONS.cache}</span>` +
-        `<span class="si-text">${t("exp.log")}</span>` +
-        `<span class="si-arrow" id="exp-log-arrow">›</span>` +
-        `</li>` +
-        `</ul>` +
-        `<textarea id="exp-log-box" readonly rows="8" placeholder="${t("exp.logEmpty")}" hidden></textarea>`;
+        `</ul>`;
     } else if (name === "display") {
       titleEl.textContent = t("display.title");
       const f = getSetting("font", "normal");
@@ -560,25 +535,7 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
   }
 
   function attachSubview(name) {
-    if (name === "cache") {
-      const btn = document.getElementById("cache-clear");
-      if (btn) btn.onclick = () => {
-        /* 清日志等临时缓存 */
-        if (window.__clearLog) window.__clearLog();
-        try {
-          Object.keys(localStorage).forEach((k) => {
-            if (k.indexOf("crypto_log") === 0) localStorage.removeItem(k);
-          });
-        } catch (e) {}
-        const now = new Date();
-        const stamp = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0") + " " + String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
-        localStorage.setItem("set_cache_clear_time", stamp);
-        const el = bodyEl.querySelector("#cache-last");
-        if (el) el.textContent = stamp;
-        if (window.__log) window.__log("cache", "缓存已清理 @" + stamp);
-        if (window.toast) window.toast(t("cache.done") + " " + stamp);
-      };
-    } else if (name === "storage") {
+    if (name === "storage") {
       const DEFAULT_PATH = "sdcard/CrytoPwa";
       const curPath = () => (getSetting("savepath", DEFAULT_PATH) || "").trim() || DEFAULT_PATH;
       document.getElementById("sp-save").onclick = () => {
@@ -714,30 +671,6 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
           }
         });
       }
-      /* 调试功能开关：开启后显示「日志记录」项（内容点击才显示） */
-      const dbgToggle = bodyEl.querySelector("#exp-dbg-toggle");
-      const logList = bodyEl.querySelector("#exp-log-list");
-      const logBox = bodyEl.querySelector("#exp-log-box");
-      const logRow = bodyEl.querySelector("#exp-log-row");
-      const renderLog = () => {
-        if (!logBox) return;
-        const lines = (window.__getLog ? window.__getLog() : []);
-        logBox.value = lines.slice(-200).map((l) => `[${l.ts.slice(5, 19).replace("T", " ")}] ${l.tag}: ${l.msg}`).join("\n") || "";
-      };
-      if (dbgToggle) dbgToggle.onchange = () => {
-        const on = dbgToggle.checked;
-        setSetting("exp_debug", on ? "1" : "0");
-        if (logList) logList.hidden = !on;
-        if (!on && logBox) logBox.hidden = true;
-        if (on && window.__log) window.__log("debug", "调试功能开启");
-        if (window.toast) window.toast(t("common.savedOk"));
-      };
-      /* 点「日志记录」→ 展开/收起日志内容 */
-      if (logRow) logRow.addEventListener("click", () => {
-        if (!logBox) return;
-        logBox.hidden = !logBox.hidden;
-        if (!logBox.hidden) { renderLog(); logBox.focus(); }
-      });
     } else if (name === "lang") {
       bodyEl.querySelectorAll("#lang-seg button").forEach((b) =>
         (b.onclick = () => { setSetting("lang", b.dataset.v); applyLanguage(); render(); })
