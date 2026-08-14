@@ -493,13 +493,13 @@
         `<label class="switch"><input type="checkbox" id="exp-dbg-toggle" ${dbgOn ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label>` +
         `</li>` +
         `</ul>` +
-        `<div class="settings-list exp-list" id="exp-log-list" ${dbgOn ? "" : "hidden"}>` +
+        `<ul class="settings-list exp-list" id="exp-log-list" ${dbgOn ? "" : "hidden"}>` +
         `<li class="settings-item" id="exp-log-row">` +
         `<span class="si-icon">${SETTINGS_ICONS.cache}</span>` +
         `<span class="si-text">${t("exp.log")}</span>` +
         `<span class="si-arrow" id="exp-log-arrow">›</span>` +
         `</li>` +
-        `</div>` +
+        `</ul>` +
         `<textarea id="exp-log-box" readonly rows="8" placeholder="${t("exp.logEmpty")}" hidden></textarea>`;
     } else if (name === "display") {
       titleEl.textContent = t("display.title");
@@ -577,7 +577,22 @@
       const pickBtn = document.getElementById("sp-pick");
       const pickHint = document.getElementById("sp-pick-hint");
       if (pickBtn) pickBtn.onclick = async () => {
-        /* 优先 File System Access API（桌面 Chrome/Edge） */
+        /* ① 原生 Capacitor FolderPicker（安卓 App：ACTION_OPEN_DOCUMENT_TREE 系统文件夹选择器） */
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.FolderPicker) {
+          try {
+            const ret = await window.Capacitor.Plugins.FolderPicker.pickFolder();
+            if (ret && ret.uri) {
+              const name = ret.name || "selected";
+              const path = "sdcard/" + name;
+              bodyEl.querySelector("#sp-path").value = path;
+              setSetting("savepath", path);
+              setSetting("save_uri", ret.uri);
+              if (pickHint) pickHint.textContent = "✅ " + name;
+              return;
+            }
+          } catch (e) { /* 用户取消或异常 → 尝试下一方案 */ }
+        }
+        /* ② File System Access API（桌面 Chrome/Edge） */
         if (window.showDirectoryPicker) {
           try {
             const h = await window.showDirectoryPicker({ id: "crypto-pwa-save" });
@@ -671,7 +686,7 @@
               "   intent://?text=hello&tab=enc&callback=myapp://result#Intent;scheme=crypto-pwa;package=com.zaa.cryptpwa;end", "",
               t("exp.noteTitle"), t("exp.note"),
             ];
-            window.dialog.alert(lines.join("\n"), { title: t("exp.cb") });
+            window.dialog.alert(lines.join("\n"), t("exp.cb"));
           }
         });
       }

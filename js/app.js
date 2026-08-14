@@ -1331,6 +1331,18 @@ function fallbackDownload(filename, content) {
 // 保存文本到文件：安卓 WebView 写系统文档目录；桌面优先 File System Access，否则下载
 function saveTextFile(filename, content) {
   if (!content) { alert(_t("save.empty", "请先生成或粘贴密钥")); return; }
+  /* 优先写进用户选择的保存目录（设置 → 内容保存路径 → 选择文件夹） */
+  const saveUri = (localStorage.getItem("set_save_uri") || "").trim();
+  if (saveUri && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.FolderPicker) {
+    window.Capacitor.Plugins.FolderPicker.saveFile({
+      uri: saveUri, name: filename, data: btoa(unescape(encodeURIComponent(content))),
+    }).then(() => {
+      if (window.toast) toast(_t("save.savedDoc", "已保存到所选目录：" + filename));
+    }).catch((err) => {
+      if (window.toast) toast(_t("save.fail", "保存失败：") + ((err && err.message) || err));
+    });
+    return;
+  }
   if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
     window.Capacitor.Plugins.Filesystem.writeFile({
       path: filename, data: content, directory: "DOCUMENTS", recursive: true,
