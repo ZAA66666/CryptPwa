@@ -77,6 +77,13 @@ body {
   overscroll-behavior: none;
   -webkit-overflow-scrolling: auto;
   overflow: hidden;
+  /* 全局文本防选中（编辑框/输入框除外，见下方例外） */
+  user-select: none;
+  -webkit-user-select: none;
+}
+textarea, input, select, [contenteditable] {
+  user-select: text;
+  -webkit-user-select: text;
 }
 main {
   flex: 1 1 auto;
@@ -1449,3 +1456,21 @@ input[type="file"] { font-size: calc(13px * var(--fs)); }
 .hist-filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 10px; }
 .hist-filters .chip { padding: 4px 10px; font-size: 12px; border: 1px solid var(--border); background: var(--card); color: var(--muted); }
 .hist-filters .chip.active { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+
+/* ===== 条形码选项：酷安风格（色板 + 圆形开关） ===== */
+.bc-options { display: flex; flex-direction: column; gap: 10px; margin: 10px 0 4px; }
+.bc-opt { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--text); }
+.bc-opt input[type="number"] { width: 84px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--settings-bg); color: var(--text); font-size: 14px; }
+.bc-switch-row { justify-content: space-between; }
+.bc-colors { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; background: var(--settings-bg); border-radius: 12px; }
+.bc-color-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.bc-color-row > span { min-width: 56px; }
+.bc-color-row input[type="color"] { width: 30px; height: 30px; border: 1px solid var(--border); border-radius: 50%; padding: 2px; background: var(--card); cursor: pointer; }
+.swatches { display: flex; flex-wrap: wrap; gap: 6px; }
+.swatch {
+  width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent;
+  background: var(--sw, #ccc); cursor: pointer; padding: 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  -webkit-tap-highlight-color: transparent;
+}
+.swatch.active { border-color: var(--accent); transform: scale(1.12); }

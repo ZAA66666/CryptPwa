@@ -393,31 +393,35 @@
 
           <label class="field-label" data-i18n="bc.fmt">编码格式</label>
           <select id="bc-fmt">
-            <option value="CODE128">CODE128（通用，推荐）</option>
+            <option value="CODE128" data-i18n="bc.fmtCode128">CODE128（通用，推荐）</option>
             <option value="CODE39">CODE39</option>
-            <option value="EAN13">EAN-13（商品条码）</option>
+            <option value="EAN13" data-i18n="bc.fmtEan13">EAN-13（商品条码）</option>
             <option value="EAN8">EAN-8</option>
             <option value="UPC">UPC-A</option>
             <option value="ITF14">ITF-14</option>
-            <option value="ITF">ITF（交错 2 of 5）</option>
+            <option value="ITF" data-i18n="bc.fmtItf">ITF（交错 2 of 5）</option>
             <option value="CODABAR">CODABAR（NW7）</option>
             <option value="MSI">MSI</option>
             <option value="Pharmacode">Pharmacode</option>
           </select>
 
           <div class="bc-options">
-            <label class="bc-opt">
+            <label class="bc-opt bc-switch-row">
               <span data-i18n="bc.showVal">显示文字</span>
-              <input type="checkbox" id="bc-showval" checked />
+              <span class="switch" style="margin:0"><input type="checkbox" id="bc-showval" checked /><span class="track"></span><span class="thumb"></span></span>
             </label>
-            <label class="bc-opt">
-              <span data-i18n="bc.color">线条颜色</span>
-              <input type="color" id="bc-color" value="#111111" />
-            </label>
-            <label class="bc-opt">
-              <span data-i18n="bc.bg">背景色</span>
-              <input type="color" id="bc-bg" value="#ffffff" />
-            </label>
+            <div class="bc-colors">
+              <div class="bc-color-row">
+                <span data-i18n="bc.color">线条颜色</span>
+                <div class="swatches" id="bc-color-swatches"></div>
+                <input type="color" id="bc-color" value="#111111" />
+              </div>
+              <div class="bc-color-row">
+                <span data-i18n="bc.bg">背景色</span>
+                <div class="swatches" id="bc-bg-swatches"></div>
+                <input type="color" id="bc-bg" value="#ffffff" />
+              </div>
+            </div>
             <label class="bc-opt">
               <span data-i18n="bc.height">高度</span>
               <input type="number" id="bc-height" value="80" min="20" max="400" />
@@ -670,133 +674,7 @@
           <button class="ph-back" aria-label="返回">‹</button>
           <span class="ph-title" data-i18n="ph.guide">使用教程</span>
         </div>
-        <p class="guide-intro">
-          点开下面的卡片，照着「怎么用」一步步做就行。每个都给了实例，边看边练最快上手。
-        </p>
-
-        <details class="guide-item" open>
-          <summary>① 哈希（Hash）—— 给数据算个“指纹”</summary>
-          <div class="guide-body">
-            <p><b>是什么：</b>把任意长度的文本，变成一串固定长度的字符（指纹）。<b>不可逆</b>——算出来就回不去原文。<b>哈希不需要密码</b>，所以算完也不会弹出“存密码本”。</p>
-            <p><b>怎么用：</b></p>
-            <ol>
-              <li>在「哈希」页粘贴文本（如 <code>hello</code>）；</li>
-              <li>选算法（推荐 SHA-256；只有 HMAC 系列才需要填“密钥”）；</li>
-              <li>点「计算哈希」→ 复制结果。</li>
-            </ol>
-            <p><b>举个栗子：</b><code>SHA-256("hello")</code> =<br><code class="mono">2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824</code></p>
-            <p><b>注意：</b>MD5 / SHA-1 已不安全，只拿来做<b>非机密</b>的完整性校验（比如比对文件有没有传错），别当密码保护用。</p>
-          </div>
-        </details>
-
-        <details class="guide-item">
-          <summary>② 编/解码（Base64 / Hex / URL / Base32 / Base58 / Unicode / JWT）—— 不是加密！</summary>
-          <div class="guide-body">
-            <p><b>是什么：</b>只是把数据<b>换一种写法</b>，可逆、<b>不需要密钥</b>。它<b>不是加密</b>，谁都能还原。</p>
-            <p><b>怎么用：</b>在「编/解码」页选方式（如 Base64 编码）→ 输入 →「执行」。</p>
-            <p><b>举个栗子：</b><code>Base64("hello")</code> = <code class="mono">aGVsbG8=</code>。Base32 / Base58 常用于分享密钥、区块链地址；Unicode 转义便于在代码里嵌中文；JWT 是带签名的令牌（可看 header/payload）。</p>
-            <p><b>注意：</b>编码 ≠ 加密。想保密请用下面的「加/解密（对称） / 非对称加/解密」，别把密码只做 Base64 就当保护了。</p>
-          </div>
-        </details>
-
-        <details class="guide-item">
-          <summary>③ 加/解密（AES / DES / 3DES / Blowfish / RC4 / Rabbit）—— 对称：一把密钥</summary>
-          <div class="guide-body">
-            <p><b>是什么：</b>加密和解密用<b>同一把密钥</b>。适合你知道对方、能安全把密钥告诉他的情况。</p>
-            <p><b>怎么用：</b></p>
-            <ol>
-              <li>选算法（<b>优先 AES</b>，最通用最安全）；</li>
-              <li>填密钥（注意下面的长度提示：AES 要 16 / 24 / 32 字节，DES 8 字节，3DES 24 字节）；</li>
-              <li>选分组模式：<b>ECB</b>（最简单、无需 IV，但最不安全）；<b>CBC</b> 等需要填 IV；</li>
-              <li>输入明文 / 密文 →「加密」或「解密」。</li>
-            </ol>
-            <p><b>注意：</b>流密码（RC4 / Rabbit）密钥长度任意、没有模式/IV。DES、3DES、ECB 模式已不推荐用于真实机密。</p>
-          </div>
-        </details>
-
-        <details class="guide-item">
-          <summary>④ 非对称加/解密 · RSA / SM2 —— 一把公钥、一把私钥</summary>
-          <div class="guide-body">
-            <p><b>是什么：</b>一对钥匙：<b>公钥</b>（可公开，用来加密 / 验签）+ <b>私钥</b>（自己藏好，用来解密 / 签名）。</p>
-            <p><b>怎么用（对方给你发密信）：</b></p>
-            <ol>
-              <li>进入「加/解密」页，顶部类别切到「非对称加密」，会<strong>自动生成</strong>密钥对（顶部显示「已生成密钥对」）；</li>
-              <li>点「查看/修改密钥对」在弹窗里查看、复制或重新生成公钥/私钥；</li>
-              <li>把<b>公钥</b>发给对方；</li>
-              <li>对方在「加密」里用你的公钥加密，把密文发你；</li>
-              <li>你选「解密」、用<b>私钥</b>解开。</li>
-            </ol>
-            <p><b>签名（证明是你发的）：</b>你选「签名」用<b>私钥</b>对文本签名 → 对方选「验签」用你的<b>公钥</b>验证。</p>
-            <p><b>注意：</b>① 需运行在 <b>https 或 localhost</b> 环境；② 2048 位单次最多加密约 190 字节；③ <b>私钥绝不能泄露</b>。</p>
-          </div>
-        </details>
-
-        <details class="guide-item">
-          <summary>⑤ 二维码 & 条形码 —— 把文字/链接变成可扫的图</summary>
-          <div class="guide-body">
-            <p><b>是什么：</b>把文本、网址等变成一张能被手机扫出来的图（二维码）；也能生成<b>条形码</b>（商品条码、Code128 等机器可读线条）。</p>
-            <p><b>怎么用：</b>在「二维码 / 条形码」页，顶部切「二维码 / 条形码」：</p>
-            <ul>
-              <li><b>二维码</b>：填内容（如网址）→ 选纠错等级 →「生成二维码」→ 可「下载 SVG」或「扫描二维码」。</li>
-              <li><b>条形码</b>：填内容（如 <code>123456789012</code>）→ 选格式（CODE128 / EAN13 等）→「生成条形码」→ 可下载 SVG。</li>
-            </ul>
-            <p><b>注意：</b>纠错等级越高越抗污损但图案越密；条形码请按用途选对格式（商品用 EAN-13，通用用 CODE128）。</p>
-          </div>
-        </details>
-
-        <details class="guide-item">
-          <summary>⑥ SM2 国密 —— 已并入「加/解密」页（类别选「非对称加密」→ 算法选 SM2）</summary>
-          <div class="guide-body">
-            <p><b>是什么：</b>和 RSA 一样是非对称算法（公钥加密 / 私钥解密，私钥签名 / 公钥验签），但符合<b>中国国家密码标准（国密）</b>，密文格式为 C1C3C2。</p>
-            <p><b>怎么用：</b>进「加/解密」页，顶部类别切到「非对称加密」，算法选 <b>SM2</b>，会自动生成密钥对（顶部显示「已生成密钥对」）。点「查看/修改密钥对」在弹窗里查看、复制、重新生成，也可「保存到密码本」；私钥建议弹窗外的「保存到文件」本地保管。选「加密 / 解密 / 签名 / 验签」→ 输入 →「执行」。</p>
-            <p><b>适合：</b>对接国内政务、金融等要求国密的场景。与 RSA 的区别主要在算法标准和密钥格式。</p>
-          </div>
-        </details>
-
-        <details class="guide-item">
-          <summary>⑦ JSON 工具 —— 格式化 / 提取 / 键值编辑</summary>
-          <div class="guide-body">
-            <p><b>是什么：</b>对 JSON 做整理和加工，不加密。</p>
-            <ul>
-              <li><b>格式化</b>：把压缩的 JSON 美化缩进；<b>压缩</b>：去掉空格变一行；<b>校验</b>：检查是否合法。</li>
-              <li><b>提取代码</b>：填 JSON + 键路径（如 <code>user.name</code>），生成对应语言的取值代码。</li>
-              <li><b>键值编辑</b>：像表格一样逐行加键和值，选类型后一键生成 JSON，也可从格式化区导入。</li>
-            </ul>
-          </div>
-        </details>
-
-        <details class="guide-item">
-          <summary>⑧ Crontab —— 写定时任务表达式</summary>
-          <div class="guide-body">
-            <p><b>是什么：</b>用一行 5 段表达式描述“什么时候执行”，常用于定时任务（如每天备份）。</p>
-            <p><b>怎么用：</b>在「Crontab」页写表达式（或点下面的常用示例）→「解析 / 校验」会告诉你接下来 5 次执行时间。</p>
-            <p><b>格式：</b><code>分 时 日 月 周</code>。例 <code>*/15 9-17 * * 1-5</code> = 工作日 9–17 点每 15 分钟。点开「怎么写」有详细说明。</p>
-          </div>
-        </details>
-
-        <details class="guide-item">
-          <summary>⑨ 随机文本生成 —— 字符串 / 虚假数据</summary>
-          <div class="guide-body">
-            <p><b>是什么：</b>快速造测试数据，不加密。</p>
-            <ul>
-              <li><b>随机字符串</b>：勾选字符范围（数字/大小写/特殊符号）、设长度、可加正则约束、设数量，一键生成。</li>
-              <li><b>随机虚假数据</b>：一键生成姓名、邮箱、手机号、身份证、地址、公司、UUID、网址、银行卡、颜色、日期等常见“假数据”，适合填表/造样例。</li>
-            </ul>
-            <p><b>注意：</b>这些都是<b>随机/虚构</b>数据，仅用于测试，不含真实个人信息。</p>
-          </div>
-        </details>
-
-        <details class="guide-item">
-          <summary>⑩ 基础概念小抄</summary>
-          <div class="guide-body">
-            <ul>
-              <li><b>明文</b>：还没处理的原始内容；<b>密文</b>：加密后的乱码。</li>
-              <li><b>密钥 / 密码</b>：加密用的“钥匙”，<b>千万别用同一个当密码</b>。</li>
-              <li><b>可逆 vs 不可逆</b>：加密、编码能还原；哈希不能还原。</li>
-              <li><b>该用哪个：</b>校验完整性→哈希；让数据能传输→编码；你和对方都要看原文且要保密→加/解密（对称）；只给对方看、怕中间人→非对称加/解密（RSA / SM2）。</li>
-            </ul>
-          </div>
-        </details>
+        <div id="guide-box"></div>
       </section>
 
       <!-- ========== 面板 7：外部调用（收到文字/图片后选择处理方式） ========== -->

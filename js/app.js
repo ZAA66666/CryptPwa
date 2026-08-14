@@ -1485,33 +1485,70 @@ if (qrTabs) {
 
 /* ---------- 6.4b 条形码生成（JsBarcode 离线库） ---------- */
 const bcBtn = document.getElementById("bc-btn");
-if (bcBtn) {
-  bcBtn.addEventListener("click", () => {
-    const val = document.getElementById("bc-input").value;
-    const out = document.getElementById("bc-output");
-    const hint = document.getElementById("bc-hint");
-    if (!val) { out.innerHTML = ""; hint.textContent = ""; return; }
-    out.innerHTML = '<svg id="bc-svg"></svg>';
-    try {
-      window.JsBarcode("#bc-svg", val, {
-        format: document.getElementById("bc-fmt").value,
-        displayValue: document.getElementById("bc-showval").checked,
-        lineColor: document.getElementById("bc-color").value,
-        background: document.getElementById("bc-bg").value,
-        height: parseInt(document.getElementById("bc-height").value, 10) || 80,
-        width: 2,
-        margin: 10,
-      });
-      hint.textContent = "";
-      hint.className = "hint";
-      addHistory({ cat: "qr", go: "qr", op: "bc", preview: val.slice(0, 24) });
-    } catch (e) {
-      out.innerHTML = "";
-      hint.textContent = ((typeof t === "function") ? t("bc.err") : "无法生成：") + (e && e.message ? e.message : "");
-      hint.className = "hint error";
-    }
-  });
+/* 条形码生成（可复用；选项变化时自动重新生成） */
+let bcTimer = null;
+function doBarcode() {
+  const val = document.getElementById("bc-input").value;
+  const out = document.getElementById("bc-output");
+  const hint = document.getElementById("bc-hint");
+  if (!val) { if (out) out.innerHTML = ""; if (hint) hint.textContent = ""; return; }
+  if (out) out.innerHTML = '<svg id="bc-svg"></svg>';
+  try {
+    window.JsBarcode("#bc-svg", val, {
+      format: document.getElementById("bc-fmt").value,
+      displayValue: document.getElementById("bc-showval").checked,
+      lineColor: document.getElementById("bc-color").value,
+      background: document.getElementById("bc-bg").value,
+      height: parseInt(document.getElementById("bc-height").value, 10) || 80,
+      width: 2,
+      margin: 10,
+    });
+    if (hint) { hint.textContent = ""; hint.className = "hint"; }
+    addHistory({ cat: "qr", go: "qr", op: "bc", preview: val.slice(0, 24) });
+  } catch (e) {
+    if (out) out.innerHTML = "";
+    if (hint) { hint.textContent = ((typeof t === "function") ? t("bc.err") : "无法生成：") + (e && e.message ? e.message : ""); hint.className = "hint error"; }
+  }
 }
+function bcRegen() {
+  clearTimeout(bcTimer);
+  bcTimer = setTimeout(doBarcode, 160);
+}
+if (bcBtn) bcBtn.addEventListener("click", doBarcode);
+/* 选项变化 → 自动重新生成（字体开关/颜色/背景/高度/格式/内容） */
+["bc-showval", "bc-color", "bc-bg", "bc-height", "bc-fmt", "bc-input"].forEach((id) => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener(id === "bc-input" ? "input" : "change", bcRegen);
+});
+/* 色板预设（酷安风格）：线条色 + 背景色 swatch */
+(function () {
+  const LINE_COLORS = ["#111111", "#000000", "#00a862", "#1a73e8", "#e53935", "#f59e0b", "#7b1fa2", "#00796b"];
+  const BG_COLORS = ["#ffffff", "#f5f5f5", "#e8f5e9", "#e3f2fd", "#fce4ec", "#fff8e1", "#f3e5f5", "#e0f2f1"];
+  const mkSwatches = (wrapId, colorInputId, colors) => {
+    const wrap = document.getElementById(wrapId);
+    const input = document.getElementById(colorInputId);
+    if (!wrap || !input) return;
+    colors.forEach((c) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "swatch" + (input.value.toLowerCase() === c ? " active" : "");
+      b.style.setProperty("--sw", c);
+      b.addEventListener("click", () => {
+        input.value = c;
+        wrap.querySelectorAll(".swatch").forEach((x) => x.classList.remove("active"));
+        b.classList.add("active");
+        bcRegen();
+      });
+      wrap.appendChild(b);
+    });
+    input.addEventListener("input", () => {
+      wrap.querySelectorAll(".swatch").forEach((x) => x.classList.remove("active"));
+      bcRegen();
+    });
+  };
+  mkSwatches("bc-color-swatches", "bc-color", LINE_COLORS);
+  mkSwatches("bc-bg-swatches", "bc-bg", BG_COLORS);
+})();
 const bcDl = document.getElementById("bc-download");
 if (bcDl) bcDl.addEventListener("click", () => {
   const svg = document.querySelector("#bc-output svg");
@@ -1620,7 +1657,18 @@ if (qrScanBtn) {
   if (scanCopy) scanCopy.addEventListener("click", (e) => copyText(scanText.value, e.target));
 }
 
-/* ---------- 7. 外部调用：URL 参数 & 系统分享 & Intent ---------- */
+/* 使用教程：按语言渲染（zh / en 完整双语内容） */
+function renderGuide() {
+  const box = document.getElementById("guide-box");
+  if (!box) return;
+  const v = (typeof t === "function") ? t("guide.text", "") : "";
+  box.innerHTML = v || "";
+}
+if (document.getElementById("guide-box")) {
+  renderGuide();
+  /* 语言切换后重新渲染 */
+  document.addEventListener("applylang", renderGuide);
+}
 // 其他 App “分享”文字/链接（manifest share_target，GET 方式）会以 ?text=...&url=...&title=... 打开本页；
 // 也支持自定义 URL Scheme / Intent：crypto-pwa://?text=... 或直接 ?text=... 打开。
 // 收到内容后不直接塞进某个面板，而是弹出“外部内容”选择器，让用户挑编码/加密方式。

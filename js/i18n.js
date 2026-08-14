@@ -7,7 +7,7 @@
 /* 本项目 GitHub 仓库（CryptPwa，作者 ZAA66666）。 */
 const GITHUB_REPO = "https://github.com/ZAA66666/CryptPwa";
 /* 当前版本号（用于“检测更新”对比 GitHub Releases） */
-const APP_VERSION = "1.5.0";
+const APP_VERSION = "2.0.1";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
@@ -114,7 +114,7 @@ window.I18N = {
     "qr.in": "内容（文本 / 网址 / 任意字符串）", "qr.ec": "纠错等级", "qr.ecL": "L（低，7%）", "qr.ecM": "M（中，15%）", "qr.ecQ": "Q（较高，25%）", "qr.ecH": "H（高，30%）", "qr.fg": "前景色", "qr.bg": "背景色", "qr.logo": "Logo", "qr.pickLogo": "选择图片", "qr.clearLogo": "清除", "qr.logoOk": "已设置 Logo，重新生成即可看到", "qr.logoCleared": "已清除 Logo",
     "qr.gen": "生成二维码", "qr.out": "二维码", "qr.dl": "下载 SVG",
     "qr.tabQr": "二维码",
-    "bc.tab": "条形码", "bc.in": "内容（条形码编码的数据）", "bc.fmt": "编码格式",
+    "bc.tab": "条形码", "bc.in": "内容（条形码编码的数据）", "bc.fmt": "编码格式", "bc.fmtCode128": "CODE128（通用，推荐）", "bc.fmtEan13": "EAN-13（商品条码）", "bc.fmtItf": "ITF（交错 2 of 5）",
     "bc.showVal": "显示文字", "bc.color": "线条颜色", "bc.bg": "背景色", "bc.height": "高度",
     "bc.gen": "生成条形码", "bc.out": "条形码", "bc.dl": "下载 SVG", "bc.err": "无法生成：",
     "qr.scan": "扫描二维码", "qr.scanTip": "将二维码对准取景框", "qr.scanOk": "识别成功",
@@ -143,6 +143,134 @@ window.I18N = {
     /* 功能面板顶部标题（返回键旁） */
     "ph.hash": "哈希", "ph.enc": "编/解码", "ph.sym": "加/解密", "ph.asym": "非对称加/解密", "ph.sm2": "SM2",
     "ph.qr": "二维码 / 条形码", "ph.guide": "使用教程", "ph.incoming": "外部内容", "ph.cron": "Crontab 定时表达式", "ph.rand": "随机文本生成",
+    "guide.text": `</div>
+        <p class="guide-intro">
+          点开下面的卡片，照着「怎么用」一步步做就行。每个都给了实例，边看边练最快上手。
+        </p>
+
+        <details class="guide-item" open>
+          <summary>① 哈希（Hash）—— 给数据算个“指纹”</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>把任意长度的文本，变成一串固定长度的字符（指纹）。<b>不可逆</b>——算出来就回不去原文。<b>哈希不需要密码</b>，所以算完也不会弹出“存密码本”。</p>
+            <p><b>怎么用：</b></p>
+            <ol>
+              <li>在「哈希」页粘贴文本（如 <code>hello</code>）；</li>
+              <li>选算法（推荐 SHA-256；只有 HMAC 系列才需要填“密钥”）；</li>
+              <li>点「计算哈希」→ 复制结果。</li>
+            </ol>
+            <p><b>举个栗子：</b><code>SHA-256("hello")</code> =<br><code class="mono">2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824</code></p>
+            <p><b>注意：</b>MD5 / SHA-1 已不安全，只拿来做<b>非机密</b>的完整性校验（比如比对文件有没有传错），别当密码保护用。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>② 编/解码（Base64 / Hex / URL / Base32 / Base58 / Unicode / JWT）—— 不是加密！</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>只是把数据<b>换一种写法</b>，可逆、<b>不需要密钥</b>。它<b>不是加密</b>，谁都能还原。</p>
+            <p><b>怎么用：</b>在「编/解码」页选方式（如 Base64 编码）→ 输入 →「执行」。</p>
+            <p><b>举个栗子：</b><code>Base64("hello")</code> = <code class="mono">aGVsbG8=</code>。Base32 / Base58 常用于分享密钥、区块链地址；Unicode 转义便于在代码里嵌中文；JWT 是带签名的令牌（可看 header/payload）。</p>
+            <p><b>注意：</b>编码 ≠ 加密。想保密请用下面的「加/解密（对称） / 非对称加/解密」，别把密码只做 Base64 就当保护了。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>③ 加/解密（AES / DES / 3DES / Blowfish / RC4 / Rabbit）—— 对称：一把密钥</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>加密和解密用<b>同一把密钥</b>。适合你知道对方、能安全把密钥告诉他的情况。</p>
+            <p><b>怎么用：</b></p>
+            <ol>
+              <li>选算法（<b>优先 AES</b>，最通用最安全）；</li>
+              <li>填密钥（注意下面的长度提示：AES 要 16 / 24 / 32 字节，DES 8 字节，3DES 24 字节）；</li>
+              <li>选分组模式：<b>ECB</b>（最简单、无需 IV，但最不安全）；<b>CBC</b> 等需要填 IV；</li>
+              <li>输入明文 / 密文 →「加密」或「解密」。</li>
+            </ol>
+            <p><b>注意：</b>流密码（RC4 / Rabbit）密钥长度任意、没有模式/IV。DES、3DES、ECB 模式已不推荐用于真实机密。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>④ 非对称加/解密 · RSA / SM2 —— 一把公钥、一把私钥</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>一对钥匙：<b>公钥</b>（可公开，用来加密 / 验签）+ <b>私钥</b>（自己藏好，用来解密 / 签名）。</p>
+            <p><b>怎么用（对方给你发密信）：</b></p>
+            <ol>
+              <li>进入「加/解密」页，顶部类别切到「非对称加密」，会<strong>自动生成</strong>密钥对（顶部显示「已生成密钥对」）；</li>
+              <li>点「查看/修改密钥对」在弹窗里查看、复制或重新生成公钥/私钥；</li>
+              <li>把<b>公钥</b>发给对方；</li>
+              <li>对方在「加密」里用你的公钥加密，把密文发你；</li>
+              <li>你选「解密」、用<b>私钥</b>解开。</li>
+            </ol>
+            <p><b>签名（证明是你发的）：</b>你选「签名」用<b>私钥</b>对文本签名 → 对方选「验签」用你的<b>公钥</b>验证。</p>
+            <p><b>注意：</b>① 需运行在 <b>https 或 localhost</b> 环境；② 2048 位单次最多加密约 190 字节；③ <b>私钥绝不能泄露</b>。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>⑤ 二维码 & 条形码 —— 把文字/链接变成可扫的图</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>把文本、网址等变成一张能被手机扫出来的图（二维码）；也能生成<b>条形码</b>（商品条码、Code128 等机器可读线条）。</p>
+            <p><b>怎么用：</b>在「二维码 / 条形码」页，顶部切「二维码 / 条形码」：</p>
+            <ul>
+              <li><b>二维码</b>：填内容（如网址）→ 选纠错等级 →「生成二维码」→ 可「下载 SVG」或「扫描二维码」。</li>
+              <li><b>条形码</b>：填内容（如 <code>123456789012</code>）→ 选格式（CODE128 / EAN13 等）→「生成条形码」→ 可下载 SVG。</li>
+            </ul>
+            <p><b>注意：</b>纠错等级越高越抗污损但图案越密；条形码请按用途选对格式（商品用 EAN-13，通用用 CODE128）。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>⑥ SM2 国密 —— 已并入「加/解密」页（类别选「非对称加密」→ 算法选 SM2）</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>和 RSA 一样是非对称算法（公钥加密 / 私钥解密，私钥签名 / 公钥验签），但符合<b>中国国家密码标准（国密）</b>，密文格式为 C1C3C2。</p>
+            <p><b>怎么用：</b>进「加/解密」页，顶部类别切到「非对称加密」，算法选 <b>SM2</b>，会自动生成密钥对（顶部显示「已生成密钥对」）。点「查看/修改密钥对」在弹窗里查看、复制、重新生成，也可「保存到密码本」；私钥建议弹窗外的「保存到文件」本地保管。选「加密 / 解密 / 签名 / 验签」→ 输入 →「执行」。</p>
+            <p><b>适合：</b>对接国内政务、金融等要求国密的场景。与 RSA 的区别主要在算法标准和密钥格式。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>⑦ JSON 工具 —— 格式化 / 提取 / 键值编辑</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>对 JSON 做整理和加工，不加密。</p>
+            <ul>
+              <li><b>格式化</b>：把压缩的 JSON 美化缩进；<b>压缩</b>：去掉空格变一行；<b>校验</b>：检查是否合法。</li>
+              <li><b>提取代码</b>：填 JSON + 键路径（如 <code>user.name</code>），生成对应语言的取值代码。</li>
+              <li><b>键值编辑</b>：像表格一样逐行加键和值，选类型后一键生成 JSON，也可从格式化区导入。</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>⑧ Crontab —— 写定时任务表达式</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>用一行 5 段表达式描述“什么时候执行”，常用于定时任务（如每天备份）。</p>
+            <p><b>怎么用：</b>在「Crontab」页写表达式（或点下面的常用示例）→「解析 / 校验」会告诉你接下来 5 次执行时间。</p>
+            <p><b>格式：</b><code>分 时 日 月 周</code>。例 <code>*/15 9-17 * * 1-5</code> = 工作日 9–17 点每 15 分钟。点开「怎么写」有详细说明。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>⑨ 随机文本生成 —— 字符串 / 虚假数据</summary>
+          <div class="guide-body">
+            <p><b>是什么：</b>快速造测试数据，不加密。</p>
+            <ul>
+              <li><b>随机字符串</b>：勾选字符范围（数字/大小写/特殊符号）、设长度、可加正则约束、设数量，一键生成。</li>
+              <li><b>随机虚假数据</b>：一键生成姓名、邮箱、手机号、身份证、地址、公司、UUID、网址、银行卡、颜色、日期等常见“假数据”，适合填表/造样例。</li>
+            </ul>
+            <p><b>注意：</b>这些都是<b>随机/虚构</b>数据，仅用于测试，不含真实个人信息。</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>⑩ 基础概念小抄</summary>
+          <div class="guide-body">
+            <ul>
+              <li><b>明文</b>：还没处理的原始内容；<b>密文</b>：加密后的乱码。</li>
+              <li><b>密钥 / 密码</b>：加密用的“钥匙”，<b>千万别用同一个当密码</b>。</li>
+              <li><b>可逆 vs 不可逆</b>：加密、编码能还原；哈希不能还原。</li>
+              <li><b>该用哪个：</b>校验完整性→哈希；让数据能传输→编码；你和对方都要看原文且要保密→加/解密（对称）；只给对方看、怕中间人→非对称加/解密（RSA / SM2）。</li>
+            </ul>
+          </div>
+        </details>`,
 
     /* RSA 保存到文件 */
     "save.pub": "保存公钥", "save.priv": "保存私钥", "save.empty": "请先生成或粘贴密钥再保存",
@@ -408,7 +536,7 @@ window.I18N = {
     "qr.in": "Content (text / URL / any string)", "qr.ec": "Error correction", "qr.ecL": "L (low, 7%)", "qr.ecM": "M (medium, 15%)", "qr.ecQ": "Q (high, 25%)", "qr.ecH": "H (highest, 30%)", "qr.fg": "Foreground", "qr.bg": "Background", "qr.logo": "Logo", "qr.pickLogo": "Pick image", "qr.clearLogo": "Clear", "qr.logoOk": "Logo set — regenerate to see it", "qr.logoCleared": "Logo cleared",
     "qr.gen": "Generate QR", "qr.out": "QR code", "qr.dl": "Download SVG",
     "qr.tabQr": "QR code",
-    "bc.tab": "Barcode", "bc.in": "Content (data to encode)", "bc.fmt": "Format",
+    "bc.tab": "Barcode", "bc.in": "Content (data to encode)", "bc.fmt": "Format", "bc.fmtCode128": "CODE128 (general, recommended)", "bc.fmtEan13": "EAN-13 (product barcode)", "bc.fmtItf": "ITF (interleaved 2 of 5)",
     "bc.showVal": "Show text", "bc.color": "Line color", "bc.bg": "Background", "bc.height": "Height",
     "bc.gen": "Generate barcode", "bc.out": "Barcode", "bc.dl": "Download SVG", "bc.err": "Cannot generate: ",
     "qr.scan": "Scan QR", "qr.scanTip": "Aim the QR code at the frame", "qr.scanOk": "Decoded",
@@ -432,6 +560,135 @@ window.I18N = {
     /* Feature panel titles (next to back button) */
     "ph.hash": "Hash", "ph.enc": "Encode/Decode", "ph.sym": "Encrypt/Decrypt", "ph.asym": "Asymmetric", "ph.sm2": "SM2",
     "ph.qr": "QR / Barcode", "ph.guide": "Guide", "ph.incoming": "Incoming", "ph.cron": "Crontab schedule", "ph.rand": "Random text",
+    "guide.text": `
+        <p class="guide-intro">
+          Open a card below and follow the steps. Every tool has a real example — practice along to learn fastest.
+        </p>
+
+        <details class="guide-item" open>
+          <summary>1) Hash — fingerprint your data</summary>
+          <div class="guide-body">
+            <p><b>What:</b> turns any text into a fixed-length string (fingerprint). <b>Irreversible</b> — you cannot get the original back. <b>Hashes need no password</b>, so saving to the password book is never offered.</p>
+            <p><b>How:</b></p>
+            <ol>
+              <li>In the Hash page paste text (e.g. <code>hello</code>);</li>
+              <li>Pick an algorithm (SHA-256 recommended; only HMAC needs a key);</li>
+              <li>Tap Compute hash then copy the result.</li>
+            </ol>
+            <p><b>Example:</b> <code>SHA-256("hello")</code> =<br><code class="mono">2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824</code></p>
+            <p><b>Note:</b> MD5 / SHA-1 are insecure — use only for <b>non-sensitive</b> integrity checks, never as password protection.</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>2) Encode/Decode (Base64 / Hex / URL / Base32 / Base58 / Unicode / JWT) — not encryption!</summary>
+          <div class="guide-body">
+            <p><b>What:</b> just rewrites data in another form — reversible and <b>keyless</b>. It is <b>not encryption</b>; anyone can decode it.</p>
+            <p><b>How:</b> in the Encode/Decode page pick a method (e.g. Base64 encode), type input, then Run.</p>
+            <p><b>Example:</b> <code>Base64("hello")</code> = <code class="mono">aGVsbG8=</code>. Base32/Base58 suit sharing keys and blockchain addresses; Unicode escapes embed CJK into code; JWT is a signed token (header/payload viewable).</p>
+            <p><b>Note:</b> encoding is not encryption. For secrecy use Symmetric / Asymmetric below — never rely on Base64 to protect a password.</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>3) Encrypt/Decrypt (AES / DES / 3DES / Blowfish / RC4 / Rabbit) — symmetric: one key</summary>
+          <div class="guide-body">
+            <p><b>What:</b> encryption and decryption use <b>the same key</b>. Good when you know the peer and can share the key safely.</p>
+            <p><b>How:</b></p>
+            <ol>
+              <li>Pick an algorithm (<b>AES first</b> — most standard and safest);</li>
+              <li>Enter the key (mind the length hint: AES 16/24/32 bytes, DES 8, 3DES 24);</li>
+              <li>Pick a mode: <b>ECB</b> (simplest, no IV, least safe); <b>CBC</b> etc. need an IV;</li>
+              <li>Enter plain/cipher text then Encrypt or Decrypt.</li>
+            </ol>
+            <p><b>Note:</b> stream ciphers (RC4 / Rabbit) take any key length and have no mode/IV. DES, 3DES and ECB are not recommended for real secrets.</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>4) Asymmetric - RSA / SM2 — a public key and a private key</summary>
+          <div class="guide-body">
+            <p><b>What:</b> a key pair: <b>public key</b> (share freely; encrypts / verifies) + <b>private key</b> (keep secret; decrypts / signs).</p>
+            <p><b>How (receive a secret message):</b></p>
+            <ol>
+              <li>Open the Encrypt/Decrypt page and switch the category to Asymmetric — a key pair is <strong>auto-generated</strong>;</li>
+              <li>Tap View/Edit key pair to inspect, copy or regenerate keys;</li>
+              <li>Send your <b>public key</b> to the peer;</li>
+              <li>The peer encrypts with your public key and sends the ciphertext;</li>
+              <li>You pick Decrypt with your <b>private key</b>.</li>
+            </ol>
+            <p><b>Sign (prove it is from you):</b> Sign the text with your <b>private key</b>; the peer verifies with your <b>public key</b>.</p>
+            <p><b>Note:</b> 1) requires <b>https or localhost</b>; 2) 2048-bit RSA encrypts up to ~190 bytes at once; 3) <b>never leak your private key</b>.</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>5) QR and Barcode — turn text/links into scannable images</summary>
+          <div class="guide-body">
+            <p><b>What:</b> turns text, URLs etc. into a scannable QR image; can also generate <b>barcodes</b> (product EAN, CODE128 etc.).</p>
+            <p><b>How:</b> in the QR/Barcode page, switch the top tab:</p>
+            <ul>
+              <li><b>QR</b>: enter content (e.g. a URL), choose error level, then Generate; you can Download SVG or Scan.</li>
+              <li><b>Barcode</b>: enter content (e.g. <code>123456789012</code>), pick format (CODE128 / EAN13 etc.), then Generate; download SVG.</li>
+            </ul>
+            <p><b>Note:</b> higher error levels resist dirt but make denser patterns; pick the right barcode format (EAN-13 for retail, CODE128 for general).</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>6) SM2 (Chinese national standard) — inside Encrypt/Decrypt (Asymmetric to SM2)</summary>
+          <div class="guide-body">
+            <p><b>What:</b> like RSA it is asymmetric (public encrypt / private decrypt, private sign / public verify), but follows the <b>Chinese national crypto standard</b>; ciphertext layout is C1C3C2.</p>
+            <p><b>How:</b> Encrypt/Decrypt page, category Asymmetric, algorithm <b>SM2</b> — a key pair is auto-generated. Use View/Edit key pair to view/copy/regenerate or save to the password book; keep the private key safe. Then Encrypt / Decrypt / Sign / Verify.</p>
+            <p><b>Use for:</b> domestic government / finance scenarios requiring the national standard. Main differences from RSA are the algorithm standard and key format.</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>7) JSON tools — format / extract / key-value editor</summary>
+          <div class="guide-body">
+            <p><b>What:</b> organize and process JSON, no encryption.</p>
+            <ul>
+              <li><b>Format</b>: beautify indentation; <b>Minify</b>: collapse to one line; <b>Validate</b>: check correctness.</li>
+              <li><b>Extract code</b>: fill JSON and a key path (e.g. <code>user.name</code>) to generate access code in the chosen language.</li>
+              <li><b>Key-value editor</b>: add keys/values row by row, pick a type, generate JSON in one tap; import from the formatted area too.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>8) Crontab — write scheduled-task expressions</summary>
+          <div class="guide-body">
+            <p><b>What:</b> one 5-field line describes "when to run", used for scheduled jobs (e.g. daily backup).</p>
+            <p><b>How:</b> write the expression in the Crontab page (or tap a preset), then Parse/Validate shows the next 5 run times.</p>
+            <p><b>Format:</b> <code>minute hour day month weekday</code>. E.g. <code>*/15 9-17 * * 1-5</code> = every 15 min on weekdays 9-17h. Tap "How to write" for details.</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>9) Random text — strings / fake data</summary>
+          <div class="guide-body">
+            <p><b>What:</b> quickly generate test data, no encryption.</p>
+            <ul>
+              <li><b>Random string</b>: tick char ranges (digits/upper/lower/symbols), set length, optional regex constraint and count — one tap.</li>
+              <li><b>Fake data</b>: one-tap generation of names, emails, phones, ID cards, addresses, companies, UUIDs, URLs, bank cards, colors, dates — great for forms / samples.</li>
+            </ul>
+            <p><b>Note:</b> all data is <b>random/fictional</b>, for testing only — no real personal information.</p>
+          </div>
+        </details>
+
+        <details class="guide-item">
+          <summary>10) Cheat sheet</summary>
+          <div class="guide-body">
+            <ul>
+              <li><b>Plaintext</b>: the raw content; <b>ciphertext</b>: the scrambled result of encryption.</li>
+              <li><b>Key / password</b>: the "key" used to encrypt — <b>never reuse it as a password</b>.</li>
+              <li><b>Reversible vs irreversible</b>: encryption and encoding can be undone; hashing cannot.</li>
+              <li><b>Which one?</b> integrity to hash; transport to encoding; both parties must read the secret to symmetric; share only with the peer and fear the man-in-the-middle to asymmetric (RSA / SM2).</li>
+            </ul>
+          </div>
+        </details>
+`,
 
     /* RSA save to file */
     "save.pub": "Save public key", "save.priv": "Save private key", "save.empty": "Generate or paste keys before saving",
@@ -625,4 +882,6 @@ function applyLang() {
       if (attr) el.setAttribute(attr, v);
     });
   });
+  /* 通知依赖语言的动态内容（如使用教程）刷新 */
+  try { document.dispatchEvent(new CustomEvent("applylang")); } catch (e) {}
 }

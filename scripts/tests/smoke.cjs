@@ -13,7 +13,7 @@ function makeEl() {
   const listeners = {};
   const el = {
     _listeners: listeners,
-    style: {}, dataset: {}, classList: {
+    style: { setProperty: function () {} }, dataset: {}, classList: {
       _s: new Set(),
       add: function (...c) { c.forEach(x => this._s.add(x)); },
       remove: function (...c) { c.forEach(x => this._s.delete(x)); },
