@@ -45,6 +45,7 @@ jobs:
       - name: Sync web assets into Android project
         run: |
           npm run sync
+          npx cap sync android
 
       - name: Run static & algorithm tests
         run: |

@@ -2,7 +2,7 @@
 
 > **定位**：安卓端离线加解密工具箱 App（网页版 PWA 为附加形态）。
 > **仓库**：github.com/ZAA66666/CryptPwa（默认分支 main，CI 自动构建 Release APK）
-> **当前版本**：v1.3.0（versionCode 3）
+> **当前版本**：v260815_0013（versionCode 21）
 > **签名**：android/app/cryptpwa-release.p12（固定签名，PKCS12，alias=cryptpwa / 密码 cryptpwa2026；CI 与本机同签名，可覆盖安装）
 > **用途**：本文件是快速上手上下文 —— 换新 AI / 换会话时先读这份，无需翻历史对话。
 
@@ -16,13 +16,13 @@
 | 核心 JS | `js/app.js`（2107 行，工具逻辑+交互）、`js/settings.js`（1539 行，设置/密码本）、`js/i18n.js`（620 行，中英双语 499 键） |
 | 页面 | `index.html`（882 行，单页，panel 切换） |
 | 样式 | `css/style.css`（单文件，酷安绿 `#00a862` 主题） |
-| 离线 | `sw.js` Service Worker，CACHE_NAME `crypto-pwa-v46`（改动必 +1） |
+| 离线 | `sw.js` Service Worker，CACHE_NAME `crypto-pwa-v69`（改动必 +1） |
 | vendor 库 | `js/vendor/`：crypto-js、qrcode-generator、jsqr、jsbarcode.all.min、sm-crypto.esm（依赖已 rewire 到本地 jsbn.esm.js） |
 | Android | `android/`（Capacitor，webDir=webapp；`scripts/sync-web.mjs` 同步 web→webapp） |
 | 数据 | localStorage（`set_vault` 密码本密文、`crypto_history_v1` 最近使用、设置项） |
 | 加密体系 | 对称 AES/DES/3DES/RC4/Rabbit/Blowfish（crypto-js）；非对称 RSA（Web Crypto）、国密 SM2（sm-crypto）；密码本主密码 AES-256-CBC + PBKDF2 10000 次 |
 
-**构建/发布流程**：改代码 → `sw.js` CACHE_NAME +1 → `node --check` 校验 → 本地 http.server 冒烟 → git commit → push origin main → GitHub Actions 自动构建 → Release 出 `CryptPwa_<版本>_release.apk`。
+**构建/发布流程**：改代码 → `sw.js` CACHE_NAME +1 + 版本号升级（i18n `APP_VERSION` / build.gradle `versionCode,versionName`）→ `node --check` 校验 → **必须 `npm run sync` + `npx cap sync android` 把 web 资源灌进 android 打包件** → git commit（含 `webapp/` 与 `android/.../public/`）→ push origin main → GitHub Actions 自动构建 → Release 出 APK。⚠️ 见第八节「构建同步陷阱」。
 
 ---
 
@@ -30,7 +30,7 @@
 
 | 页面 | 功能 | 详细能力 |
 |---|---|---|
-| **主页** | 单页工具网格 + 最近使用历史 + Toolbar | 顶部 Toolbar（标题 + 右上角三点菜单 → 设置/关于）；8 张功能卡跳转；历史记录可点击回跳、可清空；「学习与实践」提示仅主页底部显示 |
+| **主页** | 单页工具网格 + 最近使用历史 + Toolbar | 顶部 Toolbar（标题 + 右上角三点菜单 → 设置/关于）；8 张功能卡跳转；历史记录可点击回跳、可清空 |
 | **哈希** | 12 种算法 | MD5 / SHA-1 / SHA-224 / SHA-256 / SHA-384 / SHA-512 / SHA-3 / RIPEMD-160 / HMAC-MD5 / HMAC-SHA1 / HMAC-SHA256 / HMAC-SHA512，支持密钥（HMAC 时） |
 | **编/解码** | 8 种方法 | Base64（含文件/图片转 Base64）/ Base32 / Base58 / Hex / URL / Unicode 转义 / JWT（编解码、解 Header+Payload） |
 | **加/解密（对称）** | 6 算法 × 5 模式 | AES(16/24/32 字节)/DES/3DES/Blowfish/RC4/Rabbit；CBC/CTR/CFB/OFB/ECB；自动/手动密钥档位、IV 生成；随机密钥/IV 按钮 |
@@ -150,4 +150,21 @@
 4. **密码本**：`set_vault` 密文存储，主密码 AES-256-CBC（PBKDF2 10000 次）；`readPasswords()`/`writePasswords()` 读写。
 5. **GitHub**：本地 user `crypto-pwa / crypto-pwa@users.noreply.github.com`（推送时用 `-c user.name=ZAA66666` 覆盖）；push 需带 Authorization Basic（token 用个人访问令牌（PAT，避免写在文档里触发 GitHub push protection），base64 编码 `ZAA66666:<token>`；token 已存于本机记忆）。
 6. **构建触发**：push 到 main 即触发 GitHub Actions → 自动 Release APK。
-7. **安卓侧**：`android/app/build.gradle` 版本号（当前 versionCode 2 / versionName 1.2.0）需与 `js/i18n.js` 的 `APP_VERSION` 同步。
+7. **安卓侧**：`android/app/build.gradle` 版本号（当前 versionCode 21 / versionName v260815_0013）需与 `js/i18n.js` 的 `APP_VERSION` 同步。
+
+---
+
+## 八、构建同步陷阱（血泪教训，必读）
+
+**现象**：源码（根目录 index.html / js / css）改了，但装进手机的 APK 永远旧——footer 删不掉、滑动加不上、状态栏改不动，反复改反复"没生效"。
+
+**根因**：APK 打包用的是 `android/app/src/main/assets/public/`（Capacitor 的 webDir 镜像）。CI 原来只跑 `npm run sync`（刷新 `webapp/`）就直接 `gradlew assembleRelease`，**缺了 `npx cap sync android` 把 `webapp/` 灌进 android 打包件这一步**。结果 gradle 一直用仓库里那份古老的 android 打包件编译，源码改动从没进过 APK。
+
+**正确做法（每次改完源码必做）**：
+1. 根目录改代码；
+2. `npm run sync` → 刷新 `webapp/`；
+3. `npx cap sync android` → 把 `webapp/` 同步进 `android/app/src/main/assets/public/`；
+4. 提交时**必须同时提交 `webapp/` 和 `android/.../public/`**（它们被纳入版本管理，CI 只做 `cap sync`，不重新生成 android 资源）；
+5. 本地验证：直接看 `android/app/src/main/assets/public/index.html` 里有没有你的改动，比看根目录源码更准。
+
+**CI 已修复**：build-apk.yml 在 `npm run sync` 后补了 `npx cap sync android`（v260815_0013 起生效）。
