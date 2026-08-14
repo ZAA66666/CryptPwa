@@ -362,7 +362,7 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
       { title: t("set.grpData"), items: ["common", "sync"] },
       { title: t("set.grpPrivacy"), items: ["about", "feedback", "privacy", "terms", "security", "personal"] },
     ];
-    const SHEET_PICKERS = { lang: true, font: true };
+    const SHEET_PICKERS = { lang: true, font: true, theme: true };
     let html = "";
     groups.forEach((g) => {
       html += `<div class="settings-group"><div class="settings-group-title">${escapeHtml(g.title)}</div><ul class="settings-list">`;
@@ -415,6 +415,21 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
       if (!res) return;
       setSetting("font", res.v);
       applyFont();
+      renderMain();
+    } else if (key === "theme") {
+      const cur = getSetting("theme", "system");
+      const items = [
+        { v: "system", label: t("theme.system") },
+        { v: "light", label: t("theme.light") },
+        { v: "dark", label: t("theme.dark") },
+        { v: "__accent", label: t("accent.title"), desc: t("accent.desc") },
+      ];
+      const curIdx = Math.max(0, items.findIndex((x) => x.v === cur));
+      const res = await window.dialog.sheet(items, t("theme.title"), curIdx);
+      if (!res) return;
+      if (res.v === "__accent") { go("theme"); return; }
+      setSetting("theme", res.v);
+      applyTheme();
       renderMain();
     }
   }
@@ -514,20 +529,13 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
         `<p class="hint" id="sp-pick-hint"></p>` +
         `<div class="legal-text" style="margin-top:14px"><h3>${t("storage.usageTitle")}</h3><ul><li>${t("storage.usage1")}</li><li>${t("storage.usage2")}</li><li>${t("storage.usage3")}</li></ul></div>`;
     } else if (name === "theme") {
-      titleEl.textContent = t("theme.title");
-      const cur = getSetting("theme", "system");
+      titleEl.textContent = t("accent.title");
       const seed = getSetting("accent", "default");
       const presetsHtml = ACCENT_PRESETS.map((p) =>
         `<button class="accent-swatch${seed === p.v ? " active" : ""}" data-seed="${p.v}" style="--sw:${p.bg}" title="${p.name}"></button>`
       ).join("");
       html =
-        `<div class="sub-title">${t("theme.title")}</div>` +
-        `<div class="seg-inline" id="theme-seg">` +
-        `<button data-v="system" class="${cur === "system" ? "active" : ""}">${t("theme.system")}</button>` +
-        `<button data-v="light" class="${cur === "light" ? "active" : ""}">${t("theme.light")}</button>` +
-        `<button data-v="dark" class="${cur === "dark" ? "active" : ""}">${t("theme.dark")}</button>` +
-        `</div>` +
-        `<div class="sub-title" style="margin-top:22px">${t("accent.title")}</div>` +
+        `<div class="sub-title">${t("accent.title")}</div>` +
         `<div class="accent-presets" id="accent-presets">${presetsHtml}</div>` +
         `<div class="settings-row" style="margin-top:14px"><span class="sr-label">${t("accent.pick")}</span>` +
         `<input type="color" id="accent-color" value="${seed === "default" ? "#00a862" : seed}" /></div>`;
@@ -686,9 +694,6 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
         }
       };
     } else if (name === "theme") {
-      bodyEl.querySelectorAll("#theme-seg button").forEach((b) =>
-        (b.onclick = () => { setSetting("theme", b.dataset.v); applyTheme(); render(); })
-      );
       bodyEl.querySelectorAll("#accent-presets .accent-swatch").forEach((b) =>
         (b.onclick = () => { setSetting("accent", b.dataset.seed); applyTheme(); render(); })
       );

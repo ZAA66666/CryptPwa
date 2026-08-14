@@ -7,7 +7,7 @@
 /* 本项目 GitHub 仓库（CryptPwa，作者 ZAA66666）。 */
 const GITHUB_REPO = "https://github.com/ZAA66666/CryptPwa";
 /* 当前版本号（用于“检测更新”对比 GitHub Releases） */
-const APP_VERSION = "v260815_0325";
+const APP_VERSION = "v260815_0340";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
@@ -137,7 +137,7 @@ window.I18N = {
     /* 主题 */
     "theme.title": "主题", "theme.system": "跟随设备", "theme.light": "浅色", "theme.dark": "深色",
     /* 莫奈取色（动态强调色） */
-    "accent.title": "强调色 · 莫奈取色", "accent.pick": "自定义取色", "accent.reset": "恢复默认",
+    "accent.title": "强调色 · 莫奈取色", "accent.desc": "自定义主色调", "accent.pick": "自定义取色", "accent.reset": "恢复默认",
 
     /* 功能面板顶部标题（返回键旁） */
     "ph.hash": "哈希", "ph.enc": "编/解码", "ph.sym": "加/解密", "ph.asym": "非对称加/解密", "ph.sm2": "SM2",
@@ -556,7 +556,7 @@ window.I18N = {
     "set.grpGeneral": "General", "set.grpData": "Data & Privacy", "set.grpPrivacy": "Privacy & Terms", "set.dataEnc": "Data encryption", "set.cache": "Clear cache", "set.feedback": "Suggestions & Feedback", "feedback.title": "Suggestions & Feedback", "feedback.intro": "Found a problem or have an idea? Please report it via GitHub Issues — we will handle it soon.", "feedback.how": "Tap “Open GitHub Issues” to report directly, or tap “Copy feedback info” (auto-includes app version and recent logs) and paste it into an Issue or email.", "feedback.github": "Open GitHub Issues", "feedback.copyInfo": "Copy feedback info", "feedback.copied": "Feedback info copied ✅", "feedback.copyFail": "Copy failed — select manually", "enc.on": "Encryption ON — passwords stored as ciphertext", "enc.off": "Encryption OFF — passwords stored as plain text", "cache.title": "Clear cache", "cache.hint": "Clears logs and temporary data. Your vault, settings and saved files are not affected.", "cache.lastClear": "Last cleared", "cache.never": "Never", "cache.clearBtn": "Clear now", "cache.done": "Cleared ✅",
 
     "theme.title": "Theme", "theme.system": "Follow device", "theme.light": "Light", "theme.dark": "Dark",
-    "accent.title": "Accent · Monet color", "accent.pick": "Custom color", "accent.reset": "Reset",
+    "accent.title": "Accent · Monet color", "accent.desc": "Custom theme color", "accent.pick": "Custom color", "accent.reset": "Reset",
 
     /* Feature panel titles (next to back button) */
     "ph.hash": "Hash", "ph.enc": "Encode/Decode", "ph.sym": "Encrypt/Decrypt", "ph.asym": "Asymmetric", "ph.sm2": "SM2",
