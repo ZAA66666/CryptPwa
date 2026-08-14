@@ -316,6 +316,7 @@
     terms: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>',
     security: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.4 9.6 8 10 4.6-.4 8-5 8-10V6z"/></svg>',
     personal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+    feedback: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.3c-1 0-2-.2-2.9-.5L3 21l1.8-5.6A8.3 8.3 0 0 1 4 11.5 8.4 8.4 0 0 1 12.5 3.2a8.4 8.4 0 0 1 8.5 8.3z"/><path d="M8.5 10.5h7"/><path d="M8.5 14h4"/></svg>',
   };
 
   function renderMain() {
@@ -323,7 +324,7 @@
     const groups = [
       { title: t("set.grpGeneral"), items: ["display", "theme", "extcall", "exp", "storage"] },
       { title: t("set.grpData"), items: ["common", "sync", "cache"] },
-      { title: t("set.grpPrivacy"), items: ["about", "privacy", "terms", "security", "personal"] },
+      { title: t("set.grpPrivacy"), items: ["about", "feedback", "privacy", "terms", "security", "personal"] },
     ];
     let html = "";
     groups.forEach((g) => {
@@ -383,9 +384,24 @@
 
   function renderSubview(name) {
     let html = "";
-    if (["about", "privacy", "terms", "security", "personal"].includes(name)) {
-      titleEl.textContent = t(name + ".title");
-      html = `<div class="legal-text">${t(name + ".text")}</div>`;
+    if (["about", "feedback", "privacy", "terms", "security", "personal"].includes(name)) {
+      if (name === "feedback") {
+        /* 建议与反馈：GitHub Issues + 复制反馈信息（版本+日志），App 内一键带出 */
+        titleEl.textContent = t("feedback.title");
+        html =
+          `<div class="legal-text">` +
+          `<p>${t("feedback.intro")}</p>` +
+          `<p>${t("feedback.how")}</p>` +
+          `</div>` +
+          `<div class="btn-row">` +
+          `<button class="btn primary" id="fb-github">${t("feedback.github")}</button>` +
+          `<button class="btn ghost" id="fb-copy">${t("feedback.copyInfo")}</button>` +
+          `</div>` +
+          `<p class="hint" id="fb-hint"></p>`;
+      } else {
+        titleEl.textContent = t(name + ".title");
+        html = `<div class="legal-text">${t(name + ".text")}</div>`;
+      }
       if (name === "about") {
         /* 版本 + GitHub + 检测更新 置顶（“他能做什么”上方） */
         html =
@@ -477,13 +493,14 @@
         `<label class="switch"><input type="checkbox" id="exp-dbg-toggle" ${dbgOn ? "checked" : ""}><span class="track"></span><span class="thumb"></span></label>` +
         `</li>` +
         `</ul>` +
-        `<div class="exp-debug-panel" id="exp-debug-panel" ${dbgOn ? "" : "hidden"}>` +
-        `<div class="btn-row">` +
-        `<button class="btn ghost" id="exp-log-view">📋 ${t("exp.logView")}</button>` +
-        `<button class="btn ghost" id="exp-log-clear">🗑 ${t("exp.logClear")}</button>` +
+        `<div class="settings-list exp-list" id="exp-log-list" ${dbgOn ? "" : "hidden"}>` +
+        `<li class="settings-item" id="exp-log-row">` +
+        `<span class="si-icon">${SETTINGS_ICONS.cache}</span>` +
+        `<span class="si-text">${t("exp.log")}</span>` +
+        `<span class="si-arrow" id="exp-log-arrow">›</span>` +
+        `</li>` +
         `</div>` +
-        `<textarea id="exp-log-box" readonly rows="8" placeholder="${t("exp.logEmpty")}"></textarea>` +
-        `</div>`;
+        `<textarea id="exp-log-box" readonly rows="8" placeholder="${t("exp.logEmpty")}" hidden></textarea>`;
     } else if (name === "display") {
       titleEl.textContent = t("display.title");
       const f = getSetting("font", "normal");
@@ -658,10 +675,11 @@
           }
         });
       }
-      /* 调试功能开关：开启后显示日志查看面板 */
+      /* 调试功能开关：开启后显示「日志记录」项（内容点击才显示） */
       const dbgToggle = bodyEl.querySelector("#exp-dbg-toggle");
-      const dbgPanel = bodyEl.querySelector("#exp-debug-panel");
+      const logList = bodyEl.querySelector("#exp-log-list");
       const logBox = bodyEl.querySelector("#exp-log-box");
+      const logRow = bodyEl.querySelector("#exp-log-row");
       const renderLog = () => {
         if (!logBox) return;
         const lines = (window.__getLog ? window.__getLog() : []);
@@ -670,18 +688,17 @@
       if (dbgToggle) dbgToggle.onchange = () => {
         const on = dbgToggle.checked;
         setSetting("exp_debug", on ? "1" : "0");
-        if (dbgPanel) dbgPanel.hidden = !on;
+        if (logList) logList.hidden = !on;
+        if (!on && logBox) logBox.hidden = true;
         if (on && window.__log) window.__log("debug", "调试功能开启");
-        if (on) renderLog();
         if (window.toast) window.toast(t("common.savedOk"));
       };
-      if (bodyEl.querySelector("#exp-log-view")) bodyEl.querySelector("#exp-log-view").onclick = () => { renderLog(); if (logBox) logBox.focus(); };
-      if (bodyEl.querySelector("#exp-log-clear")) bodyEl.querySelector("#exp-log-clear").onclick = () => {
-        if (window.__clearLog) window.__clearLog();
-        if (window.__log) window.__log("debug", "日志已清空");
-        renderLog();
-        if (window.toast) window.toast(t("exp.logCleared"));
-      };
+      /* 点「日志记录」→ 展开/收起日志内容 */
+      if (logRow) logRow.addEventListener("click", () => {
+        if (!logBox) return;
+        logBox.hidden = !logBox.hidden;
+        if (!logBox.hidden) { renderLog(); logBox.focus(); }
+      });
     } else if (name === "lang") {
       bodyEl.querySelectorAll("#lang-seg button").forEach((b) =>
         (b.onclick = () => { setSetting("lang", b.dataset.v); applyLanguage(); render(); })
@@ -726,6 +743,25 @@
           backBtn.addEventListener(ev, () => { if (timer) { clearTimeout(timer); timer = null; } })
         );
       }
+    } else if (name === "feedback") {
+      /* 建议与反馈：GitHub Issues 直达 + 复制反馈信息（版本+日志，便于发 issue） */
+      const gh = document.getElementById("fb-github");
+      if (gh) gh.onclick = () => window.open(GITHUB_REPO + "/issues", "_blank");
+      const cp = document.getElementById("fb-copy");
+      if (cp) cp.onclick = async () => {
+        const logs = (window.__getLog ? window.__getLog() : []).slice(-20)
+          .map((l) => `[${l.ts}] ${l.tag}: ${l.msg}`).join("\n") || t("exp.logEmpty");
+        const info = `App: ${t("appTitle")}\nVersion: ${APP_VERSION}\nLang: ${window.__lang || "zh"}\n\n--- 最近日志 ---\n${logs}`;
+        try {
+          await navigator.clipboard.writeText(info);
+          const hint = document.getElementById("fb-hint");
+          if (hint) hint.textContent = t("feedback.copied");
+          if (window.toast) window.toast(t("feedback.copied"));
+        } catch (e) {
+          const hint = document.getElementById("fb-hint");
+          if (hint) hint.textContent = t("feedback.copyFail");
+        }
+      };
     } else if (name === "about") {
       /* 检测更新：对比 GitHub Releases 最新 tag 与本地 APP_VERSION */
       const btn = document.getElementById("about-check-update");

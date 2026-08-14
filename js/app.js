@@ -158,8 +158,8 @@ document.querySelectorAll("#asym-algo button").forEach((b) => {
   });
   document.addEventListener("scroll", close, { passive: true });
 })();
-// 主页工具卡片：点击跳到对应面板（含底部栏没有的「教程」）
-document.querySelectorAll(".tool-card").forEach((card) => {
+// 主页工具列表：点击跳到对应面板（含底部栏没有的「教程」）
+document.querySelectorAll(".tool-row").forEach((card) => {
   card.addEventListener("click", () => showPanel(card.dataset.go));
 });
 // 功能面板内的返回键：回到主页
