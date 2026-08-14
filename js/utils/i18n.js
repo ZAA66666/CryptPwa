@@ -7,7 +7,7 @@
 /* 本项目 GitHub 仓库（CryptPwa，作者 ZAA66666）。 */
 const GITHUB_REPO = "https://github.com/ZAA66666/CryptPwa";
 /* 当前版本号（用于“检测更新”对比 GitHub Releases） */
-const APP_VERSION = "v260815_0317";
+const APP_VERSION = "v260815_0325";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
@@ -326,9 +326,9 @@ window.I18N = {
     "ext.copyExample": "复制示例链接",
 
     /* 显示设置 */
-    "display.title": "显示设置", "disp.lang": "语言", "disp.font": "字体大小", "disp.immersive": "沉浸式状态栏",
+    "display.title": "显示设置", "disp.lang": "多语言", "disp.font": "字体大小", "disp.immersive": "沉浸式状态栏",
     "lang.system": "跟随系统", "lang.zh": "中文", "lang.en": "English",
-    "font.small": "小", "font.normal": "标准", "font.large": "大", "font.xlarge": "特大",
+    "font.system": "跟随系统", "font.small": "小号", "font.normal": "标准", "font.large": "大号", "font.xlarge": "特大",
 
     /* 密码本 */
     "common.title": "密码本", "common.add": "＋ 新增", "common.empty": "还没有保存的密码本。保存后，在加/解密 / 非对称加/解密 的密钥框旁点「密码本」即可快速填入。",
@@ -417,6 +417,8 @@ window.I18N = {
 
     /* 加密后保存提示（密码本） */
     "vp.title": "保存到密码本？", "vault.empty": "密码本为空，先去新建一个？", "vault.pickFill": "从密码本选取",
+    "vp.createAsk": "还没有主密码，是否新建一个主密码来保存密钥？", "vp.createAskTitle": "新建密码本",
+    "vp.dontAsk7d": "七天内不再弹出",
     "vp.ask": "是否把这次用的密钥存进密码本？",
     "vp.method": "加密方式",
     "vp.pw": "密码 / 密钥",
@@ -735,7 +737,7 @@ window.I18N = {
 
     "display.title": "Display", "disp.lang": "Language", "disp.font": "Font size", "disp.immersive": "Immersive status bar",
     "lang.system": "Follow system", "lang.zh": "中文", "lang.en": "English",
-    "font.small": "Small", "font.normal": "Normal", "font.large": "Large", "font.xlarge": "Extra large",
+    "font.system": "Follow system", "font.small": "Small", "font.normal": "Normal", "font.large": "Large", "font.xlarge": "Extra large",
 
     "common.title": "Saved Passwords", "common.add": "＋ Add", "common.empty": "No saved passwords yet. After saving, tap “Saved passwords” next to the key field in Encrypt/Decrypt or Asymmetric to fill instantly.",
     "common.label": "Name", "common.value": "Password / Key", "common.save": "Save", "common.cancel": "Cancel", "common.del": "Delete", "common.master": "Master password", "common.masterHint": "Used to encrypt locally saved passwords (AES-256-CBC). If forgotten, data cannot be recovered.", "common.setMaster": "Set master password", "common.changeMaster": "Change master", "common.masterPlaceholder": "Enter master password", "common.confirmMaster": "Confirm password", "common.lock": "Lock", "common.unlock": "Unlock", "common.unlockNow": "Unlock", "common.lockedTip": "The vault is encrypted. Enter the master password to unlock.", "common.masterMismatch": "Passwords do not match", "common.masterEmpty": "Please enter a master password", "common.vaultReady": "Vault ready (encrypted, on-device)", "common.export": "Export backup (JSON)", "common.import": "Import backup (JSON)", "common.exportDone": "Encrypted backup exported.", "common.importDone": "Backup imported.", "common.importFail": "Failed: bad file or wrong master password.", "common.new": "New", "vault.slot1": "Vault 1", "vault.slot2": "Vault 2", "vault.slot3": "Vault 3", "vault.slotHint": "There are 3 password vaults (Vault 1/2/3): switch the number at the top of the password book to view that vault; newly saved passwords/keys go into the currently selected vault.", "lang.import": "Import language pack", "lang.importHint": "Choose a JSON language pack ({ \"lang\": \"xx\", \"name\": \"Language name\", \"data\": { key: translation } }). Use the zh template in this project to translate and import.", "lang.importDone": "Language pack imported. You can switch to it in the language list.", "lang.importFail": "Import failed: bad file format or missing fields.", "sync.title": "Backup & Sync", "sync.webdav": "WebDAV", "sync.url": "Server URL", "sync.user": "User", "sync.pass": "Password", "sync.saveCfg": "Save config", "sync.backup": "Backup to WebDAV", "sync.restore": "Restore from WebDAV", "sync.backupDone": "Backed up to WebDAV.", "sync.restoreDone": "Restored from WebDAV.", "sync.fail": "Operation failed: ", "sync.cfgHint": "Server must support WebDAV (e.g. Nextcloud, Synology, Nutstore) and allow CORS.", "sync.needMaster": "Set and unlock the master password in Saved Passwords first.", "sync.quick": "Quick fill server URL", "sync.quickJgy": "Nutstore", "sync.quickNc": "Nextcloud", "sync.quickSyn": "Synology", "sync.exportLocal": "Export local backup", "sync.importLocal": "Import from local", "sync.exportDone": "Local backup exported.", "sync.importDone": "Local backup imported.", "sync.importFail": "Import failed: bad file or wrong master password.", "sync.test": "Test connection", "sync.testing": "Testing…", "sync.testOk": "Connection OK ✅", "sync.testFail": "Connection failed: ", "sync.needUrl": "Please fill in the server URL first", "sync.waitInput": "Auto-test after filling URL/user/password", "sync.needLoginFirst": "Please fill and save the WebDAV URL, user, and password first", "sync.scopeTitle": "Select backup scope", "sync.scopeRestoreTitle": "Select restore scope", "sync.scopeVault": "Password book", "sync.scopeSettings": "App settings", "sync.scopeCancel": "Cancel", "sync.scopeOk": "Start backup", "sync.scopeRestoreOk": "Start restore", "exp.expTitle": "Export mode", "exp.enc": "🔒 Encrypted", "exp.plain": "📄 Plain text", "exp.locked": "Unlock the password book first to export", "exp.done": "CryptoData.json exported",
@@ -817,6 +819,8 @@ window.I18N = {
 
     /* Save-to-vault prompt (password book) */
     "vp.title": "Save to password book?", "vault.empty": "Password book is empty — create one now?", "vault.pickFill": "Pick from password book",
+    "vp.createAsk": "No master password yet. Create one to save this key?", "vp.createAskTitle": "Create password book",
+    "vp.dontAsk7d": "Don't ask again for 7 days",
     "vp.ask": "Save the key you just used?",
     "vp.method": "Method",
     "vp.pw": "Password / Key",

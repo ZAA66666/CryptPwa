@@ -1424,6 +1424,14 @@ input[type="file"] { font-size: calc(13px * var(--fs)); }
 .dlg-box input:focus { border-color: var(--accent); }
 .dlg-actions { display: flex; gap: 10px; margin-top: 16px; }
 .dlg-actions .btn { flex: 1 1 auto; }
+.dlg-check-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 12px; padding: 10px 0; color: var(--text);
+  font-size: 14px; cursor: pointer;
+}
+.dlg-check-row input[type="checkbox"] {
+  width: 20px; height: 20px; margin: 0; accent-color: var(--accent);
+}
 
 /* 底部动作表（bottom sheet） */
 .dlg-box.dlg-sheet {
@@ -1444,6 +1452,8 @@ input[type="file"] { font-size: calc(13px * var(--fs)); }
   -webkit-tap-highlight-color: transparent;
 }
 .sheet-item:active { background: var(--settings-bg); }
+.sheet-item.selected { color: var(--accent); font-weight: 600; }
+.sheet-check { margin-left: auto; color: var(--accent); font-weight: 700; }
 .sheet-desc { font-size: 12px; color: var(--muted); }
 
 /* 统一现有居中弹窗（vp/exp/scan）为中心扩散动画，避免右下角弹入感 */

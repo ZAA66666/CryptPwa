@@ -173,8 +173,8 @@
     }
   }
   function applyFont() {
-    const f = getSetting("font", "normal");
-    const map = { small: 0.9, normal: 1, large: 1.15, xlarge: 1.3 };
+    const f = getSetting("font", "system");
+    const map = { system: 1, small: 0.9, normal: 1, large: 1.15, xlarge: 1.3 };
     document.documentElement.style.setProperty("--fs", map[f] || 1);
   }
   function applyImmersive() {
@@ -333,7 +333,7 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
   };
 
   function settingsItemValue(it) {
-    if (it === "display") {
+    if (it === "lang" || it === "display") {
       const l = getSetting("lang", "system");
       if (l === "system") return t("lang.system");
       if (l === "zh") return t("lang.zh");
@@ -341,6 +341,10 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
       const imp = importedLangs();
       if (imp[l]) return imp[l];
       return l;
+    }
+    if (it === "font") {
+      const f = getSetting("font", "system");
+      return t("font." + f) || f;
     }
     if (it === "theme") {
       const th = getSetting("theme", "system");
@@ -354,23 +358,65 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
   function renderMain() {
     titleEl.textContent = t("set.title");
     const groups = [
-      { title: t("set.grpGeneral"), items: ["display", "theme", "extcall", "exp", "storage"] },
+      { title: t("set.grpGeneral"), items: ["lang", "font", "theme", "extcall", "exp", "storage"] },
       { title: t("set.grpData"), items: ["common", "sync"] },
       { title: t("set.grpPrivacy"), items: ["about", "feedback", "privacy", "terms", "security", "personal"] },
     ];
+    const SHEET_PICKERS = { lang: true, font: true };
     let html = "";
     groups.forEach((g) => {
       html += `<div class="settings-group"><div class="settings-group-title">${escapeHtml(g.title)}</div><ul class="settings-list">`;
       g.items.forEach((it) => {
-        const label = t("set." + it) || t(it + ".title") || it;
-        const ico = SETTINGS_ICONS[it] || "";
+        const label = t("disp." + it) || t("set." + it) || t(it + ".title") || it;
+        const ico = SETTINGS_ICONS[it] || SETTINGS_ICONS.display || "";
         const meta = settingsItemValue(it);
         html += `<li class="settings-item" data-go="${it}"><span class="si-icon">${ico}</span><span class="si-text">${escapeHtml(label)}</span>${meta ? `<span class="si-meta">${escapeHtml(meta)}</span>` : ""}<span class="si-arrow">›</span></li>`;
       });
       html += "</ul></div>";
     });
     bodyEl.innerHTML = html;
-    bodyEl.querySelectorAll(".settings-item").forEach((li) => (li.onclick = () => go(li.dataset.go)));
+    bodyEl.querySelectorAll(".settings-item").forEach((li) => {
+      const key = li.dataset.go;
+      if (SHEET_PICKERS[key]) li.onclick = () => openSettingsSheet(key);
+      else li.onclick = () => go(key);
+    });
+  }
+
+  /* MIUI 风格底部选择器：语言 / 字体大小 */
+  async function openSettingsSheet(key) {
+    if (!window.dialog) return;
+    if (key === "lang") {
+      const cur = getSetting("lang", "system");
+      const imp = importedLangs();
+      const items = [
+        { v: "system", label: t("lang.system") },
+        { v: "zh", label: t("lang.zh") },
+        { v: "en", label: t("lang.en") },
+      ].concat(Object.keys(imp).map((lg) => ({ v: lg, label: imp[lg] })))
+       .concat([{ v: "__import", label: "📦 " + t("lang.import") }]);
+      const curIdx = Math.max(0, items.findIndex((x) => x.v === cur));
+      const res = await window.dialog.sheet(items, t("disp.lang"), curIdx);
+      if (!res) return;
+      if (res.v === "__import") { go("lang"); return; }
+      setSetting("lang", res.v);
+      applyLanguage();
+      renderMain();
+    } else if (key === "font") {
+      const cur = getSetting("font", "system");
+      const items = [
+        { v: "system", label: t("font.system") },
+        { v: "small", label: t("font.small") },
+        { v: "normal", label: t("font.normal") },
+        { v: "large", label: t("font.large") },
+        { v: "xlarge", label: t("font.xlarge") },
+      ];
+      const curIdx = Math.max(0, items.findIndex((x) => x.v === cur));
+      const res = await window.dialog.sheet(items, t("disp.font"), curIdx);
+      if (!res) return;
+      setSetting("font", res.v);
+      applyFont();
+      renderMain();
+    }
   }
 
   /* 数据加密开关：绑定到「密码本」页（已从主菜单移入）；切换时在 密文(主密码) / 明文 之间迁移 */
@@ -1593,8 +1639,7 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
     }
     function renderVP() {
       const wrap = (h) => '<div class="vp-inner">' + h + '</div>';
-      if (!vaultExists() && dataEncEnabled()) {
-        // 首次使用：先设主密码，再把当前密钥作为第一条记录存入（仅加密模式）
+      function showCreateForm() {
         panel.innerHTML = wrap(
           headHtml() +
           `<div class="cp-note">${t("vp.ask")}</div>` +
@@ -1617,6 +1662,23 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
           if (window.toast) window.toast(t("common.savedOk"));
           closeVP();
         };
+      }
+      if (!vaultExists() && dataEncEnabled()) {
+        // 首次使用：先询问是否创建主密码；用户取消仍可继续使用加解密
+        if (!window.dialog) { closeVP(); return; }
+        window.dialog.confirmCheck(t("vp.createAsk"), {
+          title: t("vp.createAskTitle"),
+          checkboxLabel: t("vp.dontAsk7d"),
+          yesLabel: t("common.new") || "新建",
+          noLabel: t("vp.skip") || "暂不",
+        }).then((ret) => {
+          if (ret.checked) {
+            try { localStorage.setItem("set_vault_snooze", String(Date.now())); } catch (e) {}
+          }
+          if (!ret.ok) { closeVP(); return; }
+          showCreateForm();
+        });
+        return;
       } else if (isLocked()) {
         // 已加密但未解锁：先在弹窗里解锁
         panel.innerHTML = wrap(

@@ -80,6 +80,10 @@ function showError(el, msg) { el.textContent = msg; el.classList.add("error"); }
 // 加密后是否弹出“保存到密码本”提示：受设置开关控制，且同一密钥已存过则不再询问
 function maybePromptVault(opts) {
   try { if (localStorage.getItem("set_ask_save") === "0") return; } catch (e) {}
+  try {
+    const snooze = localStorage.getItem("set_vault_snooze");
+    if (snooze && (Date.now() - Number(snooze) < 7 * 24 * 60 * 60 * 1000)) return;
+  } catch (e) {}
   if (window.vaultContainsValue && window.vaultContainsValue(opts.password)) return;
   if (window.openVaultPrompt) window.openVaultPrompt(opts);
 }
@@ -311,14 +315,19 @@ function toast(msg, ms = 1800) {
         setTimeout(() => inp.focus(), 60);
       });
     },
-    /* 底部动作表（bottom sheet） */
-    sheet: function (items, title) {
+    /* 底部动作表（bottom sheet）：支持 currentIndex 高亮当前选中项 */
+    sheet: function (items, title, currentIndex) {
+      const opts = (typeof title === "object" && title && title.title !== undefined) ? title : null;
+      const ttle = opts ? opts.title : title;
+      const cur = opts ? opts.currentIndex : currentIndex;
       return new Promise((res) => {
-        const list = items.map((it, i) =>
-          `<button class="sheet-item" data-i="${i}">${_esc(it.label)}${it.desc ? `<span class="sheet-desc">${_esc(it.desc)}</span>` : ""}</button>`
-        ).join("");
+        const list = items.map((it, i) => {
+          const sel = (i === cur) ? " selected" : "";
+          const check = (i === cur) ? `<span class="sheet-check">✓</span>` : "";
+          return `<button class="sheet-item${sel}" data-i="${i}">${_esc(it.label)}${check}${it.desc ? `<span class="sheet-desc">${_esc(it.desc)}</span>` : ""}</button>`;
+        }).join("");
         const box = open(
-          `<div class="sheet-title">${_esc(title || "")}</div><div class="sheet-list">${list}</div>`,
+          `<div class="sheet-title">${_esc(ttle || "")}</div><div class="sheet-list">${list}</div>`,
           "dlg-sheet"
         );
         const done = (i) => { close(); res(items[i] || null); };
@@ -326,6 +335,30 @@ function toast(msg, ms = 1800) {
           b.addEventListener("click", () => done(parseInt(b.dataset.i, 10)))
         );
         maskEl.addEventListener("click", () => done(-1));
+      });
+    },
+    /* 确认弹窗（带一个复选框）：返回 { ok: boolean, checked: boolean } */
+    confirmCheck: function (msg, opts) {
+      opts = opts || {};
+      return new Promise((res) => {
+        const chkId = "dlg-chk" + Math.random().toString(36).slice(2, 8);
+        const checked = opts.checked ? "checked" : "";
+        const box = open(
+          `<div class="dlg-title">${_esc(opts.title || T("dlg.confirm", "确认"))}</div>` +
+          `<div class="dlg-body">${String(msg == null ? "" : msg).replace(/\n/g, "<br>")}</div>` +
+          `<label class="dlg-check-row" for="${chkId}"><input type="checkbox" id="${chkId}" ${checked}><span>${_esc(opts.checkboxLabel || "")}</span></label>` +
+          `<div class="dlg-actions">` +
+          `<button class="btn ghost" id="dlg-no">${_esc(opts.noLabel || T("dlg.cancel", "取消"))}</button>` +
+          `<button class="btn primary" id="dlg-yes">${_esc(opts.yesLabel || T("dlg.ok", "确定"))}</button>` +
+          `</div>`
+        );
+        const done = (v) => {
+          const checked = box.querySelector("#" + chkId).checked;
+          close(); res({ ok: v, checked: checked });
+        };
+        box.querySelector("#dlg-no").addEventListener("click", () => done(false));
+        box.querySelector("#dlg-yes").addEventListener("click", () => done(true));
+        maskEl.addEventListener("click", () => done(false));
       });
     },
     close: close,
