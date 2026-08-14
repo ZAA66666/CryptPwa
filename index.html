@@ -848,6 +848,18 @@
   </script>
   <script src="js/i18n.js"></script>
   <script src="js/tools.js"></script>
+  <!-- 各页面/面板逻辑：独立成文件，便于维护；在 app.js 之前加载，函数/变量按全局作用域共享 -->
+  <script src="js/pages/hash.js"></script>
+  <script src="js/pages/enc.js"></script>
+  <script src="js/pages/sym.js"></script>
+  <script src="js/pages/asym.js"></script>
+  <script src="js/pages/qr.js"></script>
+  <script src="js/pages/guide.js"></script>
+  <script src="js/pages/incoming.js"></script>
+  <script src="js/pages/json.js"></script>
+  <script src="js/pages/cron.js"></script>
+  <script src="js/pages/rand.js"></script>
+  <script src="js/pages/txt.js"></script>
   <script src="js/app.js"></script>
   <script src="js/settings.js"></script>
 </body>

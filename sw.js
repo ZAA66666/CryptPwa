@@ -2,7 +2,7 @@
 /* 策略：网络优先（始终拿最新文件），网络不可用时回退缓存（离线可用）。
    这样每次改完代码，刷新即可看到新版，不会被旧缓存卡住。 */
 
-const CACHE_NAME = "crypto-pwa-v70";
+const CACHE_NAME = "crypto-pwa-v71";
 // 需要预缓存的「应用外壳」文件（保证断网也能首屏打开）
 const ASSETS = [
   "./",
@@ -11,6 +11,17 @@ const ASSETS = [
   "js/app.js",
   "js/settings.js",
   "js/i18n.js",
+  "js/pages/hash.js",
+  "js/pages/enc.js",
+  "js/pages/sym.js",
+  "js/pages/asym.js",
+  "js/pages/qr.js",
+  "js/pages/guide.js",
+  "js/pages/incoming.js",
+  "js/pages/json.js",
+  "js/pages/cron.js",
+  "js/pages/rand.js",
+  "js/pages/txt.js",
   "js/vendor/crypto-js.js",
   "js/vendor/qrcode-generator.js",
   "manifest.webmanifest",
