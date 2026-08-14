@@ -25,45 +25,53 @@
       <!-- ========== 面板 0：主页（工具网格 + 历史记录，参考 ctool） ========== -->
       <section class="panel active" id="panel-home">
         <p class="home-greet" data-i18n="home.greet">工具箱 · 点下面的功能直接用</p>
-        <div class="tool-grid">
-          <button class="tool-card" data-go="hash">
-            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 7 20"/><path d="M17 4 15 20"/><path d="M4 9h16"/><path d="M3.5 15h17"/></svg></span>
-            <span class="tc-name" data-i18n="tool.hash">哈希</span>
-          </button>
-          <button class="tool-card" data-go="enc">
-            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8 5 12l4 4"/><path d="M15 8l4 4-4 4"/><path d="M13 6l-2 12"/></svg></span>
-            <span class="tc-name" data-i18n="tool.enc">编码</span>
-          </button>
-          <button class="tool-card" data-go="sym">
-            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
-            <span class="tc-name" data-i18n="tool.sym">加/解密</span>
-          </button>
-          <button class="tool-card" data-go="qr">
-            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="5" y="5" width="3" height="3" rx="0.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="5" y="16" width="3" height="3" rx="0.6"/><rect x="13" y="14" width="3" height="3" rx="1"/><path d="M14 3v9M16.5 3v9M19 3v9"/></svg></span>
-            <span class="tc-name" data-i18n="tool.qr">二维码/条形码</span>
-          </button>
-          <button class="tool-card" data-go="json">
-            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h2"/><path d="M16 3h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2"/><path d="M9 9l3 3-3 3"/><path d="M15 9l-3 3 3 3"/></svg></span>
-            <span class="tc-name" data-i18n="tool.json">JSON</span>
-          </button>
-          <button class="tool-card" data-go="cron">
-            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg></span>
-            <span class="tc-name" data-i18n="tool.cron">Crontab</span>
-          </button>
-          <button class="tool-card" data-go="rand">
-            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.4"/><circle cx="7.5" cy="7.5" r="1.1"/><rect x="13" y="13" width="7" height="7" rx="1.4"/><circle cx="16.5" cy="16.5" r="1.1"/><path d="M14.5 4.5 19.5 9.5M19.5 4.5 14.5 9.5"/></svg></span>
-            <span class="tc-name" data-i18n="tool.rand">随机文本</span>
-          </button>
-          <button class="tool-card" data-go="txt">
-            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></span>
-            <span class="tc-name" data-i18n="tool.txt">文本工具</span>
-          </button>
-          <button class="tool-card" data-go="guide">
-            <span class="tc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-2-2-5-2-7-1v14c2-1 5-1 7 1 2-2 5-2 7-1V5c-2-1-5-1-7 1Z"/><path d="M12 6v14"/></svg></span>
-            <span class="tc-name" data-i18n="tool.guide">教程</span>
-          </button>
-        </div>
-
+        <ul class="tool-list">
+          <li><button class="tool-row" data-go="hash">
+            <span class="tr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 7 20"/><path d="M17 4 15 20"/><path d="M4 9h16"/><path d="M3.5 15h17"/></svg></span>
+            <span class="tr-text"><b data-i18n="tool.hash">哈希</b><i data-i18n="tool.hash.desc">给文本算指纹</i></span>
+            <span class="tr-arrow">›</span>
+          </button></li>
+          <li><button class="tool-row" data-go="enc">
+            <span class="tr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8 5 12l4 4"/><path d="M15 8l4 4-4 4"/><path d="M13 6l-2 12"/></svg></span>
+            <span class="tr-text"><b data-i18n="tool.enc">编/解码</b><i data-i18n="tool.enc.desc">Base64/Hex/URL 等 12 种</i></span>
+            <span class="tr-arrow">›</span>
+          </button></li>
+          <li><button class="tool-row" data-go="sym">
+            <span class="tr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+            <span class="tr-text"><b data-i18n="tool.sym">加/解密</b><i data-i18n="tool.sym.desc">AES/DES/RSA/SM2 等</i></span>
+            <span class="tr-arrow">›</span>
+          </button></li>
+          <li><button class="tool-row" data-go="qr">
+            <span class="tr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="5" y="5" width="3" height="3" rx="0.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="5" y="16" width="3" height="3" rx="0.6"/><rect x="13" y="14" width="3" height="3" rx="1"/><path d="M14 3v9M16.5 3v9M19 3v9"/></svg></span>
+            <span class="tr-text"><b data-i18n="tool.qr">二维码/条形码</b><i data-i18n="tool.qr.desc">生成/扫描，含美化</i></span>
+            <span class="tr-arrow">›</span>
+          </button></li>
+          <li><button class="tool-row" data-go="json">
+            <span class="tr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h2"/><path d="M16 3h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2"/><path d="M9 9l3 3-3 3"/><path d="M15 9l-3 3 3 3"/></svg></span>
+            <span class="tr-text"><b data-i18n="tool.json">JSON</b><i data-i18n="tool.json.desc">格式化/提取/键值编辑</i></span>
+            <span class="tr-arrow">›</span>
+          </button></li>
+          <li><button class="tool-row" data-go="rand">
+            <span class="tr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.4"/><circle cx="7.5" cy="7.5" r="1.1"/><rect x="13" y="13" width="7" height="7" rx="1.4"/><circle cx="16.5" cy="16.5" r="1.1"/><path d="M14.5 4.5 19.5 9.5M19.5 4.5 14.5 9.5"/></svg></span>
+            <span class="tr-text"><b data-i18n="tool.rand">随机文本</b><i data-i18n="tool.rand.desc">随机字符串/虚假数据</i></span>
+            <span class="tr-arrow">›</span>
+          </button></li>
+          <li><button class="tool-row" data-go="txt">
+            <span class="tr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></span>
+            <span class="tr-text"><b data-i18n="tool.txt">文本工具</b><i data-i18n="tool.txt.desc">字数/去重/对比/行级 diff</i></span>
+            <span class="tr-arrow">›</span>
+          </button></li>
+          <li><button class="tool-row" data-go="cron">
+            <span class="tr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg></span>
+            <span class="tr-text"><b data-i18n="tool.cron">Crontab</b><i data-i18n="tool.cron.desc">解析定时任务表达式</i></span>
+            <span class="tr-arrow">›</span>
+          </button></li>
+          <li><button class="tool-row" data-go="guide">
+            <span class="tr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-2-2-5-2-7-1v14c2-1 5-1 7 1 2-2 5-2 7-1V5c-2-1-5-1-7 1Z"/><path d="M12 6v14"/></svg></span>
+            <span class="tr-text"><b data-i18n="tool.guide">使用教程</b><i data-i18n="tool.guide.desc">10 张卡片，零基础到上手</i></span>
+            <span class="tr-arrow">›</span>
+          </button></li>
+        </ul>
         <div class="history-head">
           <span data-i18n="home.recent">最近使用</span>
           <span class="hist-actions">

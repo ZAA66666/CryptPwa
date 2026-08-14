@@ -71,7 +71,7 @@ body {
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   /* 顶部状态栏安全区：内容不贴状态栏 / 返回键不压在状态栏上方 */
-  padding-top: env(safe-area-inset-top);
+  padding-top: calc(env(safe-area-inset-top) + 52px);  /* 52px = app-header 高度（含 padding），让主页不被 Toolbar 遮挡 */
   padding-bottom: env(safe-area-inset-bottom);
   /* 禁用网页橡皮筋滚动 / 整页 overscroll（App 体验） */
   overscroll-behavior: none;
@@ -532,39 +532,55 @@ body.on-home { padding-bottom: calc(52px + env(safe-area-inset-bottom)); }
   color: var(--muted);
   margin: 2px 0 14px;
 }
-.tool-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-.tool-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  padding: 16px 6px;
-  border: none;
+/* 主页工具列表（参考酷安"主题风格"列表页：白底圆角卡片 + 圆角色块 + 右箭头） */
+.tool-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--card);
   border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.15s ease;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04), 0 2px 12px rgba(0,0,0,0.03);
 }
-.tool-card:active { transform: translateY(1px) scale(0.98); box-shadow: 0 4px 12px var(--accent-ring); }
-/* 统一尺寸/形状的图标块（iOS 风圆角瓷砖 + 圆润线条） */
-.tc-ico {
-  width: 52px;
-  height: 52px;
+.tool-list li + li { border-top: 1px solid var(--border); }
+.tool-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: var(--accent-soft);
-  border-radius: 14px;
-  color: var(--accent);
+  gap: 12px;
+  width: 100%;
+  padding: 13px 16px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s ease;
 }
-.tc-ico svg { width: 27px; height: 27px; display: block; }
-.tc-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.tool-row:active { background: var(--accent-soft); }
+.tool-row .tr-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  flex: 0 0 36px;
+}
+.tool-row .tr-icon svg { width: 20px; height: 20px; }
+.tool-row .tr-text {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.tool-row .tr-text b { font-size: 15px; font-weight: 600; color: var(--text); }
+.tool-row .tr-text i {
+  font-style: normal; font-size: 12px; color: var(--muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tool-row .tr-arrow {
+  color: var(--muted);
+  font-size: 22px; line-height: 1;
+  flex: 0 0 auto;
+}
 
 /* ===== 历史记录 ===== */
 .history-head {
@@ -1208,7 +1224,7 @@ textarea, input, select { font-size: calc(15px * var(--fs)); }
 .guide-intro { font-size: calc(13.5px * var(--fs)); }
 .guide-item > summary { font-size: calc(15px * var(--fs)); }
 .guide-body { font-size: calc(14px * var(--fs)); }
-.tool-card .tc-name { font-size: calc(13px * var(--fs)); }
+.tool-row .tr-text b { font-size: calc(15px * var(--fs)); font-weight: 600; color: var(--text); }
 .history-head { font-size: calc(15px * var(--fs)); }
 .link-btn { font-size: calc(13px * var(--fs)); }
 .history-item .hi-name { font-size: calc(14px * var(--fs)); }

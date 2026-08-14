@@ -7,7 +7,7 @@
 /* 本项目 GitHub 仓库（CryptPwa，作者 ZAA66666）。 */
 const GITHUB_REPO = "https://github.com/ZAA66666/CryptPwa";
 /* 当前版本号（用于“检测更新”对比 GitHub Releases） */
-const APP_VERSION = "2.0.1";
+const APP_VERSION = "2.0.2";
 window.I18N = {
   zh: {
     /* 顶栏 / 标签 */
@@ -125,7 +125,7 @@ window.I18N = {
     "footer": "本工具用于学习与实践。MD5、DES、RC4、ECB 等已不安全，请勿用于保护真实机密。",
 
     /* 历史分类徽章 & 操作名 */
-    "cat.hash": "哈希", "cat.enc": "编/解码", "cat.sym": "加/解密", "cat.rsa": "非对称加/解密", "cat.sm2": "SM2", "cat.qr": "二维码", "cat.json": "JSON", "cat.generic": "通用", "cat.cron": "Crontab", "cat.rand": "随机文本", "cat.txt": "文本工具", "tool.txt": "文本工具", "txt.title": "文本工具", "txt.count": "字数统计", "txt.dedupe": "去重", "txt.diff": "文本对比", "txt.input": "输入文本", "txt.inLines": "输入文本（每行一条）", "txt.out": "结果", "txt.chars": "字符", "txt.words": "字数", "txt.lines": "行数", "txt.bytes": "字节", "txt.runDedupe": "去重", "txt.runDiff": "对比", "txt.copyResult": "复制结果", "txt.orig": "原文", "txt.modified": "修改后", "txt.done": "完成",
+    "cat.hash": "哈希", "cat.enc": "编/解码", "cat.sym": "加/解密", "cat.rsa": "非对称加/解密", "cat.sm2": "SM2", "cat.qr": "二维码", "cat.json": "JSON", "cat.generic": "通用", "cat.cron": "Crontab", "cat.rand": "随机文本", "cat.txt": "文本工具", "tool.txt": "文本工具", "tool.hash.desc": "给文本算指纹", "tool.enc.desc": "Base64/Hex/URL 等 12 种", "tool.sym.desc": "AES/DES/RSA/SM2 等", "tool.qr.desc": "生成/扫描，含美化", "tool.json.desc": "格式化/提取/键值编辑", "tool.cron.desc": "解析定时任务表达式", "tool.rand.desc": "随机字符串/虚假数据", "tool.txt.desc": "字数/去重/对比/行级 diff", "tool.guide.desc": "10 张卡片，零基础到上手", "txt.title": "文本工具", "txt.count": "字数统计", "txt.dedupe": "去重", "txt.diff": "文本对比", "txt.input": "输入文本", "txt.inLines": "输入文本（每行一条）", "txt.out": "结果", "txt.chars": "字符", "txt.words": "字数", "txt.lines": "行数", "txt.bytes": "字节", "txt.runDedupe": "去重", "txt.runDiff": "对比", "txt.copyResult": "复制结果", "txt.orig": "原文", "txt.modified": "修改后", "txt.done": "完成",
     "op.encrypt": "加密", "op.decrypt": "解密", "op.sign": "签名", "op.verify": "验签",
 
     /* 设置框架 */
@@ -545,7 +545,7 @@ window.I18N = {
 
     "footer": "For learning & practice. MD5, DES, RC4, ECB, etc. are insecure — do not use them to protect real secrets.",
 
-    "cat.hash": "Hash", "cat.enc": "Encode/Decode", "cat.sym": "Encrypt/Decrypt", "cat.rsa": "Asymmetric", "cat.sm2": "SM2", "cat.qr": "QR", "cat.json": "JSON", "cat.generic": "General", "cat.cron": "Crontab", "cat.rand": "Random", "cat.txt": "Text tools", "tool.txt": "Text tools", "txt.title": "Text tools", "txt.count": "Word count", "txt.dedupe": "Deduplicate", "txt.diff": "Compare", "txt.input": "Input text", "txt.inLines": "Input text (one per line)", "txt.out": "Result", "txt.chars": "Chars", "txt.words": "Words", "txt.lines": "Lines", "txt.bytes": "Bytes", "txt.runDedupe": "Deduplicate", "txt.runDiff": "Compare", "txt.copyResult": "Copy result", "txt.orig": "Original", "txt.modified": "Modified", "txt.done": "Done",
+    "cat.hash": "Hash", "cat.enc": "Encode/Decode", "cat.sym": "Encrypt/Decrypt", "cat.rsa": "Asymmetric", "cat.sm2": "SM2", "cat.qr": "QR", "cat.json": "JSON", "cat.generic": "General", "cat.cron": "Crontab", "cat.rand": "Random", "cat.txt": "Text tools", "tool.txt": "Text tools", "tool.hash.desc": "Fingerprint your text", "tool.enc.desc": "Base64 / Hex / URL etc. — 12 formats", "tool.sym.desc": "AES / DES / RSA / SM2 and more", "tool.qr.desc": "Generate / scan, with styling", "tool.json.desc": "Format / extract / key-value editor", "tool.cron.desc": "Parse scheduled-task expressions", "tool.rand.desc": "Random strings / fake data", "tool.txt.desc": "Word count / dedupe / line diff", "tool.guide.desc": "10 cards, beginner to fluent", "txt.title": "Text tools", "txt.count": "Word count", "txt.dedupe": "Deduplicate", "txt.diff": "Compare", "txt.input": "Input text", "txt.inLines": "Input text (one per line)", "txt.out": "Result", "txt.chars": "Chars", "txt.words": "Words", "txt.lines": "Lines", "txt.bytes": "Bytes", "txt.runDedupe": "Deduplicate", "txt.runDiff": "Compare", "txt.copyResult": "Copy result", "txt.orig": "Original", "txt.modified": "Modified", "txt.done": "Done",
     "op.encrypt": "Encrypt", "op.decrypt": "Decrypt", "op.sign": "Sign", "op.verify": "Verify",
 
     "set.title": "Settings", "set.back": "Back",
