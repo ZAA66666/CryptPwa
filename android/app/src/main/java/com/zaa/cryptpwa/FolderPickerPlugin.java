@@ -3,13 +3,13 @@ package com.zaa.cryptpwa;
 import android.content.Intent;
 import android.net.Uri;
 
-import com.getcapacitor.ActivityResult;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.ActivityCallback;
+import androidx.activity.result.ActivityResult;
 
 /**
  * FolderPicker：调起系统「选择文件夹」对话框（ACTION_OPEN_DOCUMENT_TREE），
