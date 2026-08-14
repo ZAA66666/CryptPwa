@@ -306,6 +306,7 @@ function closeSettings() { overlay.classList.remove("show"); overlay.setAttribut
   function go(name) { stack.push(name); render(); }
   function back() { stack.pop(); if (stack.length === 0) { closeSettings(); return; } render(); }
   window.settingsBack = back; // 安卓返回键用：设置页逐级返回 / 关闭
+  window.openSettingsSubview = (name) => openSettings(name || "main");
 
   function render() {
     const top = stack[stack.length - 1];

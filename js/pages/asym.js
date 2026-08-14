@@ -95,7 +95,7 @@ const rsavPanel = document.getElementById("rsav-panel");
 function truncKey(k) {
   k = (k || "").trim();
   if (k.length <= 70) return k;
-  const om = (t("rsa.trunc") || "（已省略中间 {n} 个字符）").replace("{n}", k.length - 72);
+  const om = t("rsa.trunc").replace("{n}", k.length - 72);
   return k.slice(0, 48) + "\n        " + om + "\n" + k.slice(-24);
 }
 function fillRsaView() {

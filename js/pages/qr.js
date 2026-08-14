@@ -36,7 +36,7 @@ document.getElementById("qr-btn").addEventListener("click", () => {
     box.innerHTML = svg;
     addHistory({ cat: "qr", go: "qr", op: "gen", preview: text.slice(0, 24) });
   } catch (e) {
-    box.innerHTML = '<p class="hint error">内容过长，无法生成二维码</p>';
+    box.innerHTML = '<p class="hint error">' + (typeof t === "function" ? t("qr.errTooLong") : "内容过长，无法生成二维码") + '</p>';
   }
 });
 /* 二维码美化：Logo 选择/清除 */
@@ -48,10 +48,10 @@ document.getElementById("qr-btn").addEventListener("click", () => {
   if (logoFile) logoFile.onchange = () => {
     const f = logoFile.files[0]; if (!f) return;
     const r = new FileReader();
-    r.onload = () => { window.__qrLogo = r.result; if (window.toast) toast(typeof t === "function" ? t("qr.logoOk") : "已设置 Logo，重新生成即可看到"); };
+    r.onload = () => { window.__qrLogo = r.result; if (window.toast && typeof t === "function") toast(t("qr.logoOk")); };
     r.readAsDataURL(f);
   };
-  if (logoClear) logoClear.onclick = () => { window.__qrLogo = ""; if (window.toast) toast(typeof t === "function" ? t("qr.logoCleared") : "已清除 Logo"); };
+  if (logoClear) logoClear.onclick = () => { window.__qrLogo = ""; if (window.toast && typeof t === "function") toast(t("qr.logoCleared")); };
 })();
 document.getElementById("qr-download").addEventListener("click", () => {
   const svg = document.querySelector("#qr-output svg");
@@ -99,7 +99,7 @@ function doBarcode() {
     addHistory({ cat: "qr", go: "qr", op: "bc", preview: val.slice(0, 24) });
   } catch (e) {
     if (out) out.innerHTML = "";
-    if (hint) { hint.textContent = ((typeof t === "function") ? t("bc.err") : "无法生成：") + (e && e.message ? e.message : ""); hint.className = "hint error"; }
+    if (hint) { hint.textContent = (typeof t === "function" ? t("bc.err") : "Cannot generate: ") + (e && e.message ? e.message : ""); hint.className = "hint error"; }
   }
 }
 function bcRegen() {
@@ -189,7 +189,7 @@ function scanTick() {
     scanText.value = res.data;
     scanText.dispatchEvent(new Event("input"));
     scanResult.hidden = false;
-    scanStatus.textContent = (typeof t === "function") ? t("qr.scanOk") : "识别成功";
+    scanStatus.textContent = (typeof t === "function") ? t("qr.scanOk") : "Decoded";
     addHistory({ cat: "qr", go: "qr", op: "scan", preview: res.data.slice(0, 24) });
     return;
   }
@@ -197,7 +197,7 @@ function scanTick() {
 }
 function startCamera() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    scanStatus.textContent = (typeof t === "function") ? t("qr.noCam") : "此环境不支持摄像头，请改用“从相册选择”";
+    scanStatus.textContent = (typeof t === "function") ? t("qr.noCam") : "Camera not available — use pick from album";
     return;
   }
   navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
@@ -205,11 +205,11 @@ function startCamera() {
       scanStream = stream;
       scanVideo.srcObject = stream;
       scanVideo.play();
-      scanStatus.textContent = (typeof t === "function") ? t("qr.scanTip") : "将二维码对准取景框";
+      scanStatus.textContent = (typeof t === "function") ? t("qr.scanTip") : "Aim the QR code at the frame";
       scanRaf = requestAnimationFrame(scanTick);
     })
     .catch((err) => {
-      scanStatus.textContent = ((typeof t === "function") ? t("qr.camFail") : "无法打开摄像头：") + (err && err.message ? err.message : "");
+      scanStatus.textContent = ((typeof t === "function") ? t("qr.camFail") : "Cannot open camera: ") + (err && err.message ? err.message : "");
     });
 }
 function decodeImageFile(file) {
@@ -225,10 +225,10 @@ function decodeImageFile(file) {
       try { res = window.jsQR(ctx.getImageData(0, 0, cv.width, cv.height).data, cv.width, cv.height); } catch (e) {}
       if (res && res.data) {
         scanText.value = res.data; scanText.dispatchEvent(new Event("input")); scanResult.hidden = false;
-        scanStatus.textContent = (typeof t === "function") ? t("qr.scanOk") : "识别成功";
+        scanStatus.textContent = (typeof t === "function") ? t("qr.scanOk") : "Decoded";
         addHistory({ cat: "qr", go: "qr", op: "scan", preview: res.data.slice(0, 24) });
       } else {
-        scanStatus.textContent = (typeof t === "function") ? t("qr.scanNone") : "未识别到二维码，换一张试试";
+        scanStatus.textContent = (typeof t === "function") ? t("qr.scanNone") : "No QR found — try another image";
       }
     };
     img.src = reader.result;

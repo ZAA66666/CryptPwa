@@ -386,6 +386,10 @@ function historyDisplayName(it) {
     const opL = { fmt: L("json.tabFmt"), minify: L("json.minify"), validate: L("json.validate"), extract: L("json.tabExtract"), kv: L("json.tabKv") }[it.op] || it.op;
     return L("hist.json") + "-" + opL;
   }
+  if (it.cat === "txt") {
+    const opL = { count: L("txt.count"), dedupe: L("txt.dedupe"), diff: L("txt.diff") }[it.op] || it.op;
+    return L("cat.txt") + "-" + opL;
+  }
   if (it.cat === "cron") return L("cat.cron") + "-" + (it.preview || L("cron.parse"));
   if (it.cat === "rand") return L("cat.rand") + "-" + (it.method || "");
   return it.name || it.method || "";
@@ -545,7 +549,12 @@ function applyLaunchParams() {
     const arr = await api.listAll(cat);
     if (arr === null) return;
     if (!arr.length) {
-      if (window.dialog) await window.dialog.alert(t("vault.empty", "密码本为空，先保存一个"), t("vp.title"));
+      if (window.dialog) {
+        const ok = await window.dialog.confirm(t("vault.empty", "密码本为空，先去新建一个？"), { title: t("vp.title") });
+        if (ok && window.openSettingsSubview) window.openSettingsSubview("common");
+      } else if (confirm(t("vault.empty", "密码本为空，先去新建一个？"))) {
+        if (window.openSettingsSubview) window.openSettingsSubview("common");
+      }
       return;
     }
     const items = arr.map((p, i) => ({

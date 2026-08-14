@@ -31,6 +31,10 @@
       if ($("st-bytes")) $("st-bytes").textContent = new TextEncoder().encode(v).length;
     };
     cntInput.addEventListener("input", upd);
+    cntInput.addEventListener("blur", () => {
+      const v = cntInput.value.trim();
+      if (v) addHistory({ cat: "txt", go: "txt", op: "count", preview: v.slice(0, 24) });
+    });
     upd();
   }
   /* 去重：每行一条，Set 去重（可选保留空行） */

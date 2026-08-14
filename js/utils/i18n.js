@@ -113,7 +113,7 @@ window.I18N = {
     "rsa.badgeExt": "外", "rsa.rename": "改名", "rsa.sidePub": "公钥", "rsa.sidePriv": "私钥",
 
     /* 二维码 */
-    "qr.in": "内容（文本 / 网址 / 任意字符串）", "qr.ec": "纠错等级", "qr.ecL": "L（低，7%）", "qr.ecM": "M（中，15%）", "qr.ecQ": "Q（较高，25%）", "qr.ecH": "H（高，30%）", "qr.fg": "前景色", "qr.bg": "背景色", "qr.logo": "Logo", "qr.pickLogo": "选择图片", "qr.clearLogo": "清除", "qr.logoOk": "已设置 Logo，重新生成即可看到", "qr.logoCleared": "已清除 Logo",
+    "qr.in": "内容（文本 / 网址 / 任意字符串）", "qr.ec": "纠错等级", "qr.ecL": "L（低，7%）", "qr.ecM": "M（中，15%）", "qr.ecQ": "Q（较高，25%）", "qr.ecH": "H（高，30%）", "qr.fg": "前景色", "qr.bg": "背景色", "qr.logo": "Logo", "qr.pickLogo": "选择图片", "qr.clearLogo": "清除", "qr.logoOk": "已设置 Logo，重新生成即可看到", "qr.logoCleared": "已清除 Logo", "qr.err": "生成失败：", "qr.errTooLong": "内容过长，无法生成二维码",
     "qr.gen": "生成二维码", "qr.out": "二维码", "qr.dl": "下载 SVG",
     "qr.tabQr": "二维码",
     "bc.tab": "条形码", "bc.in": "内容（条形码编码的数据）", "bc.fmt": "编码格式", "bc.fmtCode128": "CODE128（通用，推荐）", "bc.fmtEan13": "EAN-13（商品条码）", "bc.fmtItf": "ITF（交错 2 of 5）",
@@ -416,7 +416,7 @@ window.I18N = {
       '<p>算法核心均来自成熟库，界面与交互逻辑为手写实现。</p>',
 
     /* 加密后保存提示（密码本） */
-    "vp.title": "保存到密码本？", "vault.empty": "密码本为空，先保存一个", "vault.pickFill": "从密码本选取",
+    "vp.title": "保存到密码本？", "vault.empty": "密码本为空，先去新建一个？", "vault.pickFill": "从密码本选取",
     "vp.ask": "是否把这次用的密钥存进密码本？",
     "vp.method": "加密方式",
     "vp.pw": "密码 / 密钥",
@@ -534,7 +534,7 @@ window.I18N = {
     "rsa.pairSuffix": " RSA Key", "rsa.importDefault": "Imported RSA key",
     "rsa.badgeExt": "Ext", "rsa.rename": "Rename", "rsa.sidePub": "Public", "rsa.sidePriv": "Private",
 
-    "qr.in": "Content (text / URL / any string)", "qr.ec": "Error correction", "qr.ecL": "L (low, 7%)", "qr.ecM": "M (medium, 15%)", "qr.ecQ": "Q (high, 25%)", "qr.ecH": "H (highest, 30%)", "qr.fg": "Foreground", "qr.bg": "Background", "qr.logo": "Logo", "qr.pickLogo": "Pick image", "qr.clearLogo": "Clear", "qr.logoOk": "Logo set — regenerate to see it", "qr.logoCleared": "Logo cleared",
+    "qr.in": "Content (text / URL / any string)", "qr.ec": "Error correction", "qr.ecL": "L (low, 7%)", "qr.ecM": "M (medium, 15%)", "qr.ecQ": "Q (high, 25%)", "qr.ecH": "H (highest, 30%)", "qr.fg": "Foreground", "qr.bg": "Background", "qr.logo": "Logo", "qr.pickLogo": "Pick image", "qr.clearLogo": "Clear", "qr.logoOk": "Logo set — regenerate to see it", "qr.logoCleared": "Logo cleared", "qr.err": "Generation failed: ", "qr.errTooLong": "Content too long to generate QR code",
     "qr.gen": "Generate QR", "qr.out": "QR code", "qr.dl": "Download SVG",
     "qr.tabQr": "QR code",
     "bc.tab": "Barcode", "bc.in": "Content (data to encode)", "bc.fmt": "Format", "bc.fmtCode128": "CODE128 (general, recommended)", "bc.fmtEan13": "EAN-13 (product barcode)", "bc.fmtItf": "ITF (interleaved 2 of 5)",
@@ -816,7 +816,7 @@ window.I18N = {
       '<p>Core algorithms come from mature libraries; the UI is hand-written.</p>',
 
     /* Save-to-vault prompt (password book) */
-    "vp.title": "Save to password book?", "vault.empty": "Password book is empty — save one first", "vault.pickFill": "Pick from password book",
+    "vp.title": "Save to password book?", "vault.empty": "Password book is empty — create one now?", "vault.pickFill": "Pick from password book",
     "vp.ask": "Save the key you just used?",
     "vp.method": "Method",
     "vp.pw": "Password / Key",
