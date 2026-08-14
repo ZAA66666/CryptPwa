@@ -177,9 +177,9 @@ function utf16Decode(str) {
 const ROMAN_NUM = [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"], [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]];
 function toRoman(str) {
   return str.trim().split(/[\s,]+/).map((tok) => {
-    if (!/^\d+$/.test(tok)) throw new Error("罗马数字仅支持整数：" + tok);
+    if (!/^\d+$/.test(tok)) throw new Error(t("enc.romInt") + tok);
     let n = parseInt(tok, 10);
-    if (n < 1 || n > 3999) throw new Error("范围 1~3999：" + tok);
+    if (n < 1 || n > 3999) throw new Error(t("enc.romRange") + tok);
     let out = "";
     for (const [v, sym] of ROMAN_NUM) { while (n >= v) { out += sym; n -= v; } }
     return out;
@@ -192,8 +192,8 @@ function fromRoman(str) {
     for (const [v, sym] of ROMAN_NUM) {
       while (up.startsWith(sym, i)) { n += v; i += sym.length; }
     }
-    if (i !== up.length) throw new Error("非法罗马数字：" + tok);
-    if (toRoman(String(n)) !== up) throw new Error("非法罗马数字：" + tok);
+    if (i !== up.length) throw new Error(t("enc.romInvalid") + tok);
+    if (toRoman(String(n)) !== up) throw new Error(t("enc.romInvalid") + tok);
     return String(n);
   }).join(" ");
 }
