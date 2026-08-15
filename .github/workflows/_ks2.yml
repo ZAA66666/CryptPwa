@@ -1,0 +1,16 @@
+name: Keystore Env-Only Test (env secret, no redirect, no warning)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "before"
+      - name: test env secret reference
+        env:
+          P12_B64: ${{ secrets.CRYPTPWA_P12 }}
+        run: echo "secret length is ${#P12_B64}"
+      - run: echo "after"
