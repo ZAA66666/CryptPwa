@@ -1,0 +1,12 @@
+name: Minimal Baseline 2 (with empty workflow_dispatch)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "minimal baseline 2 ok"
