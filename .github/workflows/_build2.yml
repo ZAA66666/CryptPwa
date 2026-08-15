@@ -1,0 +1,40 @@
+name: Build Step 2 (front + keystore + gradlew)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Install and sync
+        run: |
+          npm ci || npm install
+          npm run sync
+          echo "sync done"
+      - name: Restore signing keystore
+        env:
+          P12_B64: ${{ secrets.CRYPTPWA_P12 }}
+        run: |
+          if [ -n "$P12_B64" ]; then
+            echo "$P12_B64" | base64 -d > android/app/cryptpwa-release.p12
+            echo "keystore restored"
+          else
+            echo "::warning::no keystore secret"
+          fi
+      - name: Build release APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease
+      - name: List built APK
+        run: ls -la android/app/build/outputs/apk/release/ || true
