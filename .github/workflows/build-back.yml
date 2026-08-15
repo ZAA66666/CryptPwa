@@ -1,41 +1,38 @@
-name: Build Android APK
+name: Build APK - Back (compile)
 
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+  workflow_run:
+    workflows: [ "Build APK - Front (sync web assets)" ]
+    types: [ completed ]
+
+permissions:
+  actions: read
 
 jobs:
-  build-apk:
+  build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js (Capacitor 8 requires Node>=22)
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Setup Java (Capacitor 8 build requires Java 21)
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      - name: Install deps and sync web assets
-        run: |
-          npm ci || npm install
-          npm run sync
-          npx cap sync android
+      - name: Download synced android project
+        uses: actions/download-artifact@v4
+        with:
+          name: android-project
+          path: android
+          run-id: ${{ github.event.workflow_run.id }}
 
-      - name: Restore signing keystore (from Actions secret)
+      - name: Restore signing keystore
         env:
           P12_B64: ${{ secrets.CRYPTPWA_P12 }}
         run: |
           if [ -n "$P12_B64" ]; then
             echo "$P12_B64" | base64 -d > android/app/cryptpwa-release.p12
-            echo "keystore restored from secret"
+            echo "keystore restored"
           else
             echo "::warning::CRYPTPWA_P12 secret not set -- signing will fail"
           fi
