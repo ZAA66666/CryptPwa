@@ -1,0 +1,19 @@
+name: diag-on
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'x'
+        required: false
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - debug
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo on-ok
