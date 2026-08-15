@@ -1,4 +1,4 @@
-name: CI Test (no upload-artifact)
+name: CI Test (no cap sync)
 
 on:
   push:
@@ -24,10 +24,10 @@ jobs:
           java-version: 21
 
       - name: Install and sync
+        # NOTE: deliberately NOT running npx cap sync android here
         run: |
           npm ci || npm install
           npm run sync
-          npx cap sync android
 
       - name: Restore signing keystore
         env:
