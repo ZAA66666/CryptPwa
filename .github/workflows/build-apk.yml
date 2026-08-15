@@ -10,6 +10,7 @@ on:
     inputs:
       build_type:
         description: '构建类型：release=正式自签名（推荐） / debug=调试'
+        required: false
         default: 'release'
         type: choice
         options:
@@ -46,7 +47,7 @@ jobs:
           npm run sync
           npx cap sync android
 
-      - name: Run static and algorithm tests
+      - name: Run static & algorithm tests
         run: |
           node scripts/tests/consistency.cjs
           node scripts/tests/smoke.cjs
