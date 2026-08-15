@@ -1,0 +1,23 @@
+name: Build Step 1 (checkout + setups + npm sync + echo)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Install and sync
+        run: |
+          npm ci || npm install
+          npm run sync
+          echo "sync done"
