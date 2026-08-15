@@ -1,0 +1,11 @@
+name: Minimal Baseline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "minimal baseline ok"
