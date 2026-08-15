@@ -1,0 +1,65 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (Capacitor 8 requires Node>=22)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Java (Capacitor 8 build requires Java 21)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install deps and sync web assets
+        run: |
+          npm ci || npm install
+          npm run sync
+          npx cap sync android
+
+      - name: Restore signing keystore (from Actions secret)
+        env:
+          P12_B64: ${{ secrets.CRYPTPWA_P12 }}
+        run: |
+          if [ -n "$P12_B64" ]; then
+            echo "$P12_B64" | base64 -d > android/app/cryptpwa-release.p12
+            echo "keystore restored from secret"
+          else
+            echo "::warning::CRYPTPWA_P12 secret not set -- signing will fail"
+          fi
+
+      - name: Build release APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CryptPwa-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="apk-$(date +%Y%m%d-%H%M%S)"
+          gh release create "$TAG" android/app/build/outputs/apk/release/app-release.apk \
+            --title "CryptPwa $TAG" \
+            --notes "Automated release APK build (version v260815_0111)"
