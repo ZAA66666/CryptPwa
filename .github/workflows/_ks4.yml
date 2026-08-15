@@ -1,0 +1,16 @@
+name: Other Secret Test (reference CRYPTPWA_P12_PASS instead)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "before"
+      - name: inline other secret
+        run: |
+          VAL="${{ secrets.CRYPTPWA_P12_PASS }}"
+          echo "got pass length ${#VAL}"
+      - run: echo "after"
