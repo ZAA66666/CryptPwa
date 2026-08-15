@@ -1,0 +1,19 @@
+name: Gradle Bare Test (no checkout, no keystore, no upload)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Just run gradlew
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease
